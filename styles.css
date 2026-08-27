@@ -1,0 +1,78 @@
+:root {
+    --hwfcRed: #c8102e;
+    --hwfcDark: #2f2f2f;
+    --hwfcLight: #f5f5f5;
+    --hwfcWhite: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family: Carlito, "Noto Sans", Arial, sans-serif;
+
+    background: var(--hwfcLight);
+    color: var(--hwfcDark);
+}
+
+.holdingPage {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 2rem;
+}
+
+.holdingCard {
+    width: min(720px, 100%);
+
+    padding: 3rem;
+
+    text-align: center;
+
+    background: var(--hwfcWhite);
+    border-top: 8px solid var(--hwfcRed);
+}
+
+.clubName {
+    margin-top: 0;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+
+    color: var(--hwfcRed);
+}
+
+h1 {
+    margin-bottom: 0.75rem;
+
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+}
+
+.tagline {
+    margin-bottom: 2rem;
+
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.intro {
+    max-width: 600px;
+    margin: 0 auto 1rem;
+
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.footerText {
+    margin-top: 2rem;
+
+    font-weight: 700;
+}
