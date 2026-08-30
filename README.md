@@ -2,26 +2,49 @@
 
 Website for Hillsborough Walking Football Club.
 
-The site will act as the authoritative source of permanent club information,
-including:
+The site is intended to be the authoritative source of permanent club information, while Facebook remains the club's main community and regular-content channel.
 
-- Walking football information.
-- Session times and locations.
-- Costs and contact details.
-- Men's team information.
-- Ladies' team information.
-- Fixtures and events.
-- Match reports.
-- Squad profiles.
-- Club photographs and other permanent content.
+## Phase 1 Structure
 
-Facebook will remain the club's main community and regular-content channel,
-with suitable content also shared through other social platforms.
+- `/` — Home
+- `/play/` — Walking football information, sessions, costs and first-visit guidance
+- `/mens/` — Men's walking football
+- `/ladies/` — Ladies' walking football
+- `/about/` — About HWFC
+- `/contact/` — Club contact form and contact routes
+
+Design and content specifications are stored under `documentation/`.
 
 ## Current Status
 
-Initial holding page.
+Phase 1 site implementation is now in place.
 
-## Domain
+The implementation is deliberately lightweight:
 
-hillsboroughwalkingfootball.com
+- Plain HTML.
+- Shared responsive CSS.
+- No JavaScript framework.
+- A small amount of progressive JavaScript on the Contact page for query-string preselection and form status messages.
+- PHP contact-form handler for cPanel hosting.
+
+The final Hillsborough club badge / logo asset has not yet been supplied, so the header currently uses the club name as a text brand rather than inventing or approximating the badge.
+
+The About page also deliberately leaves the formal Hillsborough Boys FC relationship, affiliations and proposed values visibly unconfirmed until the club confirms them.
+
+## Contact Form
+
+The form posts to `contact/send.php` and performs server-side validation before using PHP `mail()` to send the enquiry to:
+
+`info@hillsboroughwalkingfootball.com`
+
+It also includes a simple honeypot field for basic bot filtering.
+
+The form should be tested on the production cPanel host because successful delivery depends on the server's PHP mail configuration and domain mail setup.
+
+## Deployment
+
+The production site is hosted at:
+
+`hillsboroughwalkingfootball.com`
+
+The live document root is intended to be a checkout of this repository. Deployment can therefore remain a simple pull from `main` once changes have been reviewed.
