@@ -50,8 +50,17 @@ img { max-width: 100%; }
     justify-content: space-between;
     gap: 2rem;
 }
-.brand { text-decoration: none; font-weight: 800; color: var(--hwfcRed); }
-.brandName { font-size: 1.06rem; }
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    color: var(--hwfcRed);
+    font-weight: 800;
+    line-height: 1.15;
+    text-decoration: none;
+}
+.brandLogo { width: 64px; height: 64px; flex: 0 0 auto; object-fit: contain; }
+.brandName { max-width: 220px; font-size: 1.06rem; }
 .mainNav { display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; }
 .mainNav a {
     text-decoration: none;
@@ -178,6 +187,7 @@ input:focus, select:focus, textarea:focus { outline: 3px solid rgba(200,16,46,.2
     .shell { width: min(var(--shell), calc(100% - 1.25rem)); }
     .mainNav { display: grid; grid-template-columns: repeat(3, 1fr); }
     .mainNav a { text-align: center; }
+    .brandLogo { width: 54px; height: 54px; }
     .hero { padding-top: 2.5rem; }
     h1 { font-size: clamp(2.7rem, 16vw, 4.4rem); }
     .sessionGrid, .formGrid, .eligibility { grid-template-columns: 1fr; }

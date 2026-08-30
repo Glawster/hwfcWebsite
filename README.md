@@ -27,7 +27,9 @@ The implementation is deliberately lightweight:
 - A small amount of progressive JavaScript on the Contact page for query-string preselection and form status messages.
 - PHP contact-form handler for cPanel hosting.
 
-The final Hillsborough club badge / logo asset has not yet been supplied, so the header currently uses the club name as a text brand rather than inventing or approximating the badge.
+The approved Hillsborough club badge is stored at `assets/hwfc-logo.png` and appears in
+the shared page header and browser icon. The adjacent club name remains visible for clear
+identification and accessibility.
 
 The About page also deliberately leaves the formal Hillsborough Boys FC relationship, affiliations and proposed values visibly unconfirmed until the club confirms them.
 
