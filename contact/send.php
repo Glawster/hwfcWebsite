@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 const RECIPIENT = 'info@hillsboroughwalkingfootball.com';
+const FROM_ADDRESS = 'info@hillsboroughwalkingfootball.com';
 const MAX_MESSAGE_LENGTH = 4000;
 
 function redirectWithStatus(string $status): never
@@ -39,10 +40,10 @@ if (
     $message === '' ||
     !isset($topics[$topic]) ||
     filter_var($email, FILTER_VALIDATE_EMAIL) === false ||
-    mb_strlen($name) > 120 ||
-    mb_strlen($email) > 200 ||
-    mb_strlen($phone) > 50 ||
-    mb_strlen($message) > MAX_MESSAGE_LENGTH
+    strlen($name) > 240 ||
+    strlen($email) > 300 ||
+    strlen($phone) > 100 ||
+    strlen($message) > MAX_MESSAGE_LENGTH * 4
 ) {
     redirectWithStatus('error');
 }
@@ -59,11 +60,9 @@ $body .= "Phone: " . ($cleanPhone !== '' ? $cleanPhone : 'Not provided') . "\n";
 $body .= "Enquiry type: {$topics[$topic]}\n\n";
 $body .= "Message:\n{$message}\n";
 
-$host = $_SERVER['HTTP_HOST'] ?? 'hillsboroughwalkingfootball.com';
-$host = preg_replace('/[^a-zA-Z0-9.-]/', '', $host) ?: 'hillsboroughwalkingfootball.com';
 $headers = [
-    'From: HWFC Website <info@' . $host . '>',
-    'Reply-To: ' . $cleanName . ' <' . $cleanEmail . '>',
+    'From: HWFC Website <' . FROM_ADDRESS . '>',
+    'Reply-To: ' . $cleanEmail,
     'Content-Type: text/plain; charset=UTF-8',
 ];
 
