@@ -25,6 +25,7 @@ $email = trim((string) ($_POST['email'] ?? ''));
 $phone = trim((string) ($_POST['phone'] ?? ''));
 $topic = trim((string) ($_POST['topic'] ?? ''));
 $message = trim((string) ($_POST['message'] ?? ''));
+$human = trim((string) ($_POST['human'] ?? ''));
 
 $topics = [
     'try' => "I'd like to try walking football",
@@ -38,6 +39,7 @@ if (
     $name === '' ||
     $email === '' ||
     $message === '' ||
+    $human !== 'yes' ||
     !isset($topics[$topic]) ||
     filter_var($email, FILTER_VALIDATE_EMAIL) === false ||
     strlen($name) > 240 ||
