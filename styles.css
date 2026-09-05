@@ -158,6 +158,9 @@ input, select, textarea {
     background: var(--hwfcWhite);
     color: var(--hwfcDark);
 }
+input[type="checkbox"] { width: auto; padding: 0; }
+.humanCheck { display: flex; align-items: center; gap: .6rem; }
+.humanCheck label { margin: 0; }
 textarea { min-height: 160px; resize: vertical; }
 input:focus, select:focus, textarea:focus { outline: 3px solid rgba(200,16,46,.2); border-color: var(--hwfcRed); }
 .formNote { font-size: .92rem; color: var(--hwfcMid); }
