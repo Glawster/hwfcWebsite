@@ -182,9 +182,9 @@ The website may display this address as a fallback contact route, but the contac
 
 ## WhatsApp
 
-Do not publish a WhatsApp contact unless HWFC later establishes a dedicated club-controlled number.
+WhatsApp is used internally for member event publication and session-attendance polls. It is not a public contact route.
 
-A committee member's personal mobile number should not be used as the public HWFC WhatsApp contact.
+Do not publish a WhatsApp contact unless HWFC later establishes a dedicated club-controlled number. A committee member's personal mobile number should not be used as the public HWFC WhatsApp contact.
 
 ---
 
