@@ -17,9 +17,9 @@ The website should:
 
 ### Editorial principle
 
-**Social media tells people what is happening. The website tells people who we are and how to join us.**
+**The website is the authoritative source for club information. Facebook is used for public news, photographs and reports; WhatsApp is used for member event publication and session-attendance polls.**
 
-Facebook remains HWFC's main community and regular-content channel.
+HWFC will not operate a Facebook Group. The longer-term website approach for publishing and managing events is still to be decided.
 
 ---
 
@@ -310,7 +310,7 @@ Facebook page:
 
 `https://www.facebook.com/profile.php?id=100082995559544`
 
-WhatsApp should only be promoted publicly if HWFC later establishes a dedicated club-controlled number.
+WhatsApp is used as a member communication channel for event publication and session-attendance polls. It is not a public contact route and should only be promoted publicly if HWFC later establishes a dedicated club-controlled number.
 
 ### Contact-form enquiry categories
 
@@ -324,11 +324,11 @@ Do not request unnecessary sensitive information at the initial enquiry stage.
 
 ---
 
-## 10. Social Media Responsibilities
+## 10. Communications Responsibilities
 
 ### Website
 
-Use for stable and reference information:
+Use for stable and authoritative information:
 
 - What HWFC is.
 - How to join / try a session.
@@ -343,19 +343,42 @@ Use for stable and reference information:
 - Policies / documents.
 - Sponsors and partners.
 
-### Facebook
+The longer-term mechanism for publishing and managing club events on the website is **to be decided**.
 
-Use for current and conversational content:
+### Facebook Page
 
-- Training photographs.
-- Informal club news.
-- Tournament travel and updates.
-- Social events.
+Use for public-facing club content:
+
+- Match and tournament photo albums.
+- Match and tournament reports.
+- Public club news.
+- Recruitment and publicity.
 - Fundraising activity.
 - Member stories.
-- Quick announcements.
+- Selected announcements.
 
-Suitable content may also be echoed to Instagram, X or other channels later.
+Photo albums should use the naming convention:
+
+`YYYY-MM-DD – Event Name`
+
+The report or summary for the match/tournament should accompany the album so that the photographs and report remain together.
+
+### WhatsApp
+
+Use for member communication only:
+
+- Publishing tournament and club-event information while the website event approach is being decided.
+- Session-attendance polls.
+
+Do not use WhatsApp as the main store for match reports, photographs, general club news or permanent club information.
+
+HWFC will **not** operate a Facebook Group.
+
+### YouTube
+
+Use for club video, including match footage, highlights and other suitable HWFC video.
+
+Suitable public content may also be echoed to Instagram, X or other channels later.
 
 ---
 
@@ -372,7 +395,7 @@ Suggested routes:
 /mens/     Men's information
 ```
 
-Specific event URLs can be added later.
+Specific event URLs can be added later once the website approach for event publication has been agreed.
 
 ---
 
