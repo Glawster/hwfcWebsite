@@ -2,7 +2,7 @@
 
 Website for Hillsborough Walking Football Club.
 
-The site is intended to be the authoritative source of permanent club information, while Facebook remains the club's main community and regular-content channel.
+The site is intended to be the authoritative source of permanent club information. The Facebook Page is used for public news, photographs and reports; WhatsApp is used for member event publication and session-attendance polls; YouTube is used for club video. HWFC will not operate a Facebook Group. The longer-term website approach for event publication is still to be decided.
 
 ## Phase 1 Structure
 
