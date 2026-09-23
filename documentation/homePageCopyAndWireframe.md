@@ -54,8 +54,9 @@ FIRST VISIT REASSURANCE
   [I'd Like to Try Walking Football]
 
 KEEP UP WITH HWFC
-  Facebook as main community/news channel
-  [Follow on Facebook]
+  Facebook Page for public news, photographs and reports
+  YouTube for club video
+  [Follow on Facebook] [Watch on YouTube]
 
 FINAL CTA
   Interested in playing?
@@ -202,7 +203,7 @@ This links to `/contact/` with the relevant enquiry type preselected where pract
 
 ### Copy
 
-Training photographs, tournament updates, social events and regular club news are published on Facebook.
+Match and tournament photographs, reports, publicity and regular club news are published on the HWFC Facebook Page. Club video is published on YouTube.
 
 ### Action
 
@@ -211,6 +212,12 @@ Training photographs, tournament updates, social events and regular club news ar
 Facebook URL:
 
 `https://www.facebook.com/profile.php?id=100082995559544`
+
+**Watch HWFC on YouTube**
+
+YouTube URL:
+
+`https://www.youtube.com/@HillsboroughWalkingFootball`
 
 ---
 
@@ -293,7 +300,7 @@ The Home page may reference these topics briefly and link to the detailed page.
 │ [ I'D LIKE TO TRY ]          │
 ├──────────────────────────────┤
 │ KEEP UP WITH HWFC            │
-│ [ Facebook ]                 │
+│ [ Facebook ] [ YouTube ]     │
 ├──────────────────────────────┤
 │ INTERESTED IN PLAYING?       │
 │ [ PLAY WALKING FOOTBALL ]    │
