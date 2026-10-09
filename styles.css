@@ -196,3 +196,50 @@ input:focus, select:focus, textarea:focus { outline: 3px solid rgba(200,16,46,.2
     .sessionGrid, .formGrid, .eligibility { grid-template-columns: 1fr; }
     .fieldFull { grid-column: auto; }
 }
+
+/* Member kit ordering. */
+.kitHero { padding: clamp(2rem, 4vw, 3.2rem) 0; }
+.kitHero h1 { margin-bottom: 1.4rem; }
+.kitProduct {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+    margin-bottom: 1.25rem;
+}
+.kitProductInfo { min-width: 0; }
+.kitProductInfo p { margin-bottom: .55rem; }
+.kitProductOrder {
+    display: grid;
+    gap: 1rem;
+    padding-left: clamp(0rem, 2vw, 1.5rem);
+    border-left: 1px solid var(--hwfcLine);
+}
+.kitPrice { font-size: 1.2rem; margin-top: .8rem; }
+.kitSummary { display: grid; gap: 1rem; }
+.kitImage {
+    display: block;
+    width: 100%;
+    max-width: 290px;
+    max-height: 280px;
+    margin-bottom: 1rem;
+    object-fit: contain;
+}
+.kitFulfilment { border: 1px solid var(--hwfcLine); border-radius: var(--radius); margin: 2rem 0; padding: 1rem; min-width: 0; }
+.kitFulfilment legend { font-size: 1.3rem; font-weight: 800; }
+.kitFulfilment input[type="radio"] { width: auto; }
+.kitFulfilment .humanCheck + .humanCheck { margin-top: .75rem; }
+#kitForm h2 { margin-top: 2rem; }
+#kitForm [hidden] { display: none; }
+.kitSummary, #runningOrder, .notice, .field { overflow-wrap: anywhere; }
+.field input, .field select, .field textarea { min-width: 0; max-width: 100%; }
+
+@media (max-width: 700px) {
+    .kitProduct { grid-template-columns: 1fr; gap: 1.25rem; }
+    .kitProductOrder { padding-left: 0; padding-top: 1.25rem; border-left: 0; border-top: 1px solid var(--hwfcLine); }
+    .kitImage { margin-inline: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}

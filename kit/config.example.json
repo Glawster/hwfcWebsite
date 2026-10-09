@@ -1,0 +1,40 @@
+{
+  "window": {
+    "id": "test-autumn-2026",
+    "name": "Example kit window — replace before deployment",
+    "opens": "2026-10-01T09:00:00+01:00",
+    "closes": "2026-11-01T17:00:00+00:00"
+  },
+  "managerEmail": "kit-manager@example.invalid",
+  "fromEmail": "website@example.invalid",
+  "storageDir": "orders",
+  "bank": {
+    "accountName": "REPLACE IN PRIVATE CONFIG",
+    "sortCode": "REPLACE",
+    "accountNumber": "REPLACE"
+  },
+  "deliveryPence": 500,
+  "deliveryRequired": ["address1", "city", "postcode"],
+  "products": {
+    "playingShirt": {
+      "name": "Example playing shirt",
+      "description": "Replace with the approved club catalogue.",
+      "pricePence": 2500,
+      "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "initials": true,
+      "initialsPence": 300,
+      "freeShirt": true,
+      "maxQuantity": 10
+    },
+    "trainingTop": {
+      "name": "Example training top",
+      "description": "Example product without personalisation.",
+      "pricePence": 3500,
+      "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "initials": false,
+      "initialsPence": 0,
+      "freeShirt": false,
+      "maxQuantity": 10
+    }
+  }
+}

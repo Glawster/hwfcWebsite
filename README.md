@@ -12,6 +12,7 @@ The site is intended to be the authoritative source of permanent club informatio
 - `/ladies/` — Ladies' walking football
 - `/about/` — About HWFC
 - `/contact/` — Club contact form and contact routes
+- `/kit/` — Member kit ordering during configured windows
 
 Design and content specifications are stored under `documentation/`.
 
@@ -50,3 +51,7 @@ The production site is hosted at:
 `hillsboroughwalkingfootball.com`
 
 The live document root is intended to be a checkout of this repository. Deployment can therefore remain a simple pull from `main` once changes have been reviewed.
+
+## Kit ordering
+
+The `/kit/` workflow uses PHP 8.1+ and private server-side configuration for the catalogue, ordering window, bank destination and notification addresses. See [kit ordering operations](documentation/kitOrderOperations.md) for deployment, recovery and tests. Production cPanel outbound-email acceptance is still required before REQ-001 is complete.
