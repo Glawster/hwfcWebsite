@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="kit/lib/kitOrder.php" colors="true" cacheDirectory=".phpunit.cache">
+  <testsuites><testsuite name="Kit ordering"><directory>tests</directory></testsuite></testsuites>
+</phpunit>

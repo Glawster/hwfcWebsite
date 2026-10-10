@@ -80,7 +80,7 @@ If you are thinking about playing, you do not need to commit to joining. Tell us
 
 Required.
 
-### Email address
+### Email Address
 
 Required.
 

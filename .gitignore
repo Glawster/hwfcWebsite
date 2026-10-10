@@ -2,3 +2,13 @@
 *~
 *.swp
 .vscode/
+.phpunit.cache/
+/vendor/
+/node_modules/
+/test-results/
+/kit/config.local.json
+/kit/error_log
+/config/kitConfig.json
+/orders/*.json
+/orders/*.lock
+/orders/.order-*
