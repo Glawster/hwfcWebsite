@@ -71,7 +71,7 @@ function renderOrder(array $o): void {
 <?php if ($o['address']): ?><p><?php foreach ($o['address'] as $key=>$v): if ($v !== ''): ?><?= e(ucfirst($key)) ?>: <?= e($v) ?><br><?php endif; endforeach ?></p><?php endif ?>
 <p><strong>Order Total: <?= e(kitMoney($o['totalPence'])) ?></strong></p>
 <p><?= e($o['member']['name']) ?><br><?= e($o['member']['email']) ?><br><?= e($o['member']['phone']) ?></p>
-<p>Section: <?= e($o['member']['section']) ?><?php if ($o['member']['accountHolder'] !== ''): ?> · Account Holder: <?= e($o['member']['accountHolder']) ?><?php endif ?></p>
+<?php if ($o['member']['accountHolder'] !== ''): ?><p>Account Holder: <?= e($o['member']['accountHolder']) ?></p><?php endif ?>
 <p>Order Notes: <?= nl2br(e($o['member']['notes'])) ?></p>
 <?php }
 ?>
@@ -80,12 +80,12 @@ function renderOrder(array $o): void {
 <body><a class="skipLink" href="#mainContent">Skip to main content</a>
 <header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a aria-current="page" href="/kit/">Kit</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
 <main id="mainContent"><section class="pageHero kitHero"><div class="shell narrow"><h1>Club Shop</h1>
-<?php if ($state === 'open'): ?><p class="infoStrip"><strong>Orders for this kit window close: <?= e(kitDate($c['window']['closes'])) ?>.</strong></p><?php endif ?></div></section>
+<?php if ($state === 'open' && $c && kitWindowConfigured($c)): ?><p class="infoStrip"><strong>Orders for this kit window close: <?= e(kitDate($c['window']['closes'])) ?>.</strong></p><?php endif ?></div></section>
 <section class="section"><div class="shell narrow">
 <?php if ($errors): ?><div class="notice noticeError" role="alert"><h2>Please Check Your Order</h2><ul><?php foreach ($errors as $error): ?><li><?= e($error) ?></li><?php endforeach ?></ul></div><?php endif ?>
 <?php if ($receipt): ?>
 <h2>Thank You – Your Kit Order Has Been Received</h2><p><strong>Order Reference: <?= e($receipt['reference']) ?><br>Amount to Pay: <?= e(kitMoney($receipt['totalPence'])) ?></strong></p>
-<p>Batch: <?= e($receipt['batchId']) ?> — <?= e($receipt['batchName']) ?><br>Submitted: <?= e(kitDate($receipt['submittedAt'])) ?></p>
+<?php if (($receipt['batchId'] ?? 'continuous') !== 'continuous'): ?><p>Batch: <?= e($receipt['batchId']) ?> — <?= e($receipt['batchName']) ?><br>Submitted: <?= e(kitDate($receipt['submittedAt'])) ?></p><?php else: ?><p>Submitted: <?= e(kitDate($receipt['submittedAt'])) ?></p><?php endif ?>
 <?php if ($receipt['managerMail'] !== 'sent'): ?><div class="notice noticeError" role="status">Your order has been saved, but we could not confirm the kit-manager email notification. Please contact the club with your order reference; the club can recover and retry the saved notification. Please do not submit the order again.</div><?php else: ?><p>The mail service accepted the kit-manager notification.</p><?php endif ?>
 <?php if ($receipt['memberMail'] !== 'sent'): ?><p>Your complete confirmation is shown here. Please save or print it; we could not confirm a confirmation email.</p><?php endif ?>
 <?php renderOrder($receipt); ?>
@@ -126,7 +126,7 @@ foreach (is_array($input['lines'] ?? null) ? $input['lines'] : [] as $candidate)
 <h2>Your Details</h2><div class="formGrid">
 <?php foreach (['name'=>['Full Name','text','name',120], 'email'=>['Email Address','email','email',200], 'phone'=>['Telephone Number','tel','tel',50], 'accountHolder'=>['Account Holder (if different)','text','off',120]] as $key=>$field): ?>
 <div class="field"><label for="<?= $key ?>"><?= e($field[0]) ?></label><input id="<?= $key ?>" name="<?= $key ?>" type="<?= $field[1] ?>" autocomplete="<?= $field[2] ?>" maxlength="<?= $field[3] ?>" value="<?= value($key) ?>" <?= $key !== 'accountHolder' ? 'required' : '' ?>></div><?php endforeach ?>
-<div class="field fieldFull"><label for="section">Section (Optional)</label><select id="section" name="section"><option value="">Choose section</option><?php foreach (["Men's", "Ladies'", 'Other', 'Prefer not to say'] as $section): ?><option <?= kitText($input, 'section') === $section ? 'selected' : '' ?>><?= e($section) ?></option><?php endforeach ?></select></div></div>
+</div>
 <p class="formNote">Complete Account Holder only if the bank transfer will come from an account in a different name.</p>
 <fieldset class="kitFulfilment"><legend>Collection or Delivery</legend><label class="humanCheck"><input type="radio" name="fulfilment" value="collection" <?= kitText($input,'fulfilment') !== 'delivery' ? 'checked' : '' ?>>Collect from the club</label><label class="humanCheck"><input type="radio" name="fulfilment" value="delivery" <?= kitText($input,'fulfilment') === 'delivery' ? 'checked' : '' ?>>Post / delivery (+<?= e(kitMoney($c['deliveryPence'])) ?>)</label></fieldset>
 <?php $deliveryFields = ['recipient'=>'Recipient Name','address1'=>'Address Line 1','address2'=>'Address Line 2','city'=>'Town / City','county'=>'County','postcode'=>'Postcode']; ?>
