@@ -23,7 +23,7 @@ function kitManagerSummary(array $o): string
 {
     $m = $o['member'];
     $text = "Batch: {$o['batchId']} ({$o['batchName']})\nOrder Reference: {$o['reference']}\nSubmitted: " . kitDate($o['submittedAt']) . "\nStatus: Payment Pending\n\n";
-    $text .= "Name: {$m['name']}\nEmail: {$m['email']}\nTelephone: {$m['phone']}\nSection: {$m['section']}\nAccount Holder (if different): {$m['accountHolder']}\n\n";
+    $text .= "Name: {$m['name']}\nEmail: {$m['email']}\nTelephone: {$m['phone']}\nAccount Holder (if different): {$m['accountHolder']}\n\n";
     $text .= 'New-Member Free Shirt Claimed: ' . ($o['claimFree'] ? 'YES — kit manager must check eligibility and previous use manually.' : 'No') . "\n\n";
     $text .= kitOrderLinesSummary($o);
     $text .= "\nFulfilment: {$o['fulfilment']}\n";
@@ -37,7 +37,7 @@ function kitMemberSummary(array $o): string
 {
     $m = $o['member'];
     $text = "Order Reference: {$o['reference']}\nSubmitted: " . kitDate($o['submittedAt']) . "\nStatus: Payment Pending\n\n";
-    $text .= "Name: {$m['name']}\nEmail: {$m['email']}\nTelephone: {$m['phone']}\nSection: {$m['section']}\nAccount Holder (if different): {$m['accountHolder']}\n\n";
+    $text .= "Name: {$m['name']}\nEmail: {$m['email']}\nTelephone: {$m['phone']}\nAccount Holder (if different): {$m['accountHolder']}\n\n";
     $text .= 'New-Member Free Shirt Claimed: ' . ($o['claimFree'] ? 'YES — kit manager must check eligibility and previous use manually.' : 'No') . "\n\n";
     $text .= kitOrderLinesSummary($o);
     $text .= "\nFulfilment: {$o['fulfilment']}\n";
