@@ -77,17 +77,20 @@ function kitValidateConfig(array $c): void
         }
     }
 
-    $w = $c['window'] ?? [];
-    foreach (['id', 'opens', 'closes'] as $key) {
-        if (!is_string($w[$key] ?? null) || trim($w[$key]) === '') throw new RuntimeException('Invalid kit window.');
+    if (array_key_exists('window', $c) && $c['window'] !== null) {
+        if (!is_array($c['window'])) throw new RuntimeException('Invalid kit window.');
+        $w = $c['window'];
+        foreach (['id', 'opens', 'closes'] as $key) {
+            if (!is_string($w[$key] ?? null) || trim($w[$key]) === '') throw new RuntimeException('Invalid kit window.');
+        }
+        foreach (['opens', 'closes'] as $key) {
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/', $w[$key])) throw new RuntimeException('Window dates require explicit timezone offsets.');
+            $date = new DateTimeImmutable($w[$key]);
+            $errors = DateTimeImmutable::getLastErrors();
+            if ($errors && ($errors['warning_count'] || $errors['error_count'])) throw new RuntimeException('Invalid window date.');
+        }
+        if (new DateTimeImmutable($w['opens']) >= new DateTimeImmutable($w['closes'])) throw new RuntimeException('Invalid window range.');
     }
-    foreach (['opens', 'closes'] as $key) {
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/', $w[$key])) throw new RuntimeException('Window dates require explicit timezone offsets.');
-        $date = new DateTimeImmutable($w[$key]);
-        $errors = DateTimeImmutable::getLastErrors();
-        if ($errors && ($errors['warning_count'] || $errors['error_count'])) throw new RuntimeException('Invalid window date.');
-    }
-    if (new DateTimeImmutable($w['opens']) >= new DateTimeImmutable($w['closes'])) throw new RuntimeException('Invalid window range.');
 
     if (!is_string($c['storageDir'] ?? null) || !is_dir($c['storageDir']) || !is_writable($c['storageDir'])) throw new RuntimeException('Order storage is unavailable.');
     kitValidateOrderStoragePath($c['storageDir']);
@@ -116,8 +119,14 @@ function kitValidateConfig(array $c): void
     }
 }
 
+function kitWindowConfigured(array $c): bool
+{
+    return isset($c['window']) && is_array($c['window']);
+}
+
 function kitWindowState(array $c, DateTimeImmutable $now): string
 {
+    if (!kitWindowConfigured($c)) return 'open';
     if ($now < new DateTimeImmutable($c['window']['opens'])) return 'before';
     return $now < new DateTimeImmutable($c['window']['closes']) ? 'open' : 'closed';
 }
