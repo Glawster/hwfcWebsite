@@ -1,6 +1,6 @@
 # Requirements
 
-Next available number: 005
+Next available number: 006
 
 | Req ID | Requirement | Description | Status | Agent Prompt | Architecture Decisions |
 | --- | --- | --- | --- | --- | --- |
@@ -8,3 +8,4 @@ Next available number: 005
 | 002 | [Kit order tracking](features/002-kitOrderTracking.md) | Track accepted kit orders through payment, supplier fulfilment, receipt and member handover. | ToDo | — | — |
 | 003 | [Admin authentication](features/003-adminAuthentication.md) | Protect the private `/admin/` area with email, password and a six-digit SMS PIN on every login. | ToDo | — | — |
 | 004 | [Admin kit window management](features/004-adminKitWindowManagement.md) | Allow an authenticated administrator to add, review and clear the optional kit-order window from `/admin/`. | ToDo | — | — |
+| 005 | [Admin kit configuration management](features/005-adminKitConfigurationManagement.md) | Allow authenticated administrators to manage routine Club Shop settings, kit-manager email recipients and catalogue products from `/admin/`. | ToDo | — | — |
