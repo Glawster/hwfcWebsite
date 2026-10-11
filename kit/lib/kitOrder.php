@@ -115,10 +115,11 @@ function kitAcceptOrder(array $input, array $c, DateTimeImmutable $now): array
     $result = kitValidateOrder($input, $c, $now);
     if ($result['errors']) throw new InvalidArgumentException(implode(' ', $result['errors']));
     $o = $result['order'];
+    $window = kitWindowConfigured($c) ? $c['window'] : null;
     $o += [
         'reference'=>kitReference($now, $o['member']['name'], $c),
-        'batchId'=>$c['window']['id'],
-        'batchName'=>$c['window']['name'] ?? $c['window']['id'],
+        'batchId'=>$window['id'] ?? 'continuous',
+        'batchName'=>$window['name'] ?? ($window['id'] ?? 'Continuous Ordering'),
         'submittedAt'=>$now->format(DateTimeInterface::ATOM),
         'status'=>'Payment Pending',
         'managerMail'=>'pending',
