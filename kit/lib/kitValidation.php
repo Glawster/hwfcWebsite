@@ -15,7 +15,7 @@ function kitValidateOrder(array $input, array $c, DateTimeImmutable $now): array
     if (($input['human'] ?? null) !== 'yes') $errors[] = 'Please confirm that you are human.';
 
     $member = [];
-    foreach (['name' => 120, 'email' => 200, 'phone' => 50, 'section' => 40, 'accountHolder' => 120, 'notes' => 2000] as $key => $max) {
+    foreach (['name' => 120, 'email' => 200, 'phone' => 50, 'accountHolder' => 120, 'notes' => 2000] as $key => $max) {
         $member[$key] = kitText($input, $key);
         if (strlen($member[$key]) > $max || preg_match('/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/', $member[$key]) || ($key !== 'notes' && preg_match('/[\r\n]/', $member[$key]))) {
             $errors[] = 'Please check the ' . $key . ' field and its length.';
@@ -24,7 +24,6 @@ function kitValidateOrder(array $input, array $c, DateTimeImmutable $now): array
     if ($member['name'] === '') $errors[] = 'Please enter your Full Name.';
     if (!filter_var($member['email'], FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid email address.';
     if (!preg_match('/^[+()0-9 .-]{6,50}$/', $member['phone']) || strlen(preg_replace('/\D/', '', $member['phone'])) < 6) $errors[] = 'Please enter a valid contact telephone number.';
-    if (!in_array($member['section'], ['', "Men's", "Ladies'", 'Other', 'Prefer not to say'], true)) $errors[] = 'Please choose a listed section.';
 
     $claim = ($input['claimFree'] ?? '') === 'yes';
     if (!in_array($input['claimFree'] ?? '', ['', 'yes'], true)) $errors[] = 'Please check the new-member free-shirt claim.';
