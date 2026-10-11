@@ -71,7 +71,7 @@ function renderOrder(array $o): void {
 <?php if ($o['address']): ?><p><?php foreach ($o['address'] as $key=>$v): if ($v !== ''): ?><?= e(ucfirst($key)) ?>: <?= e($v) ?><br><?php endif; endforeach ?></p><?php endif ?>
 <p><strong>Order Total: <?= e(kitMoney($o['totalPence'])) ?></strong></p>
 <p><?= e($o['member']['name']) ?><br><?= e($o['member']['email']) ?><br><?= e($o['member']['phone']) ?></p>
-<p>Section: <?= e($o['member']['section']) ?><?php if ($o['member']['accountHolder'] !== ''): ?> · Account Holder: <?= e($o['member']['accountHolder']) ?><?php endif ?></p>
+<?php if ($o['member']['accountHolder'] !== ''): ?><p>Account Holder: <?= e($o['member']['accountHolder']) ?></p><?php endif ?>
 <p>Order Notes: <?= nl2br(e($o['member']['notes'])) ?></p>
 <?php }
 ?>
@@ -126,7 +126,7 @@ foreach (is_array($input['lines'] ?? null) ? $input['lines'] : [] as $candidate)
 <h2>Your Details</h2><div class="formGrid">
 <?php foreach (['name'=>['Full Name','text','name',120], 'email'=>['Email Address','email','email',200], 'phone'=>['Telephone Number','tel','tel',50], 'accountHolder'=>['Account Holder (if different)','text','off',120]] as $key=>$field): ?>
 <div class="field"><label for="<?= $key ?>"><?= e($field[0]) ?></label><input id="<?= $key ?>" name="<?= $key ?>" type="<?= $field[1] ?>" autocomplete="<?= $field[2] ?>" maxlength="<?= $field[3] ?>" value="<?= value($key) ?>" <?= $key !== 'accountHolder' ? 'required' : '' ?>></div><?php endforeach ?>
-<div class="field fieldFull"><label for="section">Section (Optional)</label><select id="section" name="section"><option value="">Choose section</option><?php foreach (["Men's", "Ladies'", 'Other', 'Prefer not to say'] as $section): ?><option <?= kitText($input, 'section') === $section ? 'selected' : '' ?>><?= e($section) ?></option><?php endforeach ?></select></div></div>
+</div>
 <p class="formNote">Complete Account Holder only if the bank transfer will come from an account in a different name.</p>
 <fieldset class="kitFulfilment"><legend>Collection or Delivery</legend><label class="humanCheck"><input type="radio" name="fulfilment" value="collection" <?= kitText($input,'fulfilment') !== 'delivery' ? 'checked' : '' ?>>Collect from the club</label><label class="humanCheck"><input type="radio" name="fulfilment" value="delivery" <?= kitText($input,'fulfilment') === 'delivery' ? 'checked' : '' ?>>Post / delivery (+<?= e(kitMoney($c['deliveryPence'])) ?>)</label></fieldset>
 <?php $deliveryFields = ['recipient'=>'Recipient Name','address1'=>'Address Line 1','address2'=>'Address Line 2','city'=>'Town / City','county'=>'County','postcode'=>'Postcode']; ?>
