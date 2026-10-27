@@ -72,7 +72,6 @@ function errorFor(string $key): string
 <div class="field"><label for="phone">Telephone number</label><input id="phone" name="phone" value="<?= old('phone') ?>" autocomplete="tel" inputmode="tel" required><?= errorFor('phone') ?></div>
 <div class="field"><label for="email">Email address</label><input type="email" id="email" name="email" value="<?= old('email') ?>" autocomplete="email" required><?= errorFor('email') ?></div>
 <div class="field"><label for="preferred_contact">Preferred contact method</label><select id="preferred_contact" name="preferred_contact" required><option value="">Choose…</option><option value="phone"<?= selected('preferred_contact','phone') ?>>Phone call</option><option value="text"<?= selected('preferred_contact','text') ?>>Text message</option><option value="whatsapp"<?= selected('preferred_contact','whatsapp') ?>>WhatsApp</option><option value="email"<?= selected('preferred_contact','email') ?>>Email</option></select><?= errorFor('preferred_contact') ?></div>
-<div class="field"><label for="membership_section">Which section applies?</label><select id="membership_section" name="membership_section" required><option value="">Choose…</option><option value="mens"<?= selected('membership_section','mens') ?>>Men's</option><option value="ladies"<?= selected('membership_section','ladies') ?>>Ladies'</option><option value="unsure"<?= selected('membership_section','unsure') ?>>Not sure / please advise</option></select><?= errorFor('membership_section') ?></div>
 </div>
 
 <h3>Emergency contacts</h3>
