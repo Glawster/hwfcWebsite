@@ -55,3 +55,15 @@ The live document root is intended to be a checkout of this repository. Deployme
 ## Kit ordering
 
 The `/kit/` workflow uses PHP 8.1+ and private server-side configuration for the catalogue, ordering window, bank destination and notification addresses. See [kit ordering operations](documentation/kitOrderOperations.md) for deployment, recovery and tests. Production cPanel outbound-email acceptance is still required before REQ-001 is complete.
+
+## Tests
+
+Run the PHP HTTP and browser acceptance suite from the repository root:
+
+```bash
+HWFC_TEST_PHP=php python -m unittest discover -s tests -p 'test_*.py'
+```
+
+Requires PHP 8.1+, Python Playwright and its Chromium browser. See
+[kit ordering operations](documentation/kitOrderOperations.md#local-verification)
+for the PHPUnit command and verification details.

@@ -1,0 +1,540 @@
+/* deployed from Glawster/organiseMyProjects release 0.9.1 -- do not edit directly */
+$canvas: #f7f7f5;
+$canvas-text: #101f2e;
+$canvas-muted: #60788e;
+$surface: #101f2e;
+$surface-raised: #243545;
+$accent-strong: #239b78;
+$accent: #31b98f;
+$accent-hover: #56d6b0;
+$accent-focus: #14b8a6;
+$on-accent: #061510;
+$text-primary: #f5f8fb;
+$text-secondary: #d9e5ef;
+$text-muted: #8fa3b8;
+$border: #263b4e;
+$border-strong: #30465a;
+$success-surface: #163b38;
+$success-text: #75e0bf;
+$success-border: #28675e;
+$warning-surface: #40351c;
+$warning-text: #f0c76a;
+$warning-border: #735f2d;
+$error-surface: #442329;
+$error-text: #ff9da7;
+$error-border: #7b3943;
+
+/* Shared OMP application theme.
+   Canonical visual palette for Glawster applications.
+   Toolkit-specific consumers should use these semantic colour roles rather
+   than defining their own application palette. Clann Eolas intentionally
+   retains its own stylesheet.
+
+   Palette tokens
+   --------------
+   The variables above are the single colour source. Use their semantic names
+   for canvas, dark surfaces, accents, text, borders and status variants.
+*/
+
+/* Light application canvas. */
+Screen {
+    background: $canvas;
+    color: $canvas-text;
+    scrollbar-background: $surface;
+    scrollbar-background-hover: $surface-raised;
+    scrollbar-background-active: $surface-raised;
+    scrollbar-color: $canvas-muted;
+    scrollbar-color-hover: $text-muted;
+    scrollbar-color-active: $text-secondary;
+    scrollbar-corner-color: $surface;
+}
+
+Header,
+Footer {
+    background: $canvas;
+    color: $canvas-text;
+}
+
+/* Textual toasts do not inherit Screen colours, so set both their surface and
+   message ink rather than relying on Textual's default foreground token. */
+Toast {
+    background: $surface-raised;
+    color: $text-primary;
+    border-left: outer $border-strong;
+}
+
+Toast .toast--title {
+    color: $text-primary;
+}
+
+Toast.-information {
+    background: $success-surface;
+    color: $success-text;
+    border-left: outer $success-border;
+}
+
+Toast.-information .toast--title {
+    color: $success-text;
+}
+
+Toast.-warning {
+    background: $warning-surface;
+    color: $warning-text;
+    border-left: outer $warning-border;
+}
+
+Toast.-warning .toast--title {
+    color: $warning-text;
+}
+
+Toast.-error {
+    background: $error-surface;
+    color: $error-text;
+    border-left: outer $error-border;
+}
+
+Toast.-error .toast--title {
+    color: $error-text;
+}
+
+/* Quit and Palette use the same ink as the canvas headings. */
+FooterKey,
+FooterKey .footer-key--key,
+FooterKey .footer-key--description {
+    color: $canvas-text;
+    background: transparent;
+}
+
+FooterKey:hover {
+    color: $canvas-text;
+    background: $canvas;
+}
+
+TabbedContent,
+Tabs,
+TabPane {
+    background: $canvas;
+    color: $canvas-text;
+}
+
+Tab {
+    background: $canvas;
+    color: $canvas-muted;
+}
+
+Tab:hover {
+    color: $accent-focus;
+}
+
+Tab.-active {
+    color: $accent-strong;
+    text-style: bold;
+}
+
+TabPane {
+    padding: 1;
+}
+
+/* Ordinary content follows the light canvas unless explicitly placed on a
+   shared dark surface. */
+Static,
+Label {
+    background: transparent;
+    color: $canvas-text;
+}
+
+/* Semantic reusable surfaces. */
+.surface,
+.surface-raised {
+    color: $text-primary;
+}
+
+.surface {
+    background: $surface;
+    border: solid $border;
+}
+
+.surface-raised {
+    background: $surface-raised;
+    border: solid $border-strong;
+}
+
+.surface Label,
+.surface Static,
+.surface-raised Label,
+.surface-raised Static {
+    color: $text-secondary;
+}
+
+.muted {
+    color: $text-muted;
+}
+
+/* Detail headings sit on the light canvas, in the same green as an active tab. */
+.detail-title,
+.detail-heading,
+.detail-hash {
+    text-style: bold;
+    color: $accent-strong;
+}
+
+.detail-label {
+    text-style: bold;
+}
+
+.detail-muted {
+    color: $canvas-muted;
+}
+
+/* Scroll areas stay clear of the canvas. DataTable is itself a
+   ScrollableContainer, so its dark surface has to follow this rule or the
+   transparent background wins and the light table text disappears. */
+VerticalScroll,
+HorizontalScroll,
+ScrollableContainer,
+DataTable,
+ListView {
+    background: transparent;
+    scrollbar-background: $surface;
+    scrollbar-background-hover: $surface-raised;
+    scrollbar-background-active: $surface-raised;
+    scrollbar-color: $canvas-muted;
+    scrollbar-color-hover: $text-muted;
+    scrollbar-color-active: $text-secondary;
+    scrollbar-corner-color: $surface;
+}
+
+/* Tables and entry controls are dark working surfaces on the light canvas. */
+DataTable {
+    background: $surface;
+    color: $text-primary;
+    border: solid $success-text;
+}
+
+DataTable > .datatable--header {
+    background: $surface;
+    color: $text-secondary;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: $success-surface;
+    color: $success-text;
+}
+
+DataTable > .datatable--hover {
+    background: $surface-raised;
+    color: $text-primary;
+}
+
+DataTable:focus {
+    border: solid $accent-focus;
+}
+
+/* Lists are the same dark working surface as tables. The canvas Label colour
+   would otherwise stay dark when a row is highlighted. */
+ListView {
+    background: $surface;
+    color: $text-primary;
+    border: solid $success-text;
+}
+
+ListView > ListItem {
+    background: $surface;
+    color: $text-primary;
+    padding: 0 1;
+}
+
+ListView > ListItem Label,
+ListView > ListItem Static {
+    background: transparent;
+    color: $text-primary;
+}
+
+ListView > ListItem.-hovered {
+    background: $surface-raised;
+    color: $text-primary;
+}
+
+ListView > ListItem.-hovered Label,
+ListView > ListItem.-hovered Static {
+    color: $text-primary;
+}
+
+/* A focused list has its own cursor rule. Keep the same success colours the
+   table cursor uses, including the label, or the row text falls back to the
+   dark canvas ink. */
+ListView > ListItem.-highlight,
+ListView:focus > ListItem.-highlight {
+    background: $success-surface;
+    color: $success-text;
+}
+
+ListView > ListItem.-highlight Label,
+ListView > ListItem.-highlight Static,
+ListView:focus > ListItem.-highlight Label,
+ListView:focus > ListItem.-highlight Static {
+    background: transparent;
+    color: $success-text;
+}
+
+Input,
+TextArea,
+Select {
+    height: 3;
+    background: $surface;
+    color: $text-primary;
+    border: solid $success-text;
+    content-align: left middle;
+}
+
+Input:focus,
+TextArea:focus,
+Select:focus {
+    border: solid $accent-focus;
+}
+
+/* The current value and arrow are Static children. The canvas Static colour
+   would hide them on this dark surface. */
+SelectCurrent {
+    background: $surface;
+    color: $text-primary;
+    /* The Select border is the outline. The inner border would draw a second box. */
+    border: none;
+}
+
+SelectCurrent #label {
+    color: $text-muted;
+    background: transparent;
+}
+
+SelectCurrent.-has-value #label {
+    color: $text-primary;
+}
+
+SelectCurrent .arrow {
+    color: $text-muted;
+    background: transparent;
+}
+
+/* Primary actions use the darker accent; hover/focus deliberately moves to
+   the lighter accent colour. */
+Button {
+    height: 1;
+    min-height: 1;
+    padding: 0 1;
+    background: $accent;
+    color: $on-accent;
+    border: none;
+    text-style: bold;
+    content-align: center middle;
+}
+
+Button:hover,
+Button:focus {
+    background: $accent-hover;
+    color: $on-accent;
+    border: none;
+}
+
+Button.-primary {
+    background: $accent;
+    color: $on-accent;
+}
+
+.heading {
+    text-style: bold;
+}
+
+Button.-success,
+.success {
+    background: $success-surface;
+    color: $success-text;
+    border: solid $success-border;
+}
+
+Button.-warning,
+.warning {
+    background: $warning-surface;
+    color: $warning-text;
+    border: solid $warning-border;
+}
+
+/* A warning Label inside a list is a compact state marker, not a panel. */
+ListView .warning {
+    height: 1;
+    padding: 0;
+    border: none;
+}
+
+Button.-error,
+.error {
+    background: $error-surface;
+    color: $error-text;
+    border: solid $error-border;
+}
+
+/* Geometry applies to semantic and interaction states as well as plain buttons.
+   Widget defaults may otherwise restore top/bottom borders on focus or press. */
+Button, Button:hover, Button:focus, Button:disabled, Button.-active,
+Button.-primary, Button.-success, Button.-warning, Button.-error {
+    border: none !important;
+    padding: 0 1;
+    height: 1;
+    min-height: 1;
+}
+
+/* Opt-in logical horizontal groups share width and keep surrounding rows free.
+   Only non-final buttons receive a margin, avoiding an extra trailing gap. */
+.button-group {
+    layout: horizontal;
+    height: auto;
+    margin: 1 0;
+    padding: 0;
+}
+
+.button-group > Button {
+    width: 1fr;
+    min-width: 0;
+    margin: 0 1 0 0;
+}
+
+.button-group > Button:last-child {
+    margin-right: 0;
+}
+
+/* Existing screens commonly use plain Horizontal rows. Give those controls
+   the same adjacent gap without requiring button-group adoption first. */
+Horizontal > Button {
+    margin-right: 1;
+}
+
+Horizontal > Button:last-child {
+    margin-right: 0;
+}
+
+/* myBoard keeps board geometry with the shared palette so every application
+   surface and border is styled from this single stylesheet. */
+#status-panel {
+    height: 1fr;
+    padding: 0 1;
+    margin: 0 1 1 1;
+    border: solid $border;
+}
+
+.status-line {
+    height: 1;
+    color: $text-secondary;
+}
+
+#columns {
+    height: 1fr;
+    margin: 0 1 1 1;
+}
+
+.column {
+    width: 1fr;
+    height: 1fr;
+    border: solid $border;
+}
+
+.column-title {
+    height: 1;
+    padding: 0 1;
+    text-style: bold;
+}
+
+.column ListView {
+    height: 1fr;
+    border: none;
+}
+
+ConfirmMove {
+    align: center middle;
+}
+
+#confirm-box {
+    width: 72;
+    height: auto;
+    padding: 1 2;
+}
+
+#detail-scroll {
+    height: 1fr;
+}
+
+#detail-lines {
+    height: auto;
+    padding: 0 2 1 2;
+}
+
+.detail-row {
+    height: 1;
+    width: 1fr;
+}
+
+.detail-label,
+.detail-hash {
+    width: 14;
+    height: 1;
+}
+
+.detail-value {
+    width: 1fr;
+    height: 1;
+}
+
+/* The SVG generator uses ordinary controls and surfaces at a fixed reviewable
+   size. These classes only arrange the showcase; colour stays in shared roles. */
+#style-mockup {
+    height: 1fr;
+    padding: 1 2;
+}
+
+#mockup-title,
+.mockup-heading {
+    color: $accent-strong;
+    text-style: bold;
+}
+
+#mockup-title {
+    height: 1;
+}
+
+.mockup-row {
+    height: 1fr;
+    margin-top: 1;
+}
+
+.mockup-panel,
+.mockup-message {
+    width: 1fr;
+    height: 1fr;
+    padding: 1;
+    margin-right: 1;
+}
+
+.mockup-row > *:last-child {
+    margin-right: 0;
+}
+
+.mockup-panel Input,
+.mockup-panel Select {
+    margin-top: 1;
+}
+
+#mockup-list,
+#mockup-table {
+    height: 1fr;
+    margin-top: 1;
+}
+
+.mockup-message {
+    height: auto;
+}
+
+.detail-file {
+    height: 1;
+    width: 1fr;
+    padding: 0 2;
+}

@@ -19,7 +19,7 @@ Detailed session descriptions, costs, venue addresses, what to bring and first-v
 
 ---
 
-# 2. Recommended Page Order
+## 2. Recommended Page Order
 
 ```text
 HEADER
@@ -67,55 +67,55 @@ FOOTER
 
 ---
 
-# 3. Production Copy
+## 3. Production Copy
 
-## 3.1 Hero
+### 3.1 Hero
 
-### Heading
+#### Heading
 
 **Hillsborough Walking Football Club**
 
-### Strapline
+#### Strapline
 
 **Football for life.**
 
-### Introductory copy
+#### Introductory copy
 
 Friendly and competitive walking football for men and women in Hillsborough and the wider Lisburn area.
 
 Whether you have played all your life, have not kicked a ball in years, or have never played before, you are welcome.
 
-### Primary action
+#### Primary action
 
 **Play Walking Football**
 
 ---
 
-## 3.2 What Is Walking Football?
+### 3.2 What Is Walking Football?
 
-### Heading
+#### Heading
 
 **Football at a walking pace**
 
-### Copy
+#### Copy
 
 Walking football keeps the passing, movement, teamwork and enjoyment of football while reducing the physical demands of the running game.
 
 It can be social, competitive, or somewhere in between.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
 ---
 
-## 3.3 Who Can Play?
+### 3.3 Who Can Play?
 
-### Heading
+#### Heading
 
 **Could walking football be for you?**
 
-### Copy
+#### Copy
 
 You do not need to be an experienced footballer or exceptionally fit.
 
@@ -124,15 +124,15 @@ You do not need to be an experienced footballer or exceptionally fit.
 
 Beginners, returning players and experienced players are all welcome.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
 ---
 
-# 4. Sessions at a Glance
+## 4. Sessions at a Glance
 
-## Heading
+### Heading
 
 **When we play**
 
@@ -149,7 +149,7 @@ The Home page should show only a compact summary.
 
 Do not repeat venue addresses, costs, footwear guidance or detailed descriptions here.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
@@ -157,17 +157,17 @@ This links to `/play/`.
 
 ---
 
-# 5. Men's and Ladies' Football
+## 5. Men's and Ladies' Football
 
 These should be presented with equal visual prominence.
 
-## Men's Walking Football
+### Men's Walking Football
 
 Weekly sessions, fixtures, events, squad information and match reports.
 
 **Men's Football**
 
-## Ladies' Walking Football
+### Ladies' Walking Football
 
 Walking football for women aged 35 and over, including coaching, development and match sessions.
 
@@ -177,17 +177,17 @@ No previous football experience is required.
 
 ---
 
-# 6. First Visit Reassurance
+## 6. First Visit Reassurance
 
-## Heading
+### Heading
 
 **Coming along for the first time?**
 
-### Copy
+#### Copy
 
 Get in touch with us beforehand and we will make sure someone is there to greet you and introduce you to the session.
 
-### Action
+#### Action
 
 **I'd Like to Try Walking Football**
 
@@ -195,17 +195,17 @@ This links to `/contact/` with the relevant enquiry type preselected where pract
 
 ---
 
-# 7. Keep Up with HWFC
+## 7. Keep Up with HWFC
 
-## Heading
+### Heading
 
 **Keep up with HWFC**
 
-### Copy
+#### Copy
 
 Match and tournament photographs, reports, publicity and regular club news are published on the HWFC Facebook Page. Club video is published on YouTube.
 
-### Action
+#### Action
 
 **Follow HWFC on Facebook**
 
@@ -221,17 +221,17 @@ YouTube URL:
 
 ---
 
-# 8. Final Call to Action
+## 8. Final Call to Action
 
-## Heading
+### Heading
 
 **Interested in playing?**
 
-### Copy
+#### Copy
 
 See our full session information and find the right place to start.
 
-### Actions
+#### Actions
 
 **Play Walking Football**
 
@@ -239,7 +239,7 @@ See our full session information and find the right place to start.
 
 ---
 
-# 9. What the Home Page Should Not Repeat
+## 9. What the Home Page Should Not Repeat
 
 The following belong on `/play/` and should not be duplicated in full on Home:
 
@@ -257,7 +257,7 @@ The Home page may reference these topics briefly and link to the detailed page.
 
 ---
 
-# 10. Mobile Wireframe
+## 10. Mobile Wireframe
 
 ```text
 ┌──────────────────────────────┐
@@ -312,7 +312,7 @@ The Home page may reference these topics briefly and link to the detailed page.
 
 ---
 
-# 11. Outstanding Items
+## 11. Outstanding Items
 
 These do not block Home page design:
 

@@ -1,4 +1,4 @@
-<!-- deployed from Glawster/organiseMyProjects release 0.5 -- do not edit directly -->
+<!-- deployed from Glawster/organiseMyProjects release 0.9.1 -- do not edit directly -->
 # Testing Process
 
 This is the authoritative testing process for OMP-managed projects. Tests must
@@ -136,6 +136,14 @@ explicitly with `pytest -m expensive`; do not invent per-feature flags. When a
 requirement changes an affected production path, its relevant expensive suite
 must run before acceptance and release. Expensive tests must not become
 effectively optional at completion.
+
+Run the suite in the project's own Conda environment, created from
+`<projectName>Environment.yml`, so every development dependency is present.
+Tests that need an optional development dependency must skip with a reason
+naming that dependency rather than fail at import, so the suite stays usable in
+other environments. Such skips are not evidence: acceptance and release
+validation run in the project environment with `pytest -rs` and must report no
+dependency-related skips.
 
 ## Completion checklist
 

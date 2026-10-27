@@ -15,7 +15,7 @@ The page should avoid duplicating recruitment information already covered on `/p
 
 ---
 
-# 2. Recommended Page Order
+## 2. Recommended Page Order
 
 ```text
 HEADER
@@ -53,15 +53,15 @@ FOOTER
 
 ---
 
-# 3. Production Copy
+## 3. Production Copy
 
-## 3.1 Page Introduction
+### 3.1 Page Introduction
 
-### Heading
+#### Heading
 
 **About Hillsborough Walking Football Club**
 
-### Copy
+#### Copy
 
 Hillsborough Walking Football Club brings together people who want to enjoy football, stay active and be part of a friendly club community.
 
@@ -69,13 +69,13 @@ We provide regular walking football opportunities for men and women, with sessio
 
 ---
 
-# 4. Who We Are
+## 4. Who We Are
 
-## Heading
+### Heading
 
 **Football, fitness and friendship**
 
-### Copy
+#### Copy
 
 HWFC is built around the idea that football can continue to be part of people's lives for many years.
 
@@ -85,13 +85,13 @@ Alongside regular weekly sessions, the club can take part in fixtures, tournamen
 
 ---
 
-# 5. Hillsborough Boys FC Relationship
+## 5. Hillsborough Boys FC Relationship
 
-## Heading
+### Heading
 
 **Part of the Hillsborough football family**
 
-### Provisional copy
+#### Provisional copy
 
 > Hillsborough Walking Football Club is part of the wider Hillsborough Boys FC football family.
 
@@ -101,31 +101,31 @@ The website should use the same Hillsborough badge / logo family as the Hillsbor
 
 ---
 
-# 6. What We Value
+## 6. What We Value
 
-## Heading
+### Heading
 
 **What matters to us**
 
 The following themes are **proposed website values and remain subject to committee confirmation before publication**.
 
-### Welcoming
+#### Welcoming
 
 New and returning players should feel comfortable coming along for the first time.
 
-### Inclusive
+#### Inclusive
 
 The club should provide opportunities for different levels of experience and ability.
 
-### Enjoyment
+#### Enjoyment
 
 Football should remain enjoyable, social and something people look forward to.
 
-### Community
+#### Community
 
 HWFC is more than weekly sessions. Friendship, social activity and supporting each other are part of club life.
 
-### Competition
+#### Competition
 
 Players who want competitive football should also have opportunities through fixtures, tournaments and age-group competitions.
 
@@ -133,9 +133,9 @@ If the committee does not wish to adopt these as explicit club values, this sect
 
 ---
 
-# 7. Partners and Affiliations
+## 7. Partners and Affiliations
 
-## Heading
+### Heading
 
 **Partners and affiliations**
 
@@ -154,19 +154,19 @@ All specific names and relationship descriptions remain **To confirm** before pu
 
 ---
 
-# 8. Club Life
+## 8. Club Life
 
-## Heading
+### Heading
 
 **More than the football**
 
-### Copy
+#### Copy
 
 HWFC members also take part in social events, fundraising, tournaments, visits and community activities.
 
 Current photographs and day-to-day club updates are shared mainly through Facebook.
 
-### Action
+#### Action
 
 **Follow HWFC on Facebook**
 
@@ -176,7 +176,7 @@ Facebook URL:
 
 ---
 
-# 9. Future About-Section Content
+## 9. Future About-Section Content
 
 The About area can expand later without changing the Phase 1 navigation.
 
@@ -194,17 +194,17 @@ These should only be added when there is useful content to maintain.
 
 ---
 
-# 10. Contact Call to Action
+## 10. Contact Call to Action
 
-## Heading
+### Heading
 
 **Want to know more?**
 
-### Copy
+#### Copy
 
 If you have a question about HWFC, our sessions, fixtures or club activities, get in touch through the website.
 
-### Action
+#### Action
 
 **Contact HWFC**
 
@@ -216,7 +216,7 @@ Personal committee email addresses and phone numbers should not be published.
 
 ---
 
-# 11. Mobile Wireframe
+## 11. Mobile Wireframe
 
 ```text
 ┌──────────────────────────────┐
@@ -253,7 +253,7 @@ Personal committee email addresses and phone numbers should not be published.
 
 ---
 
-# 12. Outstanding Items
+## 12. Outstanding Items
 
 - Formal relationship wording with Hillsborough Boys FC.
 - Affiliations / partners to display.
