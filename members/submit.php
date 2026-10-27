@@ -45,16 +45,18 @@ try {
     $stmt = $db->prepare(<<<'SQL'
 INSERT INTO membership_applications (
     application_uuid, first_name, last_name, preferred_name, date_of_birth,
-    address, postcode, email, phone, preferred_contact, membership_section,
+    address, postcode, email, phone, preferred_contact,
     emergency_name, emergency_relationship, emergency_phone,
-    second_emergency_name, second_emergency_phone, health_relevant,
-    health_details, photo_consent, privacy_version, submitted_at, updated_at, status
+    second_emergency_name, second_emergency_relationship, second_emergency_phone,
+    health_relevant, health_details, photo_consent,
+    privacy_version, submitted_at, updated_at, status
 ) VALUES (
     :uuid, :first_name, :last_name, :preferred_name, :dob,
-    :address, :postcode, :email, :phone, :preferred_contact, :section,
+    :address, :postcode, :email, :phone, :preferred_contact,
     :emergency_name, :emergency_relationship, :emergency_phone,
-    :second_emergency_name, :second_emergency_phone, :health_relevant,
-    :health_details, :photo_consent, :privacy_version, :submitted_at, :updated_at, 'Pending'
+    :second_emergency_name, :second_emergency_relationship, :second_emergency_phone,
+    :health_relevant, :health_details, :photo_consent,
+    :privacy_version, :submitted_at, :updated_at, 'Pending'
 )
 SQL);
 
@@ -69,12 +71,12 @@ SQL);
         ':email' => strtolower($input['email']),
         ':phone' => $input['phone'],
         ':preferred_contact' => $input['preferred_contact'],
-        ':section' => $input['membership_section'],
         ':emergency_name' => $input['emergency_name'],
         ':emergency_relationship' => $input['emergency_relationship'],
         ':emergency_phone' => $input['emergency_phone'],
-        ':second_emergency_name' => $input['second_emergency_name'] ?: null,
-        ':second_emergency_phone' => $input['second_emergency_phone'] ?: null,
+        ':second_emergency_name' => ($input['second_emergency_name'] ?? '') !== '' ? $input['second_emergency_name'] : null,
+        ':second_emergency_relationship' => ($input['second_emergency_relationship'] ?? '') !== '' ? $input['second_emergency_relationship'] : null,
+        ':second_emergency_phone' => ($input['second_emergency_phone'] ?? '') !== '' ? $input['second_emergency_phone'] : null,
         ':health_relevant' => $input['health_relevant'] === 'yes' ? 1 : 0,
         ':health_details' => $input['health_relevant'] === 'yes' ? $input['health_details'] : null,
         ':photo_consent' => $input['photo_consent'] === 'yes' ? 1 : 0,
