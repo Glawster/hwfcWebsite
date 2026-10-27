@@ -12,3 +12,4 @@
 /orders/*.json
 /orders/*.lock
 /orders/.order-*
+tests/__pycache__/
