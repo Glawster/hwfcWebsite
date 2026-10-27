@@ -1,26 +1,34 @@
 # Current increment
 
-## 001: Member kit ordering
+## 004: Membership application and management — 0.6a1
 
-[Requirement](requirements/features/001-memberKitOrdering.md) · [Prompt](requirements/prompt/001-memberKitOrdering.md)
+[Requirement](requirements/features/004-membershipApplicationAndManagement.md)
 
-Branch: `feature/001-member-kit-ordering`
+Branch: `feature/004-membership-application-and-management`
 
-Implementation includes `/kit/`, server-controlled configuration, window checks, order review, per-line sizing/initials/quantity, one free-shirt claim, whole-pence totals, private durable order records, immediate manager notification, complete confirmation and CLI notification retry. See [operations](../documentation/kitOrderOperations.md).
+Version: `0.6a1`
 
-Verification on 8 October 2026:
+The 0.6 increment introduces the public `/members/` section and the first database-backed membership workflow. It includes a new membership application, a link for existing members to update their details, secure server-side validation and storage, privacy-notice version recording, separate photography/publicity consent, relevant health/safety information, and GDPR-supporting CLI export/correction/deletion operations. See [membership operations](../documentation/membershipOperations.md).
 
-- PHP 8.1 syntax checks pass for all new PHP files.
-- PHPUnit 10: 53 tests, 94 assertions passed.
-- HTTP/mail-sink and Playwright: 7 integration/browser tests passed, including 375×667, 390×844, 768×1024 and 1280×800 plus a no-JavaScript mobile flow.
+The application database is SQLite-backed. Production deployment must set `HWFC_MEMBER_DB` to a protected path outside the public document root. A protected local fallback exists under `members/data/` for development only.
 
-Acceptance criteria 1–18 and 20–28 have implementation and local rule/HTTP/browser evidence; criterion 19 has local mail-service composition evidence only. Production delivery evidence remains outstanding. Requirement stays `InProgress`.
+### Deliberately deferred to 0.7
 
-Remaining acceptance work:
+The browser administration page is not part of 0.6. Once membership data exists and the operational workflow can be evaluated, 0.7 will implement the authenticated Members administration interface. REQ-003 Admin Authentication must protect that private interface before member data is exposed through the browser.
 
-- Approve and configure actual catalogue, prices, initials rules, delivery charge, bank destination and window on cPanel.
-- Configure private storage and monitored notification retry.
-- Verify the 21-character generated payment reference is supported by the receiving bank.
-- Run the required real production cPanel mail/inbox and configuration acceptance checks in `documentation/kitOrderTesting.md`; record results here. No host access or live operational configuration was available during local implementation.
+Later REQ-004 work also includes application approval/rejection, permanent Membership IDs, membership periods and expiry, payment tracking, import/export, contacts export and virtual membership cards.
 
-No scope change was introduced. Membership/entitlement checking remains manual; no login, gateway or dashboard has been added.
+### Verification still required
+
+Before 0.6 is deployed for real applications:
+
+- run PHP syntax checks on all new membership PHP files;
+- confirm PDO SQLite is enabled on the cPanel host;
+- configure `HWFC_MEMBER_DB` outside the web root;
+- submit a clearly labelled test membership application;
+- verify subject-access export, audited correction and confirmed deletion against the test record;
+- verify `/members/data/`, `/members/lib/` and `/members/bin/` cannot be accessed over HTTP;
+- verify no database file or exported personal data is tracked by Git;
+- review the production retention process against the published privacy policy.
+
+REQ-004 remains `ToDo`/partially implemented until the full requirement is delivered; this increment intentionally delivers only the public/data foundation needed before the 0.7 administration work.
