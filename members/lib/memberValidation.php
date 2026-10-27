@@ -51,6 +51,24 @@ function hwfcValidateApplication(array $input): array
         $errors['membership_section'] = 'Choose the membership section that applies.';
     }
 
+    $secondContact = [
+        'second_emergency_name' => hwfcClean($input['second_emergency_name'] ?? ''),
+        'second_emergency_relationship' => hwfcClean($input['second_emergency_relationship'] ?? ''),
+        'second_emergency_phone' => hwfcClean($input['second_emergency_phone'] ?? ''),
+    ];
+    $secondProvided = implode('', $secondContact) !== '';
+    if ($secondProvided) {
+        if ($secondContact['second_emergency_name'] === '') {
+            $errors['second_emergency_name'] = 'Enter the second emergency contact name.';
+        }
+        if ($secondContact['second_emergency_relationship'] === '') {
+            $errors['second_emergency_relationship'] = 'Enter the second emergency contact relationship to the player.';
+        }
+        if ($secondContact['second_emergency_phone'] === '') {
+            $errors['second_emergency_phone'] = 'Enter the second emergency contact telephone number.';
+        }
+    }
+
     if (!in_array($input['health_relevant'] ?? '', ['yes', 'no'], true)) {
         $errors['health_relevant'] = 'Please tell us whether you have relevant health information.';
     }
