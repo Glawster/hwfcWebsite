@@ -1,6 +1,6 @@
 # Requirements
 
-Next available number: 006
+Next available number: 008
 
 | Req ID | Requirement | Description | Status | Agent Prompt | Architecture Decisions |
 | --- | --- | --- | --- | --- | --- |
@@ -9,6 +9,8 @@ Next available number: 006
 | 003 | [Admin authentication](features/003-adminAuthentication.md) | Protect the private `/admin/` area with email, password and a six-digit SMS PIN on every login. | ToDo | — | — |
 | 004 | [Membership application and management](features/004-membershipApplicationAndManagement.md) | Accept membership applications, maintain the member register, support GDPR administration, issue Membership IDs and provide virtual membership cards. | ToDo | — | — |
 | 005 | [Club privacy notice](features/005-clubPrivacyNotice.md) | Publish and maintain accessible club privacy information. | ToDo | — | — |
+| 006 | [Admin kit window management](features/006-adminKitWindowManagement.md) | Allow an authenticated administrator to add, review and clear the optional kit-order window from `/admin/`. | ToDo | — | — |
+| 007 | [Admin kit configuration management](features/007-adminKitConfigurationManagement.md) | Allow authenticated administrators to manage routine Club Shop settings, kit-manager email recipients and catalogue products from `/admin/`. | ToDo | — | — |
 
 ## Prompt index
 

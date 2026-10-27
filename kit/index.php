@@ -80,12 +80,12 @@ function renderOrder(array $o): void {
 <body><a class="skipLink" href="#mainContent">Skip to main content</a>
 <header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a aria-current="page" href="/kit/">Kit</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
 <main id="mainContent"><section class="pageHero kitHero"><div class="shell narrow"><h1>Club Shop</h1>
-<?php if ($state === 'open'): ?><p class="infoStrip"><strong>Orders for this kit window close: <?= e(kitDate($c['window']['closes'])) ?>.</strong></p><?php endif ?></div></section>
+<?php if ($state === 'open' && $c && kitWindowConfigured($c)): ?><p class="infoStrip"><strong>Orders for this kit window close: <?= e(kitDate($c['window']['closes'])) ?>.</strong></p><?php endif ?></div></section>
 <section class="section"><div class="shell narrow">
 <?php if ($errors): ?><div class="notice noticeError" role="alert"><h2>Please Check Your Order</h2><ul><?php foreach ($errors as $error): ?><li><?= e($error) ?></li><?php endforeach ?></ul></div><?php endif ?>
 <?php if ($receipt): ?>
 <h2>Thank You – Your Kit Order Has Been Received</h2><p><strong>Order Reference: <?= e($receipt['reference']) ?><br>Amount to Pay: <?= e(kitMoney($receipt['totalPence'])) ?></strong></p>
-<p>Batch: <?= e($receipt['batchId']) ?> — <?= e($receipt['batchName']) ?><br>Submitted: <?= e(kitDate($receipt['submittedAt'])) ?></p>
+<?php if (($receipt['batchId'] ?? 'continuous') !== 'continuous'): ?><p>Batch: <?= e($receipt['batchId']) ?> — <?= e($receipt['batchName']) ?><br>Submitted: <?= e(kitDate($receipt['submittedAt'])) ?></p><?php else: ?><p>Submitted: <?= e(kitDate($receipt['submittedAt'])) ?></p><?php endif ?>
 <?php if ($receipt['managerMail'] !== 'sent'): ?><div class="notice noticeError" role="status">Your order has been saved, but we could not confirm the kit-manager email notification. Please contact the club with your order reference; the club can recover and retry the saved notification. Please do not submit the order again.</div><?php else: ?><p>The mail service accepted the kit-manager notification.</p><?php endif ?>
 <?php if ($receipt['memberMail'] !== 'sent'): ?><p>Your complete confirmation is shown here. Please save or print it; we could not confirm a confirmation email.</p><?php endif ?>
 <?php renderOrder($receipt); ?>
