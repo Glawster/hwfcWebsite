@@ -75,14 +75,19 @@ function errorFor(string $key): string
 <div class="field"><label for="membership_section">Which section applies?</label><select id="membership_section" name="membership_section" required><option value="">Choose…</option><option value="mens"<?= selected('membership_section','mens') ?>>Men's</option><option value="ladies"<?= selected('membership_section','ladies') ?>>Ladies'</option><option value="unsure"<?= selected('membership_section','unsure') ?>>Not sure / please advise</option></select><?= errorFor('membership_section') ?></div>
 </div>
 
-<h3>Emergency contact</h3>
-<p class="formNote">Please tell your nominated emergency contact that you have supplied their details to HWFC.</p>
+<h3>Emergency contacts</h3>
+<p class="formNote">Please tell each nominated emergency contact that you have supplied their details to HWFC. The first contact is required; the second is optional.</p>
+<h4>Emergency contact 1</h4>
 <div class="formGrid">
-<div class="field"><label for="emergency_name">Emergency contact full name</label><input id="emergency_name" name="emergency_name" value="<?= old('emergency_name') ?>" required><?= errorFor('emergency_name') ?></div>
-<div class="field"><label for="emergency_relationship">Relationship to you</label><input id="emergency_relationship" name="emergency_relationship" value="<?= old('emergency_relationship') ?>" required><?= errorFor('emergency_relationship') ?></div>
-<div class="field"><label for="emergency_phone">Emergency contact telephone</label><input id="emergency_phone" name="emergency_phone" value="<?= old('emergency_phone') ?>" inputmode="tel" required><?= errorFor('emergency_phone') ?></div>
-<div class="field"><label for="second_emergency_name">Second emergency contact <span class="formNote">(optional)</span></label><input id="second_emergency_name" name="second_emergency_name" value="<?= old('second_emergency_name') ?>"></div>
-<div class="field"><label for="second_emergency_phone">Second emergency contact telephone <span class="formNote">(optional)</span></label><input id="second_emergency_phone" name="second_emergency_phone" value="<?= old('second_emergency_phone') ?>" inputmode="tel"></div>
+<div class="field"><label for="emergency_name">Full name</label><input id="emergency_name" name="emergency_name" value="<?= old('emergency_name') ?>" required><?= errorFor('emergency_name') ?></div>
+<div class="field"><label for="emergency_relationship">Relationship to player</label><input id="emergency_relationship" name="emergency_relationship" value="<?= old('emergency_relationship') ?>" required><?= errorFor('emergency_relationship') ?></div>
+<div class="field"><label for="emergency_phone">Telephone number</label><input id="emergency_phone" name="emergency_phone" value="<?= old('emergency_phone') ?>" inputmode="tel" required><?= errorFor('emergency_phone') ?></div>
+</div>
+<h4>Emergency contact 2 <span class="formNote">(optional)</span></h4>
+<div class="formGrid">
+<div class="field"><label for="second_emergency_name">Full name</label><input id="second_emergency_name" name="second_emergency_name" value="<?= old('second_emergency_name') ?>"><?= errorFor('second_emergency_name') ?></div>
+<div class="field"><label for="second_emergency_relationship">Relationship to player</label><input id="second_emergency_relationship" name="second_emergency_relationship" value="<?= old('second_emergency_relationship') ?>"><?= errorFor('second_emergency_relationship') ?></div>
+<div class="field"><label for="second_emergency_phone">Telephone number</label><input id="second_emergency_phone" name="second_emergency_phone" value="<?= old('second_emergency_phone') ?>" inputmode="tel"><?= errorFor('second_emergency_phone') ?></div>
 </div>
 
 <h3>Health and participation</h3>
