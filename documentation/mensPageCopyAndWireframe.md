@@ -20,7 +20,7 @@ The page should help visitors:
 
 ---
 
-# 2. Recommended Page Order
+## 2. Recommended Page Order
 
 ```text
 HEADER
@@ -64,21 +64,21 @@ FOOTER
 
 ---
 
-# 3. Production Copy
+## 3. Production Copy
 
-## 3.1 Introduction
+### 3.1 Introduction
 
-### Heading
+#### Heading
 
 **Men's Walking Football**
 
-### Copy
+#### Copy
 
 HWFC provides regular walking football for men aged 50 and over, with sessions ranging from gentle and social football through to more competitive games.
 
 Whether you are returning to football, already play regularly, or are trying walking football for the first time, there is a route into the club.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
@@ -86,43 +86,43 @@ This links to `/play/` rather than repeating the full joining information here.
 
 ---
 
-# 4. Men's Sessions
+## 4. Men's Sessions
 
-## Heading
+### Heading
 
 **Men's sessions**
 
 Show only the Men's / mixed regular sessions relevant to this section.
 
-### Tuesday — All abilities
+#### Tuesday — All abilities
 
 **10:30–11:30**  
 Lisburn Leisure Centre
 
 Suitable for players of all abilities.
 
-### Wednesday — Gentle / social
+#### Wednesday — Gentle / social
 
 **11:00–12:00**  
 Football Factory
 
 Best for new players, returning players or anyone looking for a gentler session.
 
-### Thursday — Competitive
+#### Thursday — Competitive
 
 **20:00–21:00**  
 Lisburn Leisure Centre
 
 For players looking for a more competitive game.
 
-### Sunday — Competitive
+#### Sunday — Competitive
 
 **11:00–12:00**  
 Football Factory
 
 For players looking for competitive walking football.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
@@ -130,13 +130,13 @@ Link to `/play/` for venue addresses, costs, footwear guidance and first-visit i
 
 ---
 
-# 5. Competitive Football
+## 5. Competitive Football
 
-## Heading
+### Heading
 
 **Competitive walking football**
 
-### Copy
+#### Copy
 
 HWFC takes part in matches, tournaments and other competitive walking-football events.
 
@@ -146,9 +146,9 @@ These competition categories are separate from the normal eligibility for weekly
 
 ---
 
-# 6. Fixtures and Events
+## 6. Fixtures and Events
 
-## Heading
+### Heading
 
 **Fixtures & events**
 
@@ -163,7 +163,7 @@ Future fixture / event entries should support:
 - Result once played.
 - Link to a match report where available.
 
-### Action
+#### Action
 
 **View Fixtures & Events**
 
@@ -173,15 +173,15 @@ Future URL:
 
 ---
 
-# 7. Squad
+## 7. Squad
 
-## Heading
+### Heading
 
 **Meet the squad**
 
 The Men's page may later show a small preview of squad profiles rather than the full squad.
 
-### Action
+#### Action
 
 **Meet the Squad**
 
@@ -193,15 +193,15 @@ Player profiles should use the shared player content structure defined in `conte
 
 ---
 
-# 8. Match Reports
+## 8. Match Reports
 
-## Heading
+### Heading
 
 **Match reports**
 
 Show the most recent Men's match report or tournament report when available.
 
-### Action
+#### Action
 
 **Read Match Reports**
 
@@ -211,19 +211,19 @@ Future URL:
 
 ---
 
-# 9. Interested in Playing?
+## 9. Interested in Playing?
 
-## Heading
+### Heading
 
 **Interested in Men's walking football?**
 
-### Copy
+#### Copy
 
 See the full session information and find the session that best suits your experience and the type of football you are looking for.
 
 If it is your first visit, contact us beforehand and we will make sure someone is there to greet you and introduce you to the session.
 
-### Actions
+#### Actions
 
 **I'd Like to Try Walking Football**
 
@@ -231,7 +231,7 @@ If it is your first visit, contact us beforehand and we will make sure someone i
 
 ---
 
-# 10. What This Page Should Not Repeat
+## 10. What This Page Should Not Repeat
 
 Keep the detailed recruitment/reference content on `/play/`:
 
@@ -244,7 +244,7 @@ Keep the detailed recruitment/reference content on `/play/`:
 
 ---
 
-# 11. Mobile Wireframe
+## 11. Mobile Wireframe
 
 ```text
 ┌──────────────────────────────┐
@@ -285,7 +285,7 @@ Keep the detailed recruitment/reference content on `/play/`:
 
 ---
 
-# 12. Outstanding Content
+## 12. Outstanding Content
 
 These items can be added later and do not block Phase 1:
 

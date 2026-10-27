@@ -24,7 +24,7 @@ Detailed general recruitment information should remain on `/play/`.
 
 ---
 
-# 2. Recommended Page Order
+## 2. Recommended Page Order
 
 ```text
 HEADER
@@ -73,39 +73,39 @@ FOOTER
 
 ---
 
-# 3. Production Copy
+## 3. Production Copy
 
-## 3.1 Introduction
+### 3.1 Introduction
 
-### Heading
+#### Heading
 
 **Ladies' Walking Football**
 
-### Copy
+#### Copy
 
 HWFC offers walking football for women aged 35 and over, with regular opportunities for coaching, development and match play.
 
 You do not need previous football experience to take part. Whether you have played before, are returning to football after a long break, or are completely new to the game, you are welcome.
 
-### Primary action
+#### Primary action
 
 **I'd Like to Try Walking Football**
 
 ---
 
-# 4. Who Is It For?
+## 4. Who Is It For?
 
-## Heading
+### Heading
 
 **Walking football for women aged 35+**
 
-### Copy
+#### Copy
 
 Our Ladies' sessions are open to women aged 35 and over.
 
 Previous football experience is not required. The aim is to provide a welcoming route into the game while also giving players opportunities to improve, play matches and take part in team events.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
@@ -113,13 +113,13 @@ Link to the detailed Play page.
 
 ---
 
-# 5. Ladies' Sessions
+## 5. Ladies' Sessions
 
-## Heading
+### Heading
 
 **Ladies' sessions**
 
-### Friday — Coaching & development
+#### Friday — Coaching & development
 
 **20:00–21:00**  
 **Football Factory**
@@ -128,14 +128,14 @@ A Ladies' session focused on coaching and development.
 
 This is a good opportunity to develop skills, confidence and understanding of the game.
 
-### Sunday — Match session
+#### Sunday — Match session
 
 **14:00–15:00**  
 **Football Factory**
 
 Match-focused walking football for women of all abilities.
 
-### Action
+#### Action
 
 **Play Walking Football**
 
@@ -143,13 +143,13 @@ Link to `/play/` for venue address, costs, footwear guidance and first-visit inf
 
 ---
 
-# 6. What to Expect
+## 6. What to Expect
 
-## Heading
+### Heading
 
 **New to walking football?**
 
-### Copy
+#### Copy
 
 You do not need to know the rules or have played organised football before coming to HWFC.
 
@@ -157,15 +157,15 @@ Get in touch with us beforehand and we will make sure someone is there to greet 
 
 There is no separate trial-session format — you simply come along and join the session with support from the group.
 
-### Action
+#### Action
 
 **I'd Like to Try Walking Football**
 
 ---
 
-# 7. Fixtures and Events
+## 7. Fixtures and Events
 
-## Heading
+### Heading
 
 **Fixtures & events**
 
@@ -180,7 +180,7 @@ Future fixture / event entries should support:
 - Result once played.
 - Link to a match report where available.
 
-### Action
+#### Action
 
 **View Fixtures & Events**
 
@@ -190,15 +190,15 @@ Future URL:
 
 ---
 
-# 8. Squad
+## 8. Squad
 
-## Heading
+### Heading
 
 **Meet the squad**
 
 The Ladies' page may later show a small preview of player profiles and link to the full squad page.
 
-### Action
+#### Action
 
 **Meet the Squad**
 
@@ -210,15 +210,15 @@ Player profiles should use the shared player content structure defined in `conte
 
 ---
 
-# 9. Match Reports
+## 9. Match Reports
 
-## Heading
+### Heading
 
 **Match reports**
 
 Show the latest Ladies' match or tournament report when available.
 
-### Action
+#### Action
 
 **Read Match Reports**
 
@@ -228,19 +228,19 @@ Future URL:
 
 ---
 
-# 10. Come and Try It
+## 10. Come and Try It
 
-## Heading
+### Heading
 
 **Thinking about giving it a go?**
 
-### Copy
+#### Copy
 
 The easiest way to find out whether walking football is for you is to come along.
 
 Contact us beforehand and tell us you are interested in a Ladies' session. We will make sure someone is there to welcome you and introduce you to the group.
 
-### Actions
+#### Actions
 
 **I'd Like to Try Walking Football**
 
@@ -254,7 +254,7 @@ Facebook Messenger remains a secondary contact option.
 
 ---
 
-# 11. Photography and Tone
+## 11. Photography and Tone
 
 The Ladies' page should use genuine HWFC Ladies' photography wherever possible.
 
@@ -270,7 +270,7 @@ Avoid imagery or wording that suggests someone must already be an experienced fo
 
 ---
 
-# 12. What This Page Should Not Repeat
+## 12. What This Page Should Not Repeat
 
 Keep the detailed general information on `/play/`:
 
@@ -285,7 +285,7 @@ The Ladies' page should give enough reassurance to encourage the visitor to cont
 
 ---
 
-# 13. Mobile Wireframe
+## 13. Mobile Wireframe
 
 ```text
 ┌──────────────────────────────┐
@@ -330,7 +330,7 @@ The Ladies' page should give enough reassurance to encourage the visitor to cont
 
 ---
 
-# 14. Outstanding Content
+## 14. Outstanding Content
 
 These items can be added later and do not block Phase 1:
 

@@ -1,4 +1,4 @@
-# 004: Admin kit window management
+# 006: Admin kit window management
 
 ## Status
 

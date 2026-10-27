@@ -1,4 +1,4 @@
-# 005: Admin kit configuration management
+# 007: Admin kit configuration management
 
 ## Status
 
@@ -10,7 +10,7 @@ As a `kit administrator`, I need to manage routine Club Shop configuration from 
 
 ## Context
 
-REQ-001 introduced a server-side `kitConfig.json` containing a mixture of deployment settings and routine Club Shop settings. REQ-004 separates the optional kit-order window into its own application-managed configuration file.
+REQ-001 introduced a server-side `kitConfig.json` containing a mixture of deployment settings and routine Club Shop settings. REQ-006 separates the optional kit-order window into its own application-managed configuration file.
 
 The same separation should be applied to other routine Club Shop settings. Values that club administrators reasonably need to change should be stored in a separate application-managed configuration file writable by the authenticated administration application, while deployment-sensitive settings remain outside the administrator-managed configuration.
 
@@ -51,7 +51,7 @@ The initial application-managed file should be `config/kitShop.json` beneath the
 - Preserve the existing product identifier rules and prevent duplicate product identifiers.
 - Validate all administrator changes using the same authoritative catalogue and pricing validation rules used by the public Club Shop.
 - Combine the deployment-managed configuration and application-managed configuration into one effective in-memory shop configuration for the existing Club Shop code.
-- Keep REQ-004 kit-window configuration separate in `config/kitWindow.json`.
+- Keep REQ-006 kit-window configuration separate in `config/kitWindow.json`.
 - Protect all configuration-management actions using the administrator authentication and CSRF controls defined by REQ-003.
 - Write `kitShop.json` atomically so an interrupted or failed update cannot leave the live shop configuration partially written or invalid.
 - Validate the complete proposed `kitShop.json` content before replacing the currently valid file.
@@ -62,7 +62,7 @@ The initial application-managed file should be `config/kitShop.json` beneath the
 
 - Editing deployment credentials, filesystem paths, mail-provider credentials, SMS-provider credentials or other secrets through `/admin/`.
 - Editing `kitConfig.json` directly from the administration application.
-- Kit-order window management; this belongs to REQ-004 and uses `kitWindow.json`.
+- Kit-order window management; this belongs to REQ-006 and uses `kitWindow.json`.
 - Uploading or editing image binary files in the initial implementation; catalogue entries may reference approved local asset paths.
 - Automatic supplier catalogue synchronisation.
 - Automatic supplier stock or price updates.
@@ -84,13 +84,13 @@ The initial application-managed file should be `config/kitShop.json` beneath the
 12. Given a state-changing configuration request without a valid CSRF token, when it is submitted, then no configuration change is made.
 13. Given a successful configuration change, when the audit information is reviewed, then the administrator identity, timestamp and nature of the change can be determined without exposing passwords, PINs or service secrets.
 14. Given the public Club Shop loads its configuration, when both deployment and administrator-managed files are valid, then the application combines them into one effective configuration without requiring the existing ordering workflow to know which file supplied each value.
-15. Given REQ-004 is also implemented, when a kit window is configured, then `kitWindow.json` remains independent of `kitShop.json` and both are combined with deployment configuration only at runtime.
+15. Given REQ-006 is also implemented, when a kit window is configured, then `kitWindow.json` remains independent of `kitShop.json` and both are combined with deployment configuration only at runtime.
 
 ## Dependencies and decisions
 
 - Depends on REQ-001 Member kit ordering for product, pricing, delivery and notification behaviour.
 - Depends on REQ-003 Admin authentication for protected access to `/admin/`.
-- Complements REQ-004 Admin kit window management; the two requirements use separate application-managed configuration files.
+- Complements REQ-006 Admin kit window management; the two requirements use separate application-managed configuration files.
 - `config/kitConfig.json` remains deployment-managed and must not be writable by routine administration features.
 - `config/kitShop.json` is application-managed and may be writable by the web application account, but it remains protected from public HTTP access by the existing `/config` protections.
 - The effective configuration model is: deployment configuration + Club Shop configuration + optional kit-window configuration.

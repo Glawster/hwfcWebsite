@@ -21,7 +21,7 @@ Secondary route:
 
 ---
 
-# 2. Recommended Page Order
+## 2. Recommended Page Order
 
 ```text
 HEADER
@@ -56,15 +56,15 @@ FOOTER
 
 ---
 
-# 3. Production Copy
+## 3. Production Copy
 
-## 3.1 Page Introduction
+### 3.1 Page Introduction
 
-### Heading
+#### Heading
 
 **Contact Hillsborough Walking Football Club**
 
-### Copy
+#### Copy
 
 Have a question about walking football, our sessions, fixtures or visiting HWFC? Send us a message and someone from the club will get back to you.
 
@@ -72,23 +72,23 @@ If you are thinking about playing, you do not need to commit to joining. Tell us
 
 ---
 
-# 4. Contact Form
+## 4. Contact Form
 
-## 4.1 Fields
+### 4.1 Fields
 
-### Name
-
-Required.
-
-### Email Address
+#### Name
 
 Required.
 
-### Phone number
+#### Email Address
+
+Required.
+
+#### Phone number
 
 Optional.
 
-### What are you contacting us about?
+#### What are you contacting us about?
 
 Required selection:
 
@@ -98,11 +98,11 @@ Required selection:
 - **Fixtures / visiting club**
 - **General enquiry**
 
-### Message
+#### Message
 
 Required free-text field.
 
-### Submit button
+#### Submit button
 
 **Send Enquiry**
 
@@ -112,7 +112,7 @@ For recruitment-specific buttons elsewhere on the site, prefer:
 
 ---
 
-# 5. Form Destination
+## 5. Form Destination
 
 All website form submissions should be delivered to:
 
@@ -126,19 +126,19 @@ The internal mailbox / forwarding arrangement can change without requiring any c
 
 ---
 
-# 6. First-Time Players
+## 6. First-Time Players
 
-## Heading
+### Heading
 
 **Coming along for the first time?**
 
-### Copy
+#### Copy
 
 Get in touch with us beforehand and tell us which session you are interested in.
 
 There is no special trial-session format. We will make sure someone is there to greet you, introduce you to the group and help you get settled into the session.
 
-### Action
+#### Action
 
 **See Session Details**
 
@@ -146,15 +146,15 @@ This links to `/play/`.
 
 ---
 
-# 7. Other Ways to Contact HWFC
+## 7. Other Ways to Contact HWFC
 
-## Facebook Messenger
+### Facebook Messenger
 
-### Copy
+#### Copy
 
 If you already use Facebook, you can also message HWFC through our Facebook page.
 
-### Action
+#### Action
 
 **Message HWFC on Facebook**
 
@@ -172,7 +172,7 @@ The Facebook Page should use an automatic first response to help categorise enqu
 
 Do not rely on Facebook as the only public contact route.
 
-## Email
+### Email
 
 Official club email:
 
@@ -180,7 +180,7 @@ Official club email:
 
 The website may display this address as a fallback contact route, but the contact form should remain the main website action.
 
-## WhatsApp
+### WhatsApp
 
 WhatsApp is used internally for member event publication and session-attendance polls. It is not a public contact route.
 
@@ -188,7 +188,7 @@ Do not publish a WhatsApp contact unless HWFC later establishes a dedicated club
 
 ---
 
-# 8. Information Not to Request
+## 8. Information Not to Request
 
 The initial contact form should not request unnecessary or sensitive information such as:
 
@@ -202,7 +202,7 @@ If someone later joins or participates in an activity requiring additional infor
 
 ---
 
-# 9. Privacy Copy
+## 9. Privacy Copy
 
 A short privacy statement should appear close to the form.
 
@@ -214,7 +214,7 @@ Do not add lengthy legal text directly beside the form. A fuller privacy page ca
 
 ---
 
-# 10. Automated Email Acknowledgement
+## 10. Automated Email Acknowledgement
 
 Where supported by the implementation, send an automatic acknowledgement from:
 
@@ -238,7 +238,7 @@ Avoid promising a specific response time unless the club is confident it can be 
 
 ---
 
-# 11. Technical Requirements for the Form
+## 11. Technical Requirements for the Form
 
 Implementation technology is not yet selected, but the final form should:
 
@@ -257,7 +257,7 @@ Avoid adding CAPTCHA that creates unnecessary difficulty for genuine users unles
 
 ---
 
-# 12. Mobile Wireframe
+## 12. Mobile Wireframe
 
 ```text
 ┌──────────────────────────────┐
@@ -301,7 +301,7 @@ Avoid adding CAPTCHA that creates unnecessary difficulty for genuine users unles
 
 ---
 
-# 13. Contact Ownership Principle
+## 13. Contact Ownership Principle
 
 All public contact mechanisms should belong to HWFC rather than to an individual member.
 
