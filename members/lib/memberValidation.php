@@ -19,7 +19,6 @@ function hwfcValidateApplication(array $input): array
         'email' => 'Email address',
         'phone' => 'Telephone number',
         'preferred_contact' => 'Preferred contact method',
-        'membership_section' => 'Membership section',
         'emergency_name' => 'Emergency contact name',
         'emergency_relationship' => 'Emergency contact relationship',
         'emergency_phone' => 'Emergency contact telephone number',
@@ -45,10 +44,6 @@ function hwfcValidateApplication(array $input): array
 
     if (!in_array($input['preferred_contact'] ?? '', ['phone', 'text', 'whatsapp', 'email'], true)) {
         $errors['preferred_contact'] = 'Choose a preferred contact method.';
-    }
-
-    if (!in_array($input['membership_section'] ?? '', ['mens', 'ladies', 'unsure'], true)) {
-        $errors['membership_section'] = 'Choose the membership section that applies.';
     }
 
     $secondContact = [
