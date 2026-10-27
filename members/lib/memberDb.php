@@ -33,11 +33,11 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     email TEXT NOT NULL,
     phone TEXT NOT NULL,
     preferred_contact TEXT NOT NULL,
-    membership_section TEXT NOT NULL,
     emergency_name TEXT NOT NULL,
     emergency_relationship TEXT NOT NULL,
     emergency_phone TEXT NOT NULL,
     second_emergency_name TEXT,
+    second_emergency_relationship TEXT,
     second_emergency_phone TEXT,
     health_relevant INTEGER NOT NULL DEFAULT 0,
     health_details TEXT,
@@ -48,6 +48,12 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     status TEXT NOT NULL DEFAULT 'Pending'
 )
 SQL);
+
+    $columns = $db->query('PRAGMA table_info(membership_applications)')->fetchAll();
+    $columnNames = array_column($columns, 'name');
+    if (!in_array('second_emergency_relationship', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN second_emergency_relationship TEXT');
+    }
 
     $db->exec(<<<'SQL'
 CREATE TABLE IF NOT EXISTS membership_audit (
