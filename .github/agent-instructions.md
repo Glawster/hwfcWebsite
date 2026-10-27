@@ -2,6 +2,8 @@
 
 Read `documentation/requirementsManagement.md`.
 
+Read `documentation/repositoryLayout.md` before adding or moving repository content.
+
 For requirement work:
 
 - use `project/requirements/requirementsIndex.md` as the next-ID authority;

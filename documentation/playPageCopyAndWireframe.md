@@ -24,7 +24,7 @@ The page should answer:
 
 ---
 
-# 2. Recommended Page Order
+## 2. Recommended Page Order
 
 ```text
 HEADER
@@ -68,15 +68,15 @@ FOOTER
 
 ---
 
-# 3. Production Copy
+## 3. Production Copy
 
-## 3.1 Page Introduction
+### 3.1 Page Introduction
 
-### Heading
+#### Heading
 
 **Play Walking Football**
 
-### Introductory copy
+#### Introductory copy
 
 Walking football is a great way to stay active, enjoy football and be part of a team.
 
@@ -84,19 +84,19 @@ You do not need to be an experienced footballer, and you do not need to be match
 
 If you are unsure which session is right for you, get in touch and we will help.
 
-### Primary action
+#### Primary action
 
 **I'd Like to Try Walking Football**
 
 ---
 
-# 4. What Is Walking Football?
+## 4. What Is Walking Football?
 
-## Heading
+### Heading
 
 **What is walking football?**
 
-### Copy
+#### Copy
 
 Walking football keeps the passing, movement, teamwork and enjoyment of football while players move at a walking pace rather than running.
 
@@ -106,13 +106,13 @@ For some people it is a way back into football after many years away. For others
 
 ---
 
-# 5. Is It for Me?
+## 5. Is It for Me?
 
-## Heading
+### Heading
 
 **Is walking football for me?**
 
-### Copy
+#### Copy
 
 You do not need previous football experience to join HWFC.
 
@@ -123,7 +123,7 @@ We welcome:
 - Beginners.
 - People who have never played organised football.
 
-### Age guidance
+#### Age guidance
 
 **Men's walking football**  
 Generally for players aged **50 and over**.
@@ -135,19 +135,19 @@ Competitive teams may be entered in age-banded competitions such as U55, U65 and
 
 ---
 
-# 6. Which Session Is Right for Me?
+## 6. Which Session Is Right for Me?
 
-## Heading
+### Heading
 
 **Find a session that suits you**
 
-### Introductory copy
+#### Introductory copy
 
 Our sessions have different characters. Some are gentler and more social, while others are more competitive or focused on coaching and development.
 
 If you are unsure where to start, contact us and we will help you choose.
 
-## Tuesday — All abilities
+### Tuesday — All abilities
 
 **10:30–11:30**  
 **Lisburn Leisure Centre**  
@@ -155,7 +155,7 @@ Lisburn, BT28 1LP
 
 Suitable for players of all abilities.
 
-## Wednesday — Gentle / social
+### Wednesday — Gentle / social
 
 **11:00–12:00**  
 **Football Factory**  
@@ -163,7 +163,7 @@ Suitable for players of all abilities.
 
 Best for new players, returning players or anyone looking for a gentler session.
 
-## Thursday — Competitive
+### Thursday — Competitive
 
 **20:00–21:00**  
 **Lisburn Leisure Centre**  
@@ -171,7 +171,7 @@ Lisburn, BT28 1LP
 
 For players looking for a more competitive game.
 
-## Friday — Ladies' coaching & development
+### Friday — Ladies' coaching & development
 
 **20:00–21:00**  
 **Football Factory**  
@@ -179,7 +179,7 @@ For players looking for a more competitive game.
 
 A Ladies' session focused on coaching and development.
 
-## Sunday — Competitive
+### Sunday — Competitive
 
 **11:00–12:00**  
 **Football Factory**  
@@ -187,7 +187,7 @@ A Ladies' session focused on coaching and development.
 
 For players looking for competitive walking football.
 
-## Sunday — Ladies' match session
+### Sunday — Ladies' match session
 
 **14:00–15:00**  
 **Football Factory**  
@@ -197,9 +197,9 @@ Match-focused walking football for women of all abilities.
 
 ---
 
-# 7. Costs
+## 7. Costs
 
-## Heading
+### Heading
 
 **What does it cost?**
 
@@ -211,15 +211,15 @@ Match-focused walking football for women of all abilities.
 
 Session fees are paid online.
 
-### Supporting copy
+#### Supporting copy
 
 You do not need to make a formal commitment before coming along for the first time. Contact us beforehand and we will help you choose a suitable session.
 
 ---
 
-# 8. What Should I Bring?
+## 8. What Should I Bring?
 
-## Heading
+### Heading
 
 **What should I bring?**
 
@@ -231,55 +231,55 @@ Trainers are also suitable at the Football Factory.
 
 ---
 
-# 9. Your First Visit
+## 9. Your First Visit
 
-## Heading
+### Heading
 
 **Coming along for the first time?**
 
-### Before you arrive
+#### Before you arrive
 
 Contact HWFC beforehand and tell us which session you are interested in.
 
 There is no special trial-session format.
 
-### When you arrive
+#### When you arrive
 
 We will make sure someone is there to greet you, introduce you to the group and help you get settled into the session.
 
-### During the session
+#### During the session
 
 Join in at a level that suits you. Nobody expects a new player to know all the walking-football rules or club routines before they arrive.
 
-### Afterwards
+#### Afterwards
 
 If you enjoy the session and would like to continue, we can explain the regular session and membership arrangements.
 
 ---
 
-# 10. Contact
+## 10. Contact
 
-## Heading
+### Heading
 
 **Ready to give it a try?**
 
-### Copy
+#### Copy
 
 Send us a message and tell us which session interests you.
 
 The easiest route is our website contact form. You can also contact HWFC through Facebook Messenger.
 
-### Primary action
+#### Primary action
 
 **I'd Like to Try Walking Football**
 
 This links to `/contact/` with the matching enquiry type preselected where practical.
 
-### Secondary action
+#### Secondary action
 
 **Contact HWFC**
 
-### Contact details
+#### Contact details
 
 Website enquiries are routed to:
 
@@ -293,7 +293,7 @@ Personal committee email addresses and phone numbers should not be published.
 
 ---
 
-# 11. Desktop Wireframe
+## 11. Desktop Wireframe
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -327,7 +327,7 @@ Personal committee email addresses and phone numbers should not be published.
 
 ---
 
-# 12. Mobile Wireframe
+## 12. Mobile Wireframe
 
 ```text
 ┌──────────────────────────────┐
@@ -364,7 +364,7 @@ Personal committee email addresses and phone numbers should not be published.
 
 ---
 
-# 13. Outstanding Items
+## 13. Outstanding Items
 
 These do not block the Play page:
 
