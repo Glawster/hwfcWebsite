@@ -12,4 +12,6 @@
 /orders/*.json
 /orders/*.lock
 /orders/.order-*
+/members/data/*.sqlite
+/members/data/*.sqlite-*
 tests/__pycache__/
