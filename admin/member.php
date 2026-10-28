@@ -226,10 +226,10 @@ if (!$application) {
         <section class="adminDetailPanel">
             <h2>Membership Dates</h2>
             <dl class="adminDetailGrid">
-                <div><dt>Member Since</dt><dd><?= adminEsc(adminDisplayDate($application['membershipStartDate'])) ?></dd></div>
-                <div><dt>Expiry Date</dt><dd><?= adminEsc(adminDisplayDate($application['membershipExpiryDate'])) ?></dd></div>
-                <div><dt>Renewal Date</dt><dd><?= adminEsc(adminRenewalDate($application['membershipExpiryDate'])) ?></dd></div>
                 <div><dt>Membership Status</dt><dd><?= adminEsc($application['status']) ?></dd></div>
+                <div><dt>Member Since</dt><dd><?= adminEsc(adminDisplayDate($application['membershipStartDate'])) ?></dd></div>
+                <div><dt>Renewal Date</dt><dd><?= adminEsc(adminRenewalDate($application['membershipExpiryDate'])) ?></dd></div>
+                <div><dt>Expiry Date</dt><dd><?= adminEsc(adminDisplayDate($application['membershipExpiryDate'])) ?></dd></div>
                 <div><dt>Payment Plan</dt><dd><?= adminEsc($application['paymentFrequency'] ?: 'Not Set') ?></dd></div>
                 <div><dt>Payment Status</dt><dd><?= adminEsc($application['paymentStatus'] ?: 'Not Recorded') ?></dd></div>
                 <div><dt>Last Payment</dt><dd><?= adminEsc(adminDisplayDate($application['lastPaymentDate'])) ?></dd></div>
