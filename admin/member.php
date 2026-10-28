@@ -88,7 +88,7 @@ if (!$application) {
         <?php if ($application['status'] === 'Pending'): ?>
         <section class="adminActionPanel" aria-labelledby="applicationActionsHeading">
             <h2 id="applicationActionsHeading">Application Actions</h2>
-            <p>Accepting assigns the next permanent HWFC Membership ID. Rejecting records the application as rejected and does not issue a Membership ID.</p>
+            <p>Accepting assigns the next available HWFC Membership ID. Rejecting records the application as rejected and does not issue a Membership ID.</p>
             <div class="adminActionRow">
                 <form method="post" action="/admin/application-status.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
@@ -101,6 +101,19 @@ if (!$application) {
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
                     <input type="hidden" name="action" value="reject">
                     <button class="button buttonSecondary" type="submit">Reject Application</button>
+                </form>
+            </div>
+        </section>
+        <?php elseif ($application['status'] === 'Active' && $application['membership_id']): ?>
+        <section class="adminActionPanel" aria-labelledby="applicationActionsHeading">
+            <h2 id="applicationActionsHeading">Application Actions</h2>
+            <p>If this application was accepted by mistake, undoing acceptance returns it to Pending and releases Membership ID <?= adminEsc($application['membership_id']) ?> for reuse.</p>
+            <div class="adminActionRow">
+                <form method="post" action="/admin/application-status.php">
+                    <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                    <input type="hidden" name="action" value="undo_accept">
+                    <button class="button buttonSecondary" type="submit">Undo Acceptance</button>
                 </form>
             </div>
         </section>
