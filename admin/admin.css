@@ -206,6 +206,25 @@
     grid-column: 1 / -1;
 }
 
+.adminNotesForm label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: .45rem;
+}
+
+.adminNotesForm textarea {
+    width: 100%;
+    min-height: 8rem;
+    resize: vertical;
+    margin-bottom: .5rem;
+}
+
+.adminHelp {
+    margin: 0 0 1rem;
+    color: #666;
+    font-size: .9rem;
+}
+
 .adminNotice {
     border-left: 4px solid #d51f3c;
     background: #fff4f6;
