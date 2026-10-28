@@ -48,11 +48,48 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 
 try {
     $db = hwfcMemberDb();
-    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, membership_start_date, membership_expiry_date, payment_frequency, payment_status, last_payment_date, paid_through_date, next_payment_due_date, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare(<<<'SQL'
+SELECT application_uuid AS applicationUuid,
+       membership_id AS membershipId,
+       first_name AS firstName,
+       last_name AS lastName,
+       preferred_name AS preferredName,
+       date_of_birth AS dateOfBirth,
+       address,
+       postcode,
+       email,
+       phone,
+       preferred_contact AS preferredContact,
+       photo_consent AS photoConsent,
+       privacy_version AS privacyVersion,
+       admin_notes AS adminNotes,
+       membership_start_date AS membershipStartDate,
+       membership_expiry_date AS membershipExpiryDate,
+       payment_frequency AS paymentFrequency,
+       payment_status AS paymentStatus,
+       last_payment_date AS lastPaymentDate,
+       paid_through_date AS paidThroughDate,
+       next_payment_due_date AS nextPaymentDueDate,
+       submitted_at AS submittedAt,
+       updated_at AS updatedAt,
+       status
+FROM membership_applications
+WHERE application_uuid = :uuid
+LIMIT 1
+SQL);
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 
-    $paymentStmt = $db->prepare('SELECT payment_date, amount_pence, payment_type, paid_through_date, recorded_at FROM membership_payments WHERE application_uuid = :uuid ORDER BY payment_date DESC, id DESC');
+    $paymentStmt = $db->prepare(<<<'SQL'
+SELECT payment_date AS paymentDate,
+       amount_pence AS amountPence,
+       payment_type AS paymentType,
+       paid_through_date AS paidThroughDate,
+       recorded_at AS recordedAt
+FROM membership_payments
+WHERE application_uuid = :uuid
+ORDER BY payment_date DESC, id DESC
+SQL);
     $paymentStmt->execute([':uuid' => $uuid]);
     $paymentHistory = $paymentStmt->fetchAll();
 } catch (Throwable $e) {
@@ -88,8 +125,8 @@ if (!$application) {
     <div class="adminShell">
         <p><a class="textLink" href="/admin/">← Back To Administration</a></p>
         <p class="eyebrow">Membership Application</p>
-        <h1><?= adminEsc(trim($application['first_name'] . ' ' . $application['last_name'])) ?></h1>
-        <p class="adminMeta">Reference <?= adminEsc(adminReference((string) $application['application_uuid'])) ?> · Status <?= adminEsc($application['status']) ?></p>
+        <h1><?= adminEsc(trim($application['firstName'] . ' ' . $application['lastName'])) ?></h1>
+        <p class="adminMeta">Reference <?= adminEsc(adminReference((string) $application['applicationUuid'])) ?> · Status <?= adminEsc($application['status']) ?></p>
 
         <?php if ($flash): ?><div class="adminSuccess" role="status"><?= adminEsc($flash) ?></div><?php endif; ?>
         <?php if ($error): ?><div class="adminError" role="alert"><?= adminEsc($error) ?></div><?php endif; ?>
@@ -99,13 +136,13 @@ if (!$application) {
             <h2 id="applicationActionsHeading">Application Actions</h2>
             <p>Accepting assigns the next available HWFC Membership ID. Rejecting records the application as rejected and does not issue a Membership ID.</p>
             <div class="adminActionRow">
-                <form method="post" action="/admin/application-status.php">
+                <form method="post" action="/admin/applicationStatus.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
                     <input type="hidden" name="action" value="accept">
                     <button class="button buttonPrimary" type="submit">Accept Application</button>
                 </form>
-                <form method="post" action="/admin/application-status.php">
+                <form method="post" action="/admin/applicationStatus.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
                     <input type="hidden" name="action" value="reject">
@@ -113,15 +150,15 @@ if (!$application) {
                 </form>
             </div>
         </section>
-        <?php elseif ($application['status'] === 'Active' && $application['membership_id']): ?>
+        <?php elseif ($application['status'] === 'Active' && $application['membershipId']): ?>
         <section class="adminActionPanel" aria-labelledby="applicationActionsHeading">
             <h2 id="applicationActionsHeading">Application Actions</h2>
-            <p>If this application was accepted by mistake, undoing acceptance returns it to Pending and releases Membership ID <?= adminEsc($application['membership_id']) ?> for reuse.</p>
+            <p>If this application was accepted by mistake, undoing acceptance returns it to Pending and releases Membership ID <?= adminEsc($application['membershipId']) ?> for reuse.</p>
             <div class="adminActionRow">
-                <form method="post" action="/admin/application-status.php">
+                <form method="post" action="/admin/applicationStatus.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
-                    <input type="hidden" name="action" value="undo_acceptance">
+                    <input type="hidden" name="action" value="undoAcceptance">
                     <button class="button buttonSecondary" type="submit">Undo Acceptance</button>
                 </form>
             </div>
@@ -131,10 +168,10 @@ if (!$application) {
             <h2 id="applicationActionsHeading">Application Actions</h2>
             <p>If this application was rejected by mistake, undoing rejection returns it to Pending so it can be reviewed again.</p>
             <div class="adminActionRow">
-                <form method="post" action="/admin/application-status.php">
+                <form method="post" action="/admin/applicationStatus.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
-                    <input type="hidden" name="action" value="undo_rejection">
+                    <input type="hidden" name="action" value="undoRejection">
                     <button class="button buttonSecondary" type="submit">Undo Rejection</button>
                 </form>
             </div>
@@ -144,54 +181,54 @@ if (!$application) {
         <section class="adminDetailPanel">
             <h2>Member Details</h2>
             <dl class="adminDetailGrid">
-                <?php if ($application['membership_id']): ?><div><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membership_id']) ?></strong></dd></div><?php endif; ?>
-                <div><dt>First Name</dt><dd><?= adminEsc($application['first_name']) ?></dd></div>
-                <div><dt>Last Name</dt><dd><?= adminEsc($application['last_name']) ?></dd></div>
-                <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferred_name'] ?: '—') ?></dd></div>
-                <div><dt>Date Of Birth</dt><dd><?= adminEsc($application['date_of_birth']) ?></dd></div>
+                <?php if ($application['membershipId']): ?><div><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
+                <div><dt>First Name</dt><dd><?= adminEsc($application['firstName']) ?></dd></div>
+                <div><dt>Last Name</dt><dd><?= adminEsc($application['lastName']) ?></dd></div>
+                <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferredName'] ?: '—') ?></dd></div>
+                <div><dt>Date Of Birth</dt><dd><?= adminEsc($application['dateOfBirth']) ?></dd></div>
                 <div class="adminDetailWide"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
                 <div><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
                 <div><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
                 <div><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
-                <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferred_contact'])) ?></dd></div>
+                <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
             </dl>
         </section>
 
-        <?php if ($application['status'] === 'Active' && $application['membership_id']): ?>
+        <?php if ($application['status'] === 'Active' && $application['membershipId']): ?>
         <section class="adminDetailPanel">
             <h2>Membership And Payment</h2>
-            <form method="post" action="/admin/member-membership.php" class="adminMembershipForm">
+            <form method="post" action="/admin/memberMembership.php" class="adminMembershipForm">
                 <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                 <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
                 <div class="adminFormGrid">
                     <label>Membership Start Date
-                        <input type="date" name="membership_start_date" value="<?= adminEsc($application['membership_start_date'] ?? '') ?>">
+                        <input type="date" name="membershipStartDate" value="<?= adminEsc($application['membershipStartDate'] ?? '') ?>">
                     </label>
                     <label>Membership Expiry Date
-                        <input type="date" name="membership_expiry_date" value="<?= adminEsc($application['membership_expiry_date'] ?? '') ?>">
+                        <input type="date" name="membershipExpiryDate" value="<?= adminEsc($application['membershipExpiryDate'] ?? '') ?>">
                     </label>
                     <label>Payment Frequency
-                        <select name="payment_frequency">
+                        <select name="paymentFrequency">
                             <?php foreach (['Not Set', 'Annual', 'Monthly'] as $frequencyOption): ?>
-                                <option value="<?= adminEsc($frequencyOption) ?>"<?= $application['payment_frequency'] === $frequencyOption ? ' selected' : '' ?>><?= adminEsc($frequencyOption) ?></option>
+                                <option value="<?= adminEsc($frequencyOption) ?>"<?= $application['paymentFrequency'] === $frequencyOption ? ' selected' : '' ?>><?= adminEsc($frequencyOption) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </label>
                     <label>Payment Status
-                        <select name="payment_status">
+                        <select name="paymentStatus">
                             <?php foreach (['Not Recorded', 'Current', 'Payment Due', 'Overdue', 'Paid In Full', 'Waived'] as $paymentOption): ?>
-                                <option value="<?= adminEsc($paymentOption) ?>"<?= $application['payment_status'] === $paymentOption ? ' selected' : '' ?>><?= adminEsc($paymentOption) ?></option>
+                                <option value="<?= adminEsc($paymentOption) ?>"<?= $application['paymentStatus'] === $paymentOption ? ' selected' : '' ?>><?= adminEsc($paymentOption) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </label>
                     <label>Last Payment Date
-                        <input type="date" name="last_payment_date" value="<?= adminEsc($application['last_payment_date'] ?? '') ?>">
+                        <input type="date" name="lastPaymentDate" value="<?= adminEsc($application['lastPaymentDate'] ?? '') ?>">
                     </label>
                     <label>Paid Through
-                        <input type="date" name="paid_through_date" value="<?= adminEsc($application['paid_through_date'] ?? '') ?>">
+                        <input type="date" name="paidThroughDate" value="<?= adminEsc($application['paidThroughDate'] ?? '') ?>">
                     </label>
                     <label>Next Payment Due
-                        <input type="date" value="<?= adminEsc($application['next_payment_due_date'] ?? '') ?>" readonly>
+                        <input type="date" value="<?= adminEsc($application['nextPaymentDueDate'] ?? '') ?>" readonly>
                     </label>
                 </div>
                 <p class="adminHelp">Membership expiry is the end of the annual membership period. For monthly payments, Paid Through records how far payments currently cover the member; Next Payment Due is calculated as the following day. If an expiry date is left blank when a start date is saved, it is set automatically to one year less one day.</p>
@@ -201,16 +238,16 @@ if (!$application) {
             <h3>Record Payment</h3>
             <p class="adminHelp">Use these after confirming the bank transfer. The monthly action advances Paid Through by one membership month; the annual action covers the member through their membership expiry.</p>
             <div class="adminActionRow">
-                <form method="post" action="/admin/member-payment.php">
+                <form method="post" action="/admin/memberPayment.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
-                    <input type="hidden" name="payment_type" value="monthly">
+                    <input type="hidden" name="paymentType" value="monthly">
                     <button class="button buttonPrimary" type="submit">Record £5 Monthly Payment</button>
                 </form>
-                <form method="post" action="/admin/member-payment.php">
+                <form method="post" action="/admin/memberPayment.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
-                    <input type="hidden" name="payment_type" value="annual">
+                    <input type="hidden" name="paymentType" value="annual">
                     <button class="button buttonSecondary" type="submit">Record £60 Annual Payment</button>
                 </form>
             </div>
@@ -225,11 +262,11 @@ if (!$application) {
                         <tbody>
                         <?php foreach ($paymentHistory as $payment): ?>
                             <tr>
-                                <td><?= adminEsc($payment['payment_date']) ?></td>
-                                <td><?= adminEsc(ucfirst((string) $payment['payment_type'])) ?></td>
-                                <td><?= adminEsc(adminMoney((int) $payment['amount_pence'])) ?></td>
-                                <td><?= adminEsc($payment['paid_through_date'] ?: '—') ?></td>
-                                <td><?= adminEsc(adminDate((string) $payment['recorded_at'])) ?></td>
+                                <td><?= adminEsc($payment['paymentDate']) ?></td>
+                                <td><?= adminEsc(ucfirst((string) $payment['paymentType'])) ?></td>
+                                <td><?= adminEsc(adminMoney((int) $payment['amountPence'])) ?></td>
+                                <td><?= adminEsc($payment['paidThroughDate'] ?: '—') ?></td>
+                                <td><?= adminEsc(adminDate((string) $payment['recordedAt'])) ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -241,11 +278,11 @@ if (!$application) {
 
         <section class="adminDetailPanel">
             <h2>Notes</h2>
-            <form method="post" action="/admin/member-notes.php" class="adminNotesForm">
+            <form method="post" action="/admin/memberNotes.php" class="adminNotesForm">
                 <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                 <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
-                <label for="admin_notes">Internal free-form notes</label>
-                <textarea id="admin_notes" name="admin_notes" maxlength="5000" rows="6"><?= adminEsc($application['admin_notes'] ?? '') ?></textarea>
+                <label for="adminNotes">Internal free-form notes</label>
+                <textarea id="adminNotes" name="adminNotes" maxlength="5000" rows="6"><?= adminEsc($application['adminNotes'] ?? '') ?></textarea>
                 <p class="adminHelp">For club administration notes only. Avoid recording unnecessary sensitive information.</p>
                 <button class="button buttonPrimary" type="submit">Save Notes</button>
             </form>
@@ -254,10 +291,10 @@ if (!$application) {
         <section class="adminDetailPanel">
             <h2>Privacy And Submission</h2>
             <dl class="adminDetailGrid">
-                <div><dt>Photography / Publicity Consent</dt><dd><?= ((int) $application['photo_consent']) === 1 ? 'Yes' : 'No' ?></dd></div>
-                <div><dt>Privacy Notice Version</dt><dd><?= adminEsc($application['privacy_version']) ?></dd></div>
-                <div><dt>Submitted</dt><dd><?= adminEsc(adminDate((string) $application['submitted_at'])) ?></dd></div>
-                <div><dt>Last Updated</dt><dd><?= adminEsc(adminDate((string) $application['updated_at'])) ?></dd></div>
+                <div><dt>Photography / Publicity Consent</dt><dd><?= ((int) $application['photoConsent']) === 1 ? 'Yes' : 'No' ?></dd></div>
+                <div><dt>Privacy Notice Version</dt><dd><?= adminEsc($application['privacyVersion']) ?></dd></div>
+                <div><dt>Submitted</dt><dd><?= adminEsc(adminDate((string) $application['submittedAt'])) ?></dd></div>
+                <div><dt>Last Updated</dt><dd><?= adminEsc(adminDate((string) $application['updatedAt'])) ?></dd></div>
             </dl>
         </section>
 
