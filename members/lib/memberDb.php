@@ -24,6 +24,7 @@ function hwfcMemberDb(): PDO
 CREATE TABLE IF NOT EXISTS membership_applications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     application_uuid TEXT NOT NULL UNIQUE,
+    membership_id TEXT UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     preferred_name TEXT,
@@ -54,6 +55,18 @@ SQL);
     if (!in_array('second_emergency_relationship', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN second_emergency_relationship TEXT');
     }
+    if (!in_array('membership_id', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_id TEXT');
+        $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS membership_applications_membership_id_uq ON membership_applications (membership_id) WHERE membership_id IS NOT NULL');
+    }
+
+    $db->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS membership_id_sequence (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    last_value INTEGER NOT NULL DEFAULT 0
+)
+SQL);
+    $db->exec('INSERT OR IGNORE INTO membership_id_sequence (id, last_value) VALUES (1, 0)');
 
     $db->exec(<<<'SQL'
 CREATE TABLE IF NOT EXISTS membership_audit (
@@ -67,6 +80,13 @@ SQL);
 
     @chmod($path, 0600);
     return $db;
+}
+
+function hwfcNextMembershipId(PDO $db): string
+{
+    $db->exec('UPDATE membership_id_sequence SET last_value = last_value + 1 WHERE id = 1');
+    $value = (int) $db->query('SELECT last_value FROM membership_id_sequence WHERE id = 1')->fetchColumn();
+    return sprintf('HWFC-%06d', $value);
 }
 
 function hwfcAudit(PDO $db, string $uuid, string $event, array $details = []): void
