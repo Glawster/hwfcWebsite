@@ -1,0 +1,144 @@
+.adminShell {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+}
+
+.adminHeader {
+    background: #151515;
+    color: #fff;
+    padding: 1rem 0;
+}
+
+.adminHeaderInner {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+}
+
+.adminBrand {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.adminMode {
+    margin: 0;
+    font-size: .85rem;
+    color: #cfcfcf;
+}
+
+.adminMain {
+    padding: 2rem 0 3rem;
+}
+
+.adminSummaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2rem;
+}
+
+.adminSummaryCard {
+    border: 1px solid #ddd;
+    border-radius: .75rem;
+    padding: 1rem;
+    background: #fff;
+}
+
+.adminSummaryCard strong {
+    display: block;
+    font-size: 1.8rem;
+    margin-top: .25rem;
+}
+
+.adminPanel {
+    border: 1px solid #ddd;
+    border-radius: .75rem;
+    background: #fff;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.adminPanelHeader {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.adminPanelHeader h2,
+.adminPanelHeader p {
+    margin: 0;
+}
+
+.adminPanelHeader p {
+    margin-top: .35rem;
+    color: #555;
+}
+
+.adminTableWrap {
+    overflow-x: auto;
+}
+
+.adminTable {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.adminTable th,
+.adminTable td {
+    text-align: left;
+    padding: .8rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+
+.adminTable th {
+    background: #f6f6f6;
+    font-size: .85rem;
+}
+
+.adminTable tr:last-child td {
+    border-bottom: 0;
+}
+
+.adminStatus {
+    display: inline-block;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: .15rem .55rem;
+    font-size: .78rem;
+    white-space: nowrap;
+}
+
+.adminEmpty,
+.adminError,
+.adminPlaceholder {
+    padding: 1.25rem;
+}
+
+.adminError {
+    background: #fff1f1;
+}
+
+.adminPlaceholderGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.adminPlaceholder {
+    border: 1px dashed #bbb;
+    border-radius: .75rem;
+    background: #fafafa;
+}
+
+.adminPlaceholder h3 {
+    margin-top: 0;
+}
+
+@media (max-width: 700px) {
+    .adminHeaderInner {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
