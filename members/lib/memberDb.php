@@ -45,6 +45,10 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     photo_consent INTEGER NOT NULL DEFAULT 0,
     privacy_version TEXT NOT NULL,
     admin_notes TEXT,
+    membership_start_date TEXT,
+    membership_expiry_date TEXT,
+    payment_status TEXT NOT NULL DEFAULT 'Not Recorded',
+    last_payment_date TEXT,
     submitted_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Pending'
@@ -62,6 +66,18 @@ SQL);
     }
     if (!in_array('admin_notes', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN admin_notes TEXT');
+    }
+    if (!in_array('membership_start_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_start_date TEXT');
+    }
+    if (!in_array('membership_expiry_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_expiry_date TEXT');
+    }
+    if (!in_array('payment_status', $columnNames, true)) {
+        $db->exec("ALTER TABLE membership_applications ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'Not Recorded'");
+    }
+    if (!in_array('last_payment_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN last_payment_date TEXT');
     }
 
     $db->exec(<<<'SQL'
