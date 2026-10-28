@@ -208,7 +208,7 @@ if (!$application) {
 
         <section class="adminDetailPanel">
             <h2>Member Details</h2>
-            <dl class="adminDetailGrid">
+            <dl class="adminDetailGrid adminMemberDetailGrid">
                 <?php if ($application['membershipId']): ?><div class="adminDetailWide"><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
                 <div><dt>First Name</dt><dd><?= adminEsc($application['firstName']) ?></dd></div>
                 <div><dt>Last Name</dt><dd><?= adminEsc($application['lastName']) ?></dd></div>
