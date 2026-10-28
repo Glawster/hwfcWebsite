@@ -95,6 +95,70 @@ function hwfcMembershipAcceptanceMessage(array $member, array $config): array
     ];
 }
 
+function hwfcMembershipRenewalReminderMessage(array $member, array $config): array
+{
+    $email = trim((string) ($member['email'] ?? ''));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || preg_match('/[\r\n]/', $email)) {
+        throw new RuntimeException('The member does not have a valid email address.');
+    }
+
+    $membershipId = trim((string) ($member['membershipId'] ?? ''));
+    $firstName = trim((string) (($member['preferredName'] ?? '') ?: ($member['firstName'] ?? '')));
+    $expiryDate = trim((string) ($member['membershipExpiryDate'] ?? ''));
+    if ($membershipId === '' || $expiryDate === '') {
+        throw new RuntimeException('Membership ID and expiry date are required for a renewal reminder.');
+    }
+
+    $bank = $config['bank'] ?? [];
+    foreach (['accountName', 'sortCode', 'accountNumber'] as $key) {
+        if (!is_string($bank[$key] ?? null) || trim($bank[$key]) === '') {
+            throw new RuntimeException('Bank-transfer configuration is incomplete.');
+        }
+    }
+
+    $contactEmail = trim((string) ($config['managerEmail'] ?? 'info@hillsboroughwalkingfootball.com'));
+    if (!filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
+        $contactEmail = 'info@hillsboroughwalkingfootball.com';
+    }
+
+    $displayExpiry = $expiryDate;
+    try {
+        $displayExpiry = (new DateTimeImmutable($expiryDate))->format('d M Y');
+    } catch (Throwable) {
+    }
+
+    $subject = 'HWFC Membership Renewal Reminder — ' . $membershipId;
+    $body = implode("\n", [
+        'Hello ' . ($firstName !== '' ? $firstName : 'there') . ',',
+        '',
+        'A quick reminder that your Hillsborough Walking Football Club membership expired on ' . $displayExpiry . '.',
+        '',
+        'Membership ID: ' . $membershipId,
+        '',
+        'If you would like to renew, membership is £60 for the year, or £5 per month.',
+        '',
+        'Please pay by bank transfer using the following details:',
+        'Account name: ' . trim((string) $bank['accountName']),
+        'Sort code: ' . trim((string) $bank['sortCode']),
+        'Account number: ' . trim((string) $bank['accountNumber']),
+        'Payment reference: ' . $membershipId,
+        '',
+        'Please use your Membership ID as the payment reference so we can match the payment to your membership.',
+        '',
+        'If you have any questions, contact ' . $contactEmail . '.',
+        '',
+        'Hillsborough Walking Football Club',
+        'https://hillsboroughwalkingfootball.com',
+    ]);
+
+    return [
+        'to' => $email,
+        'subject' => $subject,
+        'body' => $body,
+        'from' => trim((string) $config['fromEmail']),
+    ];
+}
+
 function hwfcMembershipSendAcceptance(array $member): string
 {
     $config = kitLoadConfig();
