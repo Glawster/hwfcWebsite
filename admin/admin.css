@@ -178,6 +178,48 @@
     white-space: nowrap;
 }
 
+.adminTable .adminMembershipForm {
+    min-width: 690px;
+}
+
+.adminTable .adminActionRow {
+    flex-wrap: nowrap;
+    align-items: flex-end;
+}
+
+.adminTable .adminActionRow label {
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.adminTable .adminActionRow input {
+    display: block;
+    width: 130px;
+    margin-top: .35rem;
+    padding: .55rem .6rem;
+    border: 1px solid #bbb;
+    border-radius: .4rem;
+    background: #fff;
+    font: inherit;
+}
+
+.adminTable .adminActionRow input[name="visitor_count"] {
+    width: 85px;
+}
+
+.adminTable .adminActionRow input[name="collected_by"] {
+    width: 170px;
+}
+
+.adminTable .adminActionRow input[name="notes"] {
+    width: 190px;
+}
+
+.adminTable .adminActionRow .button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
 .adminDetailGrid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
