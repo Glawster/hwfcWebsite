@@ -2,7 +2,7 @@
 
 ## Status
 
-ToDo
+Completed
 
 ## Outcome
 
@@ -109,3 +109,5 @@ The notice should support HWFC's obligations under applicable UK data-protection
 ## Change history
 
 - 2026-10-25: created — require a public, maintained Club Privacy Notice with point-of-collection links, versioning, membership integration and coverage of HWFC's website and club-administration processing.
+- 2026-10-27: status ToDo -> InProgress — myBoard.
+- 2026-10-27: status InProgress -> Completed — myBoard.

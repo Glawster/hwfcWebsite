@@ -24,3 +24,7 @@ Remaining acceptance work:
 - Run the required real production cPanel mail/inbox and configuration acceptance checks in `documentation/kitOrderTesting.md`; record results here. No host access or live operational configuration was available during local implementation.
 
 No scope change was introduced. Membership/entitlement checking remains manual; no login, gateway or dashboard has been added.
+## Requirements
+- [005: Club privacy notice](requirements/features/005-clubPrivacyNotice.md) — Completed
+- [004: Membership application and management](requirements/features/004-membershipApplicationAndManagement.md) — InProgress
+
