@@ -220,37 +220,51 @@
     white-space: nowrap;
 }
 
-.adminTable .adminReconcileRow {
-    display: flex !important;
-    flex-flow: row nowrap !important;
-    align-items: center !important;
-    gap: .6rem !important;
-    width: max-content;
-    min-width: max-content;
+.adminReconcileTable {
+    min-width: 1050px;
+    table-layout: fixed;
 }
 
-.adminTable .adminReconcileRow input {
-    flex: 0 0 auto !important;
-    display: inline-block !important;
-    width: 120px !important;
-    min-width: 120px !important;
-    margin: 0 !important;
+.adminReconcileTable th:nth-child(1),
+.adminReconcileTable td:nth-child(1) { width: 96px; }
+.adminReconcileTable th:nth-child(2),
+.adminReconcileTable td:nth-child(2) { width: 58px; }
+.adminReconcileTable th:nth-child(3),
+.adminReconcileTable td:nth-child(3) { width: 128px; }
+.adminReconcileTable th:nth-child(4),
+.adminReconcileTable td:nth-child(4) { width: 110px; }
+.adminReconcileTable th:nth-child(5),
+.adminReconcileTable td:nth-child(5) { width: 118px; }
+.adminReconcileTable th:nth-child(6),
+.adminReconcileTable td:nth-child(6) { width: 155px; }
+.adminReconcileTable th:nth-child(7),
+.adminReconcileTable td:nth-child(7) { width: 190px; }
+.adminReconcileTable th:nth-child(8),
+.adminReconcileTable td:nth-child(8) { width: 92px; }
+
+.adminReconcileTable td {
+    vertical-align: middle;
+}
+
+.adminReconcileTable td:nth-child(-n+4) {
+    white-space: nowrap;
+}
+
+.adminInlineInput {
+    width: 100%;
+    box-sizing: border-box;
     padding: .55rem .6rem;
+    border: 1px solid #bbb;
+    border-radius: .4rem;
+    background: #fff;
+    font: inherit;
 }
 
-.adminTable .adminReconcileRow input[name="collected_by"] {
-    width: 150px !important;
-    min-width: 150px !important;
-}
-
-.adminTable .adminReconcileRow input[name="notes"] {
-    width: 180px !important;
-    min-width: 180px !important;
-}
-
-.adminTable .adminReconcileRow .button {
-    flex: 0 0 auto !important;
+.adminReconcileTable form {
     margin: 0;
+}
+
+.adminReconcileTable .button {
     white-space: nowrap;
 }
 
