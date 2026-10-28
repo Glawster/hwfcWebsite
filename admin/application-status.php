@@ -28,9 +28,10 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid) || !in_array($action, ['accept', 'rej
 }
 
 $db = hwfcMemberDb();
+$successMessage = null;
 
 try {
-    $db->exec('BEGIN IMMEDIATE');
+    $db->beginTransaction();
 
     $stmt = $db->prepare('SELECT status, membership_id FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
@@ -61,7 +62,7 @@ try {
             'membership_id' => $membershipId,
             'actor' => 'local-development-admin',
         ]);
-        $_SESSION['admin_flash'] = 'Application accepted and Membership ID ' . $membershipId . ' assigned.';
+        $successMessage = 'Application accepted and Membership ID ' . $membershipId . ' assigned.';
     } else {
         $update = $db->prepare("UPDATE membership_applications SET status = 'Rejected', updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Pending'");
         $update->execute([
@@ -76,10 +77,11 @@ try {
             'to_status' => 'Rejected',
             'actor' => 'local-development-admin',
         ]);
-        $_SESSION['admin_flash'] = 'Application rejected.';
+        $successMessage = 'Application rejected.';
     }
 
     $db->commit();
+    $_SESSION['admin_flash'] = $successMessage;
 } catch (Throwable $e) {
     if ($db->inTransaction()) {
         $db->rollBack();
