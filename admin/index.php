@@ -112,9 +112,10 @@ function adminDate(string $iso): string
                         </thead>
                         <tbody>
                         <?php foreach ($applications as $application): ?>
+                            <?php $detailUrl = '/admin/member.php?id=' . rawurlencode((string) $application['application_uuid']); ?>
                             <tr>
-                                <td><?= adminEsc(adminReference((string) $application['application_uuid'])) ?></td>
-                                <td><?= adminEsc(trim($application['first_name'] . ' ' . $application['last_name'])) ?></td>
+                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(adminReference((string) $application['application_uuid'])) ?></a></td>
+                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(trim($application['first_name'] . ' ' . $application['last_name'])) ?></a></td>
                                 <td><?= adminEsc($application['email']) ?></td>
                                 <td><?= adminEsc($application['phone']) ?></td>
                                 <td><span class="adminStatus"><?= adminEsc($application['status']) ?></span></td>
