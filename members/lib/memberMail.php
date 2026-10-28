@@ -35,11 +35,11 @@ function hwfcMembershipAcceptanceMessage(array $member, array $config): array
         throw new RuntimeException('The member does not have a valid email address.');
     }
 
-    $membershipId = trim((string) ($member['membership_id'] ?? ''));
-    $firstName = trim((string) ($member['preferred_name'] ?: $member['first_name'] ?? ''));
-    $startDate = trim((string) ($member['membership_start_date'] ?? ''));
-    $expiryDate = trim((string) ($member['membership_expiry_date'] ?? ''));
-    $frequency = trim((string) ($member['payment_frequency'] ?? ''));
+    $membershipId = trim((string) ($member['membershipId'] ?? ''));
+    $firstName = trim((string) (($member['preferredName'] ?? '') ?: ($member['firstName'] ?? '')));
+    $startDate = trim((string) ($member['membershipStartDate'] ?? ''));
+    $expiryDate = trim((string) ($member['membershipExpiryDate'] ?? ''));
+    $frequency = trim((string) ($member['paymentFrequency'] ?? ''));
 
     if ($membershipId === '' || $startDate === '' || $expiryDate === '') {
         throw new RuntimeException('Set the Membership ID and membership dates before sending the acceptance email.');
