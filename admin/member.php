@@ -43,7 +43,7 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 
 try {
     $db = hwfcMemberDb();
-    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 } catch (Throwable $e) {
@@ -146,6 +146,18 @@ if (!$application) {
                 <div><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
                 <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferred_contact'])) ?></dd></div>
             </dl>
+        </section>
+
+        <section class="adminDetailPanel">
+            <h2>Notes</h2>
+            <form method="post" action="/admin/member-notes.php" class="adminNotesForm">
+                <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                <label for="admin_notes">Internal free-form notes</label>
+                <textarea id="admin_notes" name="admin_notes" maxlength="5000" rows="6"><?= adminEsc($application['admin_notes'] ?? '') ?></textarea>
+                <p class="adminHelp">For club administration notes only. Avoid recording unnecessary sensitive information.</p>
+                <button class="button buttonPrimary" type="submit">Save Notes</button>
+            </form>
         </section>
 
         <section class="adminDetailPanel">
