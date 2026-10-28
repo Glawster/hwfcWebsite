@@ -88,9 +88,26 @@ SQL);
 
 function hwfcNextMembershipId(PDO $db): string
 {
-    $db->exec('UPDATE membership_id_sequence SET last_value = last_value + 1 WHERE id = 1');
-    $value = (int) $db->query('SELECT last_value FROM membership_id_sequence WHERE id = 1')->fetchColumn();
-    return sprintf('HWFC-%06d', $value);
+    $used = $db->query("SELECT membership_id FROM membership_applications WHERE membership_id IS NOT NULL AND membership_id LIKE 'HWFC-%' ORDER BY membership_id")->fetchAll(PDO::FETCH_COLUMN);
+
+    $next = 1;
+    foreach ($used as $membershipId) {
+        if (!preg_match('/^HWFC-(\d{6})$/', (string) $membershipId, $matches)) {
+            continue;
+        }
+
+        $value = (int) $matches[1];
+        if ($value === $next) {
+            $next++;
+            continue;
+        }
+
+        if ($value > $next) {
+            break;
+        }
+    }
+
+    return sprintf('HWFC-%06d', $next);
 }
 
 function hwfcAudit(PDO $db, string $uuid, string $event, array $details = []): void
