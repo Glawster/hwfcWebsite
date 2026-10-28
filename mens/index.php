@@ -1,9 +1,11 @@
+<?php
+$activeNav = 'mens';
+?>
 <!doctype html>
 <html lang="en-GB">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Men's Walking Football | Hillsborough Walking Football Club</title><meta name="description" content="Men's walking football at HWFC: regular sessions and competitive football for players aged 50 and over."><link rel="icon" type="image/png" href="/assets/hwfc-logo.png"><link rel="stylesheet" href="/styles.css"></head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a aria-current="page" href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a href="/kit/">Kit</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
+<?php require __DIR__ . '/../includes/site-header.php'; ?>
 <main id="mainContent">
 <section class="pageHero"><div class="shell narrow"><p class="eyebrow">HWFC</p><h1>Men's Walking Football</h1><p class="heroLead">Regular walking football for men aged 50 and over, from gentle and social football through to more competitive games.</p><p>Whether you are returning to football, already play regularly, or are trying walking football for the first time, there is a route into the club.</p><div class="buttonRow"><a class="button buttonPrimary" href="/play/">Play Walking Football</a></div></div></section>
 <section class="section"><div class="shell"><p class="eyebrow">Weekly football</p><h2>Men's sessions</h2><div class="sessionGrid">
@@ -15,5 +17,5 @@
 <section class="section sectionSoft"><div class="shell narrow"><p class="eyebrow">Competition</p><h2>Competitive walking football</h2><p class="lead">HWFC takes part in matches, tournaments and other competitive walking-football events.</p><p>Teams may be entered in different age categories depending on the competition, including U55, U65 and U70. These competition categories are separate from the normal eligibility for weekly club sessions.</p></div></section>
 <section class="section sectionDark"><div class="shell ctaGrid"><div><p class="eyebrow">Join us</p><h2>Interested in Men's walking football?</h2><p>See the full session information or get in touch before your first visit. We will make sure someone is there to welcome you.</p></div><div class="buttonStack"><a class="button buttonLight" href="/contact/?topic=try">I'd Like to Try Walking Football</a><a class="button buttonOutlineLight" href="/contact/">Contact HWFC</a></div></div></section>
 </main>
-<footer class="siteFooter"><div class="shell footerGrid"><div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div><div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a></div><div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div></div></footer>
+<?php require __DIR__ . '/../includes/site-footer.php'; ?>
 </body></html>

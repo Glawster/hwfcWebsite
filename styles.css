@@ -1,6 +1,10 @@
 @import url("/base.css");
 @import url("/version.css");
 
+h3 {
+    margin-top: 1.5rem;
+}
+
 .siteFooter::after {
     content: "Website version " var(--siteVersion);
     display: block;

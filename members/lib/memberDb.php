@@ -24,6 +24,7 @@ function hwfcMemberDb(): PDO
 CREATE TABLE IF NOT EXISTS membership_applications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     application_uuid TEXT NOT NULL UNIQUE,
+    membership_id TEXT UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     preferred_name TEXT,
@@ -43,6 +44,11 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     health_details TEXT,
     photo_consent INTEGER NOT NULL DEFAULT 0,
     privacy_version TEXT NOT NULL,
+    admin_notes TEXT,
+    membership_start_date TEXT,
+    membership_expiry_date TEXT,
+    payment_status TEXT NOT NULL DEFAULT 'Not Recorded',
+    last_payment_date TEXT,
     submitted_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Pending'
@@ -54,6 +60,33 @@ SQL);
     if (!in_array('second_emergency_relationship', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN second_emergency_relationship TEXT');
     }
+    if (!in_array('membership_id', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_id TEXT');
+        $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS membership_applications_membership_id_uq ON membership_applications (membership_id) WHERE membership_id IS NOT NULL');
+    }
+    if (!in_array('admin_notes', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN admin_notes TEXT');
+    }
+    if (!in_array('membership_start_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_start_date TEXT');
+    }
+    if (!in_array('membership_expiry_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_expiry_date TEXT');
+    }
+    if (!in_array('payment_status', $columnNames, true)) {
+        $db->exec("ALTER TABLE membership_applications ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'Not Recorded'");
+    }
+    if (!in_array('last_payment_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN last_payment_date TEXT');
+    }
+
+    $db->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS membership_id_sequence (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    last_value INTEGER NOT NULL DEFAULT 0
+)
+SQL);
+    $db->exec('INSERT OR IGNORE INTO membership_id_sequence (id, last_value) VALUES (1, 0)');
 
     $db->exec(<<<'SQL'
 CREATE TABLE IF NOT EXISTS membership_audit (
@@ -67,6 +100,30 @@ SQL);
 
     @chmod($path, 0600);
     return $db;
+}
+
+function hwfcNextMembershipId(PDO $db): string
+{
+    $used = $db->query("SELECT membership_id FROM membership_applications WHERE membership_id IS NOT NULL AND membership_id LIKE 'HWFC-%' ORDER BY membership_id")->fetchAll(PDO::FETCH_COLUMN);
+
+    $next = 1;
+    foreach ($used as $membershipId) {
+        if (!preg_match('/^HWFC-(\d{6})$/', (string) $membershipId, $matches)) {
+            continue;
+        }
+
+        $value = (int) $matches[1];
+        if ($value === $next) {
+            $next++;
+            continue;
+        }
+
+        if ($value > $next) {
+            break;
+        }
+    }
+
+    return sprintf('HWFC-%06d', $next);
 }
 
 function hwfcAudit(PDO $db, string $uuid, string $event, array $details = []): void

@@ -1,3 +1,6 @@
+<?php
+$activeNav = 'home';
+?>
 <!doctype html>
 <html lang="en-GB">
 <head>
@@ -9,25 +12,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader">
-    <div class="shell headerInner">
-        <a class="brand" href="/" aria-label="Hillsborough Walking Football Club home">
-            <img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64">
-            <span class="brandName">Hillsborough Walking Football Club</span>
-        </a>
-        <nav class="mainNav" aria-label="Main navigation">
-            <a aria-current="page" href="/">Home</a>
-            <a href="/play/">Play</a>
-            <a href="/mens/">Men's</a>
-            <a href="/ladies/">Ladies'</a>
-            <a href="/members/">Members</a>
-            <a href="/kit/">Kit</a>
-            <a href="/about/">About</a>
-            <a href="/contact/">Contact</a>
-        </nav>
-    </div>
-</header>
+<?php require __DIR__ . '/includes/site-header.php'; ?>
 <main id="mainContent">
     <section class="hero">
         <div class="shell heroGrid">
@@ -124,12 +109,6 @@
         </div>
     </section>
 </main>
-<footer class="siteFooter">
-    <div class="shell footerGrid">
-        <div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div>
-        <div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a href="/members/">Members</a></div>
-        <div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div>
-    </div>
-</footer>
+<?php require __DIR__ . '/includes/site-footer.php'; ?>
 </body>
 </html>

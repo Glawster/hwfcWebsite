@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+$activeNav = 'members';
 session_start();
 if (empty($_SESSION['member_csrf'])) {
     $_SESSION['member_csrf'] = bin2hex(random_bytes(24));
@@ -48,8 +49,7 @@ function errorFor(string $key): string
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a aria-current="page" href="/members/">Members</a><a href="/kit/">Kit</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
+<?php require __DIR__ . '/../includes/site-header.php'; ?>
 <main id="mainContent">
 <section class="pageHero"><div class="shell narrow"><p class="eyebrow">HWFC membership</p><h1>Members</h1><p class="heroLead">Apply to join Hillsborough Walking Football Club, or keep the details we already hold about you up to date.</p><div class="buttonRow"><a class="button buttonPrimary" href="#application">Apply for membership</a><a class="button buttonSecondary" href="https://docs.google.com/forms/d/e/1FAIpQLScyUqbWcvOLKTFX0r_Er9qADa1iV08DMU2hHMEUonuDbf6NBw/viewform" target="_blank" rel="noopener">Update existing member details</a></div></div></section>
 
@@ -102,6 +102,6 @@ function errorFor(string $key): string
 <div class="buttonRow"><button class="button buttonPrimary" type="submit">Submit membership application</button></div>
 </form></div></section>
 </main>
-<footer class="siteFooter"><div class="shell footerGrid"><div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div><div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a href="/members/">Members</a></div><div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div></div></footer>
+<?php require __DIR__ . '/../includes/site-footer.php'; ?>
 </body>
 </html>
