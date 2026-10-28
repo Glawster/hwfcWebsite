@@ -112,8 +112,21 @@ if (!$application) {
                 <form method="post" action="/admin/application-status.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
-                    <input type="hidden" name="action" value="undo_accept">
+                    <input type="hidden" name="action" value="undo_acceptance">
                     <button class="button buttonSecondary" type="submit">Undo Acceptance</button>
+                </form>
+            </div>
+        </section>
+        <?php elseif ($application['status'] === 'Rejected'): ?>
+        <section class="adminActionPanel" aria-labelledby="applicationActionsHeading">
+            <h2 id="applicationActionsHeading">Application Actions</h2>
+            <p>If this application was rejected by mistake, undoing rejection returns it to Pending so it can be reviewed again.</p>
+            <div class="adminActionRow">
+                <form method="post" action="/admin/application-status.php">
+                    <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                    <input type="hidden" name="action" value="undo_rejection">
+                    <button class="button buttonSecondary" type="submit">Undo Rejection</button>
                 </form>
             </div>
         </section>
