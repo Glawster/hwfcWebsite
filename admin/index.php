@@ -21,7 +21,14 @@ $error = null;
 try {
     $db = hwfcMemberDb();
     $applications = $db->query(<<<'SQL'
-SELECT application_uuid, membership_id, first_name, last_name, email, phone, status, submitted_at
+SELECT application_uuid AS applicationUuid,
+       membership_id AS membershipId,
+       first_name AS firstName,
+       last_name AS lastName,
+       email,
+       phone,
+       status,
+       submitted_at AS submittedAt
 FROM membership_applications
 ORDER BY submitted_at DESC, id DESC
 SQL)->fetchAll();
@@ -122,15 +129,15 @@ function adminMoney(int $pence): string
                         </thead>
                         <tbody>
                         <?php foreach ($applications as $application): ?>
-                            <?php $detailUrl = '/admin/member.php?id=' . rawurlencode((string) $application['application_uuid']); ?>
+                            <?php $detailUrl = '/admin/member.php?id=' . rawurlencode((string) $application['applicationUuid']); ?>
                             <tr>
-                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(adminReference((string) $application['application_uuid'])) ?></a></td>
-                                <td><?= adminEsc($application['membership_id'] ?: '—') ?></td>
-                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(trim($application['first_name'] . ' ' . $application['last_name'])) ?></a></td>
+                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(adminReference((string) $application['applicationUuid'])) ?></a></td>
+                                <td><?= adminEsc($application['membershipId'] ?: '—') ?></td>
+                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(trim($application['firstName'] . ' ' . $application['lastName'])) ?></a></td>
                                 <td><?= adminEsc($application['email']) ?></td>
                                 <td><?= adminEsc($application['phone']) ?></td>
                                 <td><span class="adminStatus"><?= adminEsc($application['status']) ?></span></td>
-                                <td><?= adminEsc(adminDate((string) $application['submitted_at'])) ?></td>
+                                <td><?= adminEsc(adminDate((string) $application['submittedAt'])) ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
