@@ -28,7 +28,8 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
     exit('Invalid request.');
 }
 
-if (mb_strlen($notes) > 5000) {
+$notesLength = function_exists('mb_strlen') ? mb_strlen($notes) : strlen($notes);
+if ($notesLength > 5000) {
     $_SESSION['admin_error'] = 'Notes must be 5,000 characters or fewer.';
     header('Location: /admin/member.php?id=' . rawurlencode($uuid));
     exit;
