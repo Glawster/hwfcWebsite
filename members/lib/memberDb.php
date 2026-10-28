@@ -110,6 +110,38 @@ CREATE TABLE IF NOT EXISTS membership_audit (
 )
 SQL);
 
+    $db->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS membership_payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    application_uuid TEXT NOT NULL,
+    membership_id TEXT NOT NULL,
+    payment_date TEXT NOT NULL,
+    amount_pence INTEGER NOT NULL,
+    payment_type TEXT NOT NULL,
+    paid_through_date TEXT,
+    recorded_at TEXT NOT NULL,
+    FOREIGN KEY (application_uuid) REFERENCES membership_applications(application_uuid)
+)
+SQL);
+    $db->exec('CREATE INDEX IF NOT EXISTS membership_payments_application_idx ON membership_payments (application_uuid, payment_date DESC, id DESC)');
+
+    $db->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS session_takings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_date TEXT NOT NULL,
+    session_name TEXT NOT NULL,
+    member_count INTEGER NOT NULL DEFAULT 0,
+    visitor_count INTEGER NOT NULL DEFAULT 0,
+    member_rate_pence INTEGER NOT NULL DEFAULT 200,
+    visitor_rate_pence INTEGER NOT NULL DEFAULT 300,
+    total_pence INTEGER NOT NULL,
+    collected_by TEXT,
+    notes TEXT,
+    recorded_at TEXT NOT NULL
+)
+SQL);
+    $db->exec('CREATE INDEX IF NOT EXISTS session_takings_date_idx ON session_takings (session_date DESC, id DESC)');
+
     @chmod($path, 0600);
     return $db;
 }
