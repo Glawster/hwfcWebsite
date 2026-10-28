@@ -87,7 +87,7 @@ try {
             throw new RuntimeException('Only active applications can have acceptance undone.');
         }
         $releasedMembershipId = (string) ($application['membership_id'] ?? '');
-        $update = $db->prepare("UPDATE membership_applications SET status = 'Pending', membership_id = NULL, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Active'");
+        $update = $db->prepare("UPDATE membership_applications SET status = 'Pending', membership_id = NULL, membership_start_date = NULL, membership_expiry_date = NULL, payment_status = 'Not Recorded', last_payment_date = NULL, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Active'");
         $update->execute([
             ':updated_at' => $now,
             ':uuid' => $uuid,
@@ -99,6 +99,7 @@ try {
             'from_status' => 'Active',
             'to_status' => 'Pending',
             'released_membership_id' => $releasedMembershipId,
+            'membership_details_cleared' => true,
             'actor' => 'local-development-admin',
         ]);
         $successMessage = $releasedMembershipId !== ''
