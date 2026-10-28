@@ -276,25 +276,26 @@ SQL);
     <?php if ($importedSessions): ?>
     <section class="adminPanel">
         <div class="adminPanelHeader"><h2>Reconcile Imported Sessions</h2><p>Each attending member is £2. Enter the amount actually received so any difference remains visible.</p></div>
-        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Date</th><th>Day</th><th>Venue</th><th>Members</th><th>Actual £</th><th>Collected By</th><th>Notes</th><th></th></tr></thead><tbody>
+        <div class="adminTableWrap"><table class="adminTable adminReconcileTable"><thead><tr><th>Date</th><th>Day</th><th>Venue</th><th>Members</th><th>Actual £</th><th>Collected By</th><th>Notes</th><th></th></tr></thead><tbody>
         <?php foreach ($importedSessions as $index => $session): ?>
-            <?php $memberExpected = ((int) $session['member_count']) * 200; ?>
+            <?php
+                $memberExpected = ((int) $session['member_count']) * 200;
+                $formId = 'reconcile-' . (int) $index;
+            ?>
             <tr>
                 <td><?= takingsEsc($session['session_date']) ?></td>
                 <td><strong><?= takingsEsc(takingsDay($session['session_date'])) ?></strong></td>
                 <td><?= takingsEsc($session['venue'] ?: '—') ?></td>
                 <td><?= (int) $session['member_count'] ?> (<?= takingsEsc(takingsMoney($memberExpected)) ?>)</td>
-                <td colspan="4">
-                    <form method="post" action="/admin/session-takings.php" class="adminMembershipForm">
+                <td><input class="adminInlineInput adminInlineMoney" form="<?= takingsEsc($formId) ?>" aria-label="Actual takings" type="text" name="actual_takings" inputmode="decimal" value="<?= takingsEsc(number_format($memberExpected / 100, 2, '.', '')) ?>" required></td>
+                <td><input class="adminInlineInput adminInlineCollector" form="<?= takingsEsc($formId) ?>" aria-label="Collected by" type="text" name="collected_by" maxlength="120"></td>
+                <td><input class="adminInlineInput adminInlineNotes" form="<?= takingsEsc($formId) ?>" aria-label="Notes" type="text" name="notes" maxlength="1000"></td>
+                <td>
+                    <form id="<?= takingsEsc($formId) ?>" method="post" action="/admin/session-takings.php">
                         <input type="hidden" name="csrf" value="<?= takingsEsc($_SESSION['admin_csrf']) ?>">
                         <input type="hidden" name="action" value="record_omf">
                         <input type="hidden" name="session_index" value="<?= (int) $index ?>">
-                        <div class="adminActionRow adminReconcileRow">
-                            <input aria-label="Actual takings" type="text" name="actual_takings" inputmode="decimal" value="<?= takingsEsc(number_format($memberExpected / 100, 2, '.', '')) ?>" required>
-                            <input aria-label="Collected by" type="text" name="collected_by" maxlength="120">
-                            <input aria-label="Notes" type="text" name="notes" maxlength="1000">
-                            <button class="button buttonPrimary" type="submit">Record</button>
-                        </div>
+                        <button class="button buttonPrimary" type="submit">Record</button>
                     </form>
                 </td>
             </tr>
