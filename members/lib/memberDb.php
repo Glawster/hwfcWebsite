@@ -47,8 +47,11 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     admin_notes TEXT,
     membership_start_date TEXT,
     membership_expiry_date TEXT,
+    payment_frequency TEXT NOT NULL DEFAULT 'Not Set',
     payment_status TEXT NOT NULL DEFAULT 'Not Recorded',
     last_payment_date TEXT,
+    paid_through_date TEXT,
+    next_payment_due_date TEXT,
     submitted_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Pending'
@@ -73,11 +76,20 @@ SQL);
     if (!in_array('membership_expiry_date', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_expiry_date TEXT');
     }
+    if (!in_array('payment_frequency', $columnNames, true)) {
+        $db->exec("ALTER TABLE membership_applications ADD COLUMN payment_frequency TEXT NOT NULL DEFAULT 'Not Set'");
+    }
     if (!in_array('payment_status', $columnNames, true)) {
         $db->exec("ALTER TABLE membership_applications ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'Not Recorded'");
     }
     if (!in_array('last_payment_date', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN last_payment_date TEXT');
+    }
+    if (!in_array('paid_through_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN paid_through_date TEXT');
+    }
+    if (!in_array('next_payment_due_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN next_payment_due_date TEXT');
     }
 
     $db->exec(<<<'SQL'
