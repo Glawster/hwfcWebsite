@@ -49,7 +49,7 @@ try {
 }
 
 $name = trim((string) ((($member['preferredName'] ?? '') ?: $member['firstName']) . ' ' . $member['lastName']));
-$mailto = 'mailto:' . rawurlencode($message['to']) . '?subject=' . rawurlencode($message['subject']) . '&body=' . rawurlencode($message['body']);
+$mailto = 'mailto:' . $message['to'] . '?subject=' . rawurlencode($message['subject']) . '&body=' . rawurlencode($message['body']);
 ?>
 <!doctype html>
 <html lang="en-GB">
