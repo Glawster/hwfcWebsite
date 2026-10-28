@@ -35,6 +35,34 @@ function adminDate(string $iso): string
     }
 }
 
+function adminDisplayDate(?string $iso): string
+{
+    $value = trim((string) $iso);
+    if ($value === '') {
+        return '—';
+    }
+
+    try {
+        return (new DateTimeImmutable($value))->format('d M Y');
+    } catch (Throwable) {
+        return $value;
+    }
+}
+
+function adminRenewalDate(?string $expiryDate): string
+{
+    $value = trim((string) $expiryDate);
+    if ($value === '') {
+        return '—';
+    }
+
+    try {
+        return (new DateTimeImmutable($value))->modify('+1 day')->format('d M Y');
+    } catch (Throwable) {
+        return $value;
+    }
+}
+
 function adminMoney(int $pence): string
 {
     return '£' . number_format($pence / 100, 2);
@@ -181,11 +209,11 @@ if (!$application) {
         <section class="adminDetailPanel">
             <h2>Member Details</h2>
             <dl class="adminDetailGrid">
-                <?php if ($application['membershipId']): ?><div><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
+                <?php if ($application['membershipId']): ?><div class="adminDetailWide"><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
                 <div><dt>First Name</dt><dd><?= adminEsc($application['firstName']) ?></dd></div>
                 <div><dt>Last Name</dt><dd><?= adminEsc($application['lastName']) ?></dd></div>
                 <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferredName'] ?: '—') ?></dd></div>
-                <div><dt>Date Of Birth</dt><dd><?= adminEsc($application['dateOfBirth']) ?></dd></div>
+                <div><dt>Date Of Birth</dt><dd><?= adminEsc(adminDisplayDate($application['dateOfBirth'])) ?></dd></div>
                 <div class="adminDetailWide"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
                 <div><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
                 <div><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
@@ -193,6 +221,23 @@ if (!$application) {
                 <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
             </dl>
         </section>
+
+        <?php if ($application['membershipId']): ?>
+        <section class="adminDetailPanel">
+            <h2>Membership Dates</h2>
+            <dl class="adminDetailGrid">
+                <div><dt>Member Since</dt><dd><?= adminEsc(adminDisplayDate($application['membershipStartDate'])) ?></dd></div>
+                <div><dt>Expiry Date</dt><dd><?= adminEsc(adminDisplayDate($application['membershipExpiryDate'])) ?></dd></div>
+                <div><dt>Renewal Date</dt><dd><?= adminEsc(adminRenewalDate($application['membershipExpiryDate'])) ?></dd></div>
+                <div><dt>Membership Status</dt><dd><?= adminEsc($application['status']) ?></dd></div>
+                <div><dt>Payment Plan</dt><dd><?= adminEsc($application['paymentFrequency'] ?: 'Not Set') ?></dd></div>
+                <div><dt>Payment Status</dt><dd><?= adminEsc($application['paymentStatus'] ?: 'Not Recorded') ?></dd></div>
+                <div><dt>Last Payment</dt><dd><?= adminEsc(adminDisplayDate($application['lastPaymentDate'])) ?></dd></div>
+                <div><dt>Paid Through</dt><dd><?= adminEsc(adminDisplayDate($application['paidThroughDate'])) ?></dd></div>
+                <div><dt>Next Payment Due</dt><dd><?= adminEsc(adminDisplayDate($application['nextPaymentDueDate'])) ?></dd></div>
+            </dl>
+        </section>
+        <?php endif; ?>
 
         <?php if ($application['status'] === 'Active' && $application['membershipId']): ?>
         <section class="adminDetailPanel">
@@ -262,10 +307,10 @@ if (!$application) {
                         <tbody>
                         <?php foreach ($paymentHistory as $payment): ?>
                             <tr>
-                                <td><?= adminEsc($payment['paymentDate']) ?></td>
+                                <td><?= adminEsc(adminDisplayDate($payment['paymentDate'])) ?></td>
                                 <td><?= adminEsc(ucfirst((string) $payment['paymentType'])) ?></td>
                                 <td><?= adminEsc(adminMoney((int) $payment['amountPence'])) ?></td>
-                                <td><?= adminEsc($payment['paidThroughDate'] ?: '—') ?></td>
+                                <td><?= adminEsc(adminDisplayDate($payment['paidThroughDate'])) ?></td>
                                 <td><?= adminEsc(adminDate((string) $payment['recordedAt'])) ?></td>
                             </tr>
                         <?php endforeach; ?>
