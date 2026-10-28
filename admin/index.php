@@ -20,7 +20,7 @@ $error = null;
 try {
     $db = hwfcMemberDb();
     $applications = $db->query(<<<'SQL'
-SELECT application_uuid, first_name, last_name, email, phone, status, submitted_at
+SELECT application_uuid, membership_id, first_name, last_name, email, phone, status, submitted_at
 FROM membership_applications
 ORDER BY submitted_at DESC, id DESC
 SQL)->fetchAll();
@@ -71,14 +71,14 @@ function adminDate(string $iso): string
 <header class="adminHeader">
     <div class="adminShell adminHeaderInner">
         <p class="adminBrand"><strong>HWFC Administration</strong></p>
-        <p class="adminMode">Local Development · Read Only · Version 0.6a2</p>
+        <p class="adminMode">Local Development · Version 0.6a2</p>
     </div>
 </header>
 <main class="adminMain">
     <div class="adminShell">
         <p class="eyebrow">Administration Dashboard</p>
         <h1>Club Administration</h1>
-        <p class="lead">This development view reads the same membership database used by the public application form. No changes can be made from this page yet.</p>
+        <p class="lead">This development view reads the same membership database used by the public application form. Pending applications can now be accepted or rejected from their detail page.</p>
 
         <div class="adminSummaryGrid" aria-label="Membership application summary">
             <div class="adminSummaryCard"><span>Total Applications</span><strong><?= $counts['total'] ?></strong></div>
@@ -91,7 +91,7 @@ function adminDate(string $iso): string
         <section class="adminPanel" aria-labelledby="membershipApplicationsHeading">
             <div class="adminPanelHeader">
                 <h2 id="membershipApplicationsHeading">Membership Applications</h2>
-                <p>Read-only summary. Sensitive health and emergency-contact information is deliberately excluded from this list.</p>
+                <p>Sensitive health and emergency-contact information is deliberately excluded until authenticated admin access is implemented.</p>
             </div>
             <?php if ($error !== null): ?>
                 <div class="adminError" role="alert"><?= adminEsc($error) ?></div>
@@ -103,6 +103,7 @@ function adminDate(string $iso): string
                         <thead>
                         <tr>
                             <th>Reference</th>
+                            <th>Membership ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Telephone</th>
@@ -115,6 +116,7 @@ function adminDate(string $iso): string
                             <?php $detailUrl = '/admin/member.php?id=' . rawurlencode((string) $application['application_uuid']); ?>
                             <tr>
                                 <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(adminReference((string) $application['application_uuid'])) ?></a></td>
+                                <td><?= adminEsc($application['membership_id'] ?: '—') ?></td>
                                 <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(trim($application['first_name'] . ' ' . $application['last_name'])) ?></a></td>
                                 <td><?= adminEsc($application['email']) ?></td>
                                 <td><?= adminEsc($application['phone']) ?></td>
@@ -131,7 +133,7 @@ function adminDate(string $iso): string
         <section aria-labelledby="futureAdminHeading">
             <div class="sectionHeading"><div><p class="eyebrow">Next Admin Functions</p><h2 id="futureAdminHeading">Planned Work</h2></div></div>
             <div class="adminPlaceholderGrid">
-                <article class="adminPlaceholder"><h3>Member Management</h3><p>Review applications, accept/reject, assign Membership IDs, maintain membership periods and payment status.</p></article>
+                <article class="adminPlaceholder"><h3>Member Management</h3><p>Maintain membership periods, renewals and payment status for accepted members.</p></article>
                 <article class="adminPlaceholder"><h3>Kit Orders</h3><p>Track payment, supplier ordering, receipt and member handover against the existing kit-order reference.</p></article>
                 <article class="adminPlaceholder"><h3>Data Protection</h3><p>Authenticated subject-access export, correction and deletion/anonymisation workflows building on the existing GDPR tooling.</p></article>
                 <article class="adminPlaceholder"><h3>Configuration</h3><p>Protected management of club settings already defined by the kit and membership requirements.</p></article>
