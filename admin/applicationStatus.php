@@ -33,7 +33,7 @@ $successMessage = null;
 try {
     $db->beginTransaction();
 
-    $stmt = $db->prepare('SELECT status, membership_id FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare('SELECT status, membership_id AS membershipId FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 
@@ -47,7 +47,7 @@ try {
         if ($application['status'] !== 'Pending') {
             throw new RuntimeException('Only pending applications can be accepted.');
         }
-        $membershipId = $application['membership_id'] ?: hwfcNextMembershipId($db);
+        $membershipId = $application['membershipId'] ?: hwfcNextMembershipId($db);
         $update = $db->prepare("UPDATE membership_applications SET status = 'Active', membership_id = :membership_id, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Pending'");
         $update->execute([
             ':membership_id' => $membershipId,
@@ -86,7 +86,7 @@ try {
         if ($application['status'] !== 'Active') {
             throw new RuntimeException('Only active applications can have acceptance undone.');
         }
-        $releasedMembershipId = (string) ($application['membership_id'] ?? '');
+        $releasedMembershipId = (string) ($application['membershipId'] ?? '');
         $update = $db->prepare("UPDATE membership_applications SET status = 'Pending', membership_id = NULL, membership_start_date = NULL, membership_expiry_date = NULL, payment_frequency = 'Not Set', payment_status = 'Not Recorded', last_payment_date = NULL, paid_through_date = NULL, next_payment_due_date = NULL, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Active'");
         $update->execute([
             ':updated_at' => $now,
