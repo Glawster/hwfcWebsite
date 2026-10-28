@@ -91,6 +91,7 @@ if ($paymentFrequency === 'Annual' && $paymentStatus === 'Paid In Full' && $paid
 }
 
 $nextPaymentDueDate = $paidThroughDate !== '' ? nextPaymentDueFromPaidThrough($paidThroughDate) : '';
+$redirectToAcceptancePreview = false;
 
 try {
     $db = hwfcMemberDb();
@@ -104,6 +105,10 @@ try {
     if ($application['status'] !== 'Active' || !$application['membership_id']) {
         throw new RuntimeException('Membership details can only be maintained for an active member.');
     }
+
+    $wasOnboarded = $application['membership_start_date']
+        && $application['membership_expiry_date']
+        && in_array($application['payment_frequency'], ['Annual', 'Monthly'], true);
 
     $update = $db->prepare(<<<'SQL'
 UPDATE membership_applications
@@ -133,13 +138,23 @@ SQL);
         'membership_id' => $application['membership_id'],
         'payment_frequency' => $paymentFrequency,
         'payment_status' => $paymentStatus,
-        'actor' => 'local-development-admin',
+        'actor' => 'admin',
     ]);
 
+    $isReadyForOnboarding = $startDate !== ''
+        && $expiryDate !== ''
+        && in_array($paymentFrequency, ['Annual', 'Monthly'], true);
+
+    $redirectToAcceptancePreview = !$wasOnboarded && $isReadyForOnboarding;
     $_SESSION['admin_flash'] = 'Membership and payment details saved.';
 } catch (Throwable $e) {
     error_log('Admin membership details update failed: ' . $e->getMessage());
     $_SESSION['admin_error'] = $e->getMessage();
+}
+
+if ($redirectToAcceptancePreview) {
+    header('Location: /admin/member-acceptance-email.php?id=' . rawurlencode($uuid));
+    exit;
 }
 
 header('Location: /admin/member.php?id=' . rawurlencode($uuid));
