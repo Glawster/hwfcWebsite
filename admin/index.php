@@ -15,6 +15,7 @@ $counts = [
     'lapsed' => 0,
     'rejected' => 0,
 ];
+$sessionIncomePence = 0;
 $error = null;
 
 try {
@@ -32,6 +33,8 @@ SQL)->fetchAll();
             $counts[$key]++;
         }
     }
+
+    $sessionIncomePence = (int) $db->query('SELECT COALESCE(SUM(total_pence), 0) FROM session_takings')->fetchColumn();
 } catch (Throwable $e) {
     $error = 'The membership database could not be read. Check HWFC_MEMBER_DB and SQLite support.';
     error_log('Admin membership dashboard failed: ' . $e->getMessage());
@@ -54,6 +57,11 @@ function adminDate(string $iso): string
     } catch (Throwable) {
         return $iso;
     }
+}
+
+function adminMoney(int $pence): string
+{
+    return '£' . number_format($pence / 100, 2);
 }
 ?>
 <!doctype html>
@@ -78,7 +86,7 @@ function adminDate(string $iso): string
     <div class="adminShell">
         <p class="eyebrow">Administration Dashboard</p>
         <h1>Club Administration</h1>
-        <p class="lead">This development view reads the same membership database used by the public application form. Pending applications can now be accepted or rejected from their detail page.</p>
+        <p class="lead">Manage membership applications, membership payments and lightweight club session income records.</p>
 
         <div class="adminSummaryGrid" aria-label="Membership application summary">
             <div class="adminSummaryCard"><span>Total Applications</span><strong><?= $counts['total'] ?></strong></div>
@@ -86,6 +94,7 @@ function adminDate(string $iso): string
             <div class="adminSummaryCard"><span>Active</span><strong><?= $counts['active'] ?></strong></div>
             <div class="adminSummaryCard"><span>Lapsed</span><strong><?= $counts['lapsed'] ?></strong></div>
             <div class="adminSummaryCard"><span>Rejected</span><strong><?= $counts['rejected'] ?></strong></div>
+            <div class="adminSummaryCard"><span>Session Income Recorded</span><strong><?= adminEsc(adminMoney($sessionIncomePence)) ?></strong></div>
         </div>
 
         <section class="adminPanel" aria-labelledby="membershipApplicationsHeading">
@@ -130,10 +139,17 @@ function adminDate(string $iso): string
             <?php endif; ?>
         </section>
 
+        <section aria-labelledby="adminToolsHeading">
+            <div class="sectionHeading"><div><p class="eyebrow">Administration</p><h2 id="adminToolsHeading">Admin Tools</h2></div></div>
+            <div class="adminPlaceholderGrid">
+                <article class="adminPlaceholder"><h3>Session Takings</h3><p>Record member and visitor attendance totals and calculate £2 / £3 session income.</p><p><a class="textLink" href="/admin/session-takings.php">Open Session Takings →</a></p></article>
+                <article class="adminPlaceholder"><h3>Member Payments</h3><p>Open an active member above to record £5 monthly or £60 annual membership payments and view their payment history.</p></article>
+            </div>
+        </section>
+
         <section aria-labelledby="futureAdminHeading">
             <div class="sectionHeading"><div><p class="eyebrow">Next Admin Functions</p><h2 id="futureAdminHeading">Planned Work</h2></div></div>
             <div class="adminPlaceholderGrid">
-                <article class="adminPlaceholder"><h3>Member Management</h3><p>Maintain membership periods, renewals and payment status for accepted members.</p></article>
                 <article class="adminPlaceholder"><h3>Kit Orders</h3><p>Track payment, supplier ordering, receipt and member handover against the existing kit-order reference.</p></article>
                 <article class="adminPlaceholder"><h3>Data Protection</h3><p>Authenticated subject-access export, correction and deletion/anonymisation workflows building on the existing GDPR tooling.</p></article>
                 <article class="adminPlaceholder"><h3>Configuration</h3><p>Protected management of club settings already defined by the kit and membership requirements.</p></article>
