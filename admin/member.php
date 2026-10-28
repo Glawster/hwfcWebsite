@@ -35,6 +35,11 @@ function adminDate(string $iso): string
     }
 }
 
+function adminMoney(int $pence): string
+{
+    return '£' . number_format($pence / 100, 2);
+}
+
 $uuid = trim((string) ($_GET['id'] ?? ''));
 if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
     http_response_code(404);
@@ -46,6 +51,10 @@ try {
     $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, membership_start_date, membership_expiry_date, payment_frequency, payment_status, last_payment_date, paid_through_date, next_payment_due_date, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
+
+    $paymentStmt = $db->prepare('SELECT payment_date, amount_pence, payment_type, paid_through_date, recorded_at FROM membership_payments WHERE application_uuid = :uuid ORDER BY payment_date DESC, id DESC');
+    $paymentStmt->execute([':uuid' => $uuid]);
+    $paymentHistory = $paymentStmt->fetchAll();
 } catch (Throwable $e) {
     error_log('Admin membership detail failed: ' . $e->getMessage());
     http_response_code(500);
@@ -188,6 +197,45 @@ if (!$application) {
                 <p class="adminHelp">Membership expiry is the end of the annual membership period. For monthly payments, Paid Through records how far payments currently cover the member; Next Payment Due is calculated as the following day. If an expiry date is left blank when a start date is saved, it is set automatically to one year less one day.</p>
                 <button class="button buttonPrimary" type="submit">Save Membership Details</button>
             </form>
+
+            <h3>Record Payment</h3>
+            <p class="adminHelp">Use these after confirming the bank transfer. The monthly action advances Paid Through by one membership month; the annual action covers the member through their membership expiry.</p>
+            <div class="adminActionRow">
+                <form method="post" action="/admin/member-payment.php">
+                    <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                    <input type="hidden" name="payment_type" value="monthly">
+                    <button class="button buttonPrimary" type="submit">Record £5 Monthly Payment</button>
+                </form>
+                <form method="post" action="/admin/member-payment.php">
+                    <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                    <input type="hidden" name="payment_type" value="annual">
+                    <button class="button buttonSecondary" type="submit">Record £60 Annual Payment</button>
+                </form>
+            </div>
+
+            <h3>Payment History</h3>
+            <?php if (!$paymentHistory): ?>
+                <p class="adminHelp">No membership payments have been recorded yet.</p>
+            <?php else: ?>
+                <div class="adminTableWrap">
+                    <table class="adminTable">
+                        <thead><tr><th>Payment Date</th><th>Type</th><th>Amount</th><th>Paid Through</th><th>Recorded</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($paymentHistory as $payment): ?>
+                            <tr>
+                                <td><?= adminEsc($payment['payment_date']) ?></td>
+                                <td><?= adminEsc(ucfirst((string) $payment['payment_type'])) ?></td>
+                                <td><?= adminEsc(adminMoney((int) $payment['amount_pence'])) ?></td>
+                                <td><?= adminEsc($payment['paid_through_date'] ?: '—') ?></td>
+                                <td><?= adminEsc(adminDate((string) $payment['recorded_at'])) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </section>
         <?php endif; ?>
 
