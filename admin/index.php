@@ -71,17 +71,17 @@ function adminDate(string $iso): string
 <header class="adminHeader">
     <div class="adminShell adminHeaderInner">
         <p class="adminBrand"><strong>HWFC Administration</strong></p>
-        <p class="adminMode">Local development · read only · version 0.6a2</p>
+        <p class="adminMode">Local Development · Read Only · Version 0.6a2</p>
     </div>
 </header>
 <main class="adminMain">
     <div class="adminShell">
-        <p class="eyebrow">Administration dashboard</p>
-        <h1>Club administration</h1>
+        <p class="eyebrow">Administration Dashboard</p>
+        <h1>Club Administration</h1>
         <p class="lead">This development view reads the same membership database used by the public application form. No changes can be made from this page yet.</p>
 
         <div class="adminSummaryGrid" aria-label="Membership application summary">
-            <div class="adminSummaryCard"><span>Total applications</span><strong><?= $counts['total'] ?></strong></div>
+            <div class="adminSummaryCard"><span>Total Applications</span><strong><?= $counts['total'] ?></strong></div>
             <div class="adminSummaryCard"><span>Pending</span><strong><?= $counts['pending'] ?></strong></div>
             <div class="adminSummaryCard"><span>Active</span><strong><?= $counts['active'] ?></strong></div>
             <div class="adminSummaryCard"><span>Lapsed</span><strong><?= $counts['lapsed'] ?></strong></div>
@@ -90,7 +90,7 @@ function adminDate(string $iso): string
 
         <section class="adminPanel" aria-labelledby="membershipApplicationsHeading">
             <div class="adminPanelHeader">
-                <h2 id="membershipApplicationsHeading">Membership applications</h2>
+                <h2 id="membershipApplicationsHeading">Membership Applications</h2>
                 <p>Read-only summary. Sensitive health and emergency-contact information is deliberately excluded from this list.</p>
             </div>
             <?php if ($error !== null): ?>
@@ -128,11 +128,11 @@ function adminDate(string $iso): string
         </section>
 
         <section aria-labelledby="futureAdminHeading">
-            <div class="sectionHeading"><div><p class="eyebrow">Next admin functions</p><h2 id="futureAdminHeading">Planned work</h2></div></div>
+            <div class="sectionHeading"><div><p class="eyebrow">Next Admin Functions</p><h2 id="futureAdminHeading">Planned Work</h2></div></div>
             <div class="adminPlaceholderGrid">
-                <article class="adminPlaceholder"><h3>Member management</h3><p>Review applications, accept/reject, assign Membership IDs, maintain membership periods and payment status.</p></article>
-                <article class="adminPlaceholder"><h3>Kit orders</h3><p>Track payment, supplier ordering, receipt and member handover against the existing kit-order reference.</p></article>
-                <article class="adminPlaceholder"><h3>Data protection</h3><p>Authenticated subject-access export, correction and deletion/anonymisation workflows building on the existing GDPR tooling.</p></article>
+                <article class="adminPlaceholder"><h3>Member Management</h3><p>Review applications, accept/reject, assign Membership IDs, maintain membership periods and payment status.</p></article>
+                <article class="adminPlaceholder"><h3>Kit Orders</h3><p>Track payment, supplier ordering, receipt and member handover against the existing kit-order reference.</p></article>
+                <article class="adminPlaceholder"><h3>Data Protection</h3><p>Authenticated subject-access export, correction and deletion/anonymisation workflows building on the existing GDPR tooling.</p></article>
                 <article class="adminPlaceholder"><h3>Configuration</h3><p>Protected management of club settings already defined by the kit and membership requirements.</p></article>
             </div>
         </section>
