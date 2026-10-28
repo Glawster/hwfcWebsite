@@ -23,6 +23,12 @@ function takingsMoney(int $pence): string
     return '£' . number_format($pence / 100, 2);
 }
 
+function takingsDay(string $isoDate): string
+{
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', $isoDate);
+    return $date === false ? $isoDate : $date->format('D');
+}
+
 function omfDateToIso(string $value): string
 {
     $date = DateTimeImmutable::createFromFormat('!d/m/y', trim($value));
@@ -81,7 +87,6 @@ function parseOmfAttendanceReport(string $path): array
     for ($column = 1; $column < $columnCount; $column++) {
         $dateText = $rows[1][$column] ?? '';
         $venue = $rows[2][$column] ?? '';
-        $day = $rows[3][$column] ?? '';
         $name = $rows[4][$column] ?? '';
         $totalText = $totalRow[$column] ?? '';
 
@@ -96,7 +101,6 @@ function parseOmfAttendanceReport(string $path): array
             'session_date' => omfDateToIso($dateText),
             'session_name' => $name,
             'venue' => $venue,
-            'day' => $day,
             'member_count' => (int) $totalText,
         ];
     }
@@ -154,11 +158,8 @@ try {
         if ($index === false || !isset($importedSessions[$index]) || !is_array($importedSessions[$index])) {
             throw new RuntimeException('The imported OMF session is no longer available. Re-import the report.');
         }
+
         $session = $importedSessions[$index];
-        $visitorCount = filter_var($_POST['visitor_count'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 100]]);
-        if ($visitorCount === false) {
-            throw new RuntimeException('Visitor count must be a whole number of zero or more.');
-        }
         $actualPence = parsePoundsToPence((string) ($_POST['actual_takings'] ?? ''));
         $collectedBy = trim((string) ($_POST['collected_by'] ?? ''));
         $notes = trim((string) ($_POST['notes'] ?? ''));
@@ -168,8 +169,7 @@ try {
 
         $memberCount = (int) $session['member_count'];
         $memberRate = 200;
-        $visitorRate = 300;
-        $expectedPence = ($memberCount * $memberRate) + ($visitorCount * $visitorRate);
+        $expectedPence = $memberCount * $memberRate;
 
         $duplicate = $db->prepare('SELECT id FROM session_takings WHERE session_date = :session_date AND session_name = :session_name LIMIT 1');
         $duplicate->execute([
@@ -187,8 +187,8 @@ INSERT INTO session_takings (
     collected_by, notes, recorded_at, attendance_source,
     venue, expected_total_pence, actual_total_pence
 ) VALUES (
-    :session_date, :session_name, :member_count, :visitor_count,
-    :member_rate_pence, :visitor_rate_pence, :total_pence,
+    :session_date, :session_name, :member_count, 0,
+    :member_rate_pence, 0, :total_pence,
     :collected_by, :notes, :recorded_at, 'omf',
     :venue, :expected_total_pence, :actual_total_pence
 )
@@ -197,9 +197,7 @@ SQL);
             ':session_date' => $session['session_date'],
             ':session_name' => $session['session_name'],
             ':member_count' => $memberCount,
-            ':visitor_count' => $visitorCount,
             ':member_rate_pence' => $memberRate,
-            ':visitor_rate_pence' => $visitorRate,
             ':total_pence' => $actualPence,
             ':collected_by' => $collectedBy !== '' ? $collectedBy : null,
             ':notes' => $notes !== '' ? $notes : null,
@@ -215,7 +213,7 @@ SQL);
     }
 
     $records = $db->query('SELECT * FROM session_takings ORDER BY session_date DESC, id DESC LIMIT 100')->fetchAll();
-    $summary = $db->query('SELECT COALESCE(SUM(COALESCE(actual_total_pence, total_pence)), 0) AS total_pence, COALESCE(SUM(member_count), 0) AS members, COALESCE(SUM(visitor_count), 0) AS visitors FROM session_takings')->fetch();
+    $summary = $db->query('SELECT COALESCE(SUM(COALESCE(actual_total_pence, total_pence)), 0) AS total_pence, COALESCE(SUM(member_count), 0) AS members FROM session_takings')->fetch();
 } catch (Throwable $e) {
     error_log('Admin session takings failed: ' . $e->getMessage());
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -224,7 +222,7 @@ SQL);
         exit;
     }
     $records = [];
-    $summary = ['total_pence' => 0, 'members' => 0, 'visitors' => 0];
+    $summary = ['total_pence' => 0, 'members' => 0];
     $error = $e->getMessage();
 }
 ?>
@@ -245,7 +243,7 @@ SQL);
     <p><a class="textLink" href="/admin/">← Back To Administration</a></p>
     <p class="eyebrow">Club Income</p>
     <h1>Session Takings</h1>
-    <p class="lead">Import final attendance totals from organiseMyFooty, add any visitors, and reconcile expected session fees against the amount actually received.</p>
+    <p class="lead">Import final member attendance totals from organiseMyFooty and reconcile the expected £2 session fees against the amount actually received.</p>
 
     <?php if ($flash): ?><div class="adminSuccess" role="status"><?= takingsEsc($flash) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="adminError" role="alert"><?= takingsEsc($error) ?></div><?php endif; ?>
@@ -253,7 +251,6 @@ SQL);
     <div class="adminSummaryGrid" aria-label="Session income summary">
         <div class="adminSummaryCard"><span>Total Session Income</span><strong><?= takingsEsc(takingsMoney((int) $summary['total_pence'])) ?></strong></div>
         <div class="adminSummaryCard"><span>Member Attendances</span><strong><?= (int) $summary['members'] ?></strong></div>
-        <div class="adminSummaryCard"><span>Visitor Attendances</span><strong><?= (int) $summary['visitors'] ?></strong></div>
     </div>
 
     <section class="adminDetailPanel">
@@ -278,25 +275,24 @@ SQL);
 
     <?php if ($importedSessions): ?>
     <section class="adminPanel">
-        <div class="adminPanelHeader"><h2>Reconcile Imported Sessions</h2><p>Members are £2 each from OMF attendance; visitors are £3 each. Enter the amount actually received so differences remain visible.</p></div>
-        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Date</th><th>Session</th><th>Venue</th><th>Members</th><th>Reconcile</th></tr></thead><tbody>
+        <div class="adminPanelHeader"><h2>Reconcile Imported Sessions</h2><p>Each attending member is £2. Enter the amount actually received so any difference remains visible.</p></div>
+        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Date</th><th>Day</th><th>Venue</th><th>Members</th><th>Actual £</th><th>Collected By</th><th>Notes</th><th></th></tr></thead><tbody>
         <?php foreach ($importedSessions as $index => $session): ?>
             <?php $memberExpected = ((int) $session['member_count']) * 200; ?>
             <tr>
                 <td><?= takingsEsc($session['session_date']) ?></td>
-                <td><?= takingsEsc($session['session_name']) ?></td>
+                <td><strong><?= takingsEsc(takingsDay($session['session_date'])) ?></strong></td>
                 <td><?= takingsEsc($session['venue'] ?: '—') ?></td>
                 <td><?= (int) $session['member_count'] ?> (<?= takingsEsc(takingsMoney($memberExpected)) ?>)</td>
-                <td>
+                <td colspan="4">
                     <form method="post" action="/admin/session-takings.php" class="adminMembershipForm">
                         <input type="hidden" name="csrf" value="<?= takingsEsc($_SESSION['admin_csrf']) ?>">
                         <input type="hidden" name="action" value="record_omf">
                         <input type="hidden" name="session_index" value="<?= (int) $index ?>">
-                        <div class="adminActionRow">
-                            <label>Visitors <input type="number" name="visitor_count" min="0" max="100" value="0" required></label>
-                            <label>Actual £ <input type="text" name="actual_takings" inputmode="decimal" placeholder="<?= takingsEsc(number_format($memberExpected / 100, 2, '.', '')) ?>" required></label>
-                            <label>Collected By <input type="text" name="collected_by" maxlength="120"></label>
-                            <label>Notes <input type="text" name="notes" maxlength="1000"></label>
+                        <div class="adminActionRow adminReconcileRow">
+                            <input aria-label="Actual takings" type="text" name="actual_takings" inputmode="decimal" value="<?= takingsEsc(number_format($memberExpected / 100, 2, '.', '')) ?>" required>
+                            <input aria-label="Collected by" type="text" name="collected_by" maxlength="120">
+                            <input aria-label="Notes" type="text" name="notes" maxlength="1000">
                             <button class="button buttonPrimary" type="submit">Record</button>
                         </div>
                     </form>
@@ -310,18 +306,17 @@ SQL);
     <section class="adminPanel">
         <div class="adminPanelHeader"><h2>Recent Session Takings</h2><p>Latest 100 reconciled sessions.</p></div>
         <?php if (!$records): ?><div class="adminEmpty">No session takings have been recorded yet.</div><?php else: ?>
-        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Date</th><th>Session</th><th>Members</th><th>Visitors</th><th>Expected</th><th>Actual</th><th>Difference</th><th>Source</th></tr></thead><tbody>
+        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Date</th><th>Day</th><th>Members</th><th>Expected</th><th>Actual</th><th>Difference</th><th>Source</th></tr></thead><tbody>
         <?php foreach ($records as $record): ?>
             <?php
-                $expected = $record['expected_total_pence'] !== null ? (int) $record['expected_total_pence'] : (int) $record['total_pence'];
+                $expected = $record['expected_total_pence'] !== null ? (int) $record['expected_total_pence'] : ((int) $record['member_count'] * 200);
                 $actual = $record['actual_total_pence'] !== null ? (int) $record['actual_total_pence'] : (int) $record['total_pence'];
                 $difference = $actual - $expected;
             ?>
             <tr>
                 <td><?= takingsEsc($record['session_date']) ?></td>
-                <td><?= takingsEsc($record['session_name']) ?></td>
+                <td><?= takingsEsc(takingsDay((string) $record['session_date'])) ?></td>
                 <td><?= (int) $record['member_count'] ?></td>
-                <td><?= (int) $record['visitor_count'] ?></td>
                 <td><?= takingsEsc(takingsMoney($expected)) ?></td>
                 <td><strong><?= takingsEsc(takingsMoney($actual)) ?></strong></td>
                 <td><?= ($difference > 0 ? '+' : '') . takingsEsc(takingsMoney($difference)) ?></td>
