@@ -2,10 +2,19 @@
 
 declare(strict_types=1);
 
+session_start();
+
 require_once __DIR__ . '/lib/adminDevAccess.php';
 require_once __DIR__ . '/../members/lib/memberDb.php';
 
 hwfcRequireAdminDevelopmentAccess();
+
+if (empty($_SESSION['admin_csrf'])) {
+    $_SESSION['admin_csrf'] = bin2hex(random_bytes(24));
+}
+$flash = $_SESSION['admin_flash'] ?? null;
+$error = $_SESSION['admin_error'] ?? null;
+unset($_SESSION['admin_flash'], $_SESSION['admin_error']);
 
 function adminEsc(?string $value): string
 {
@@ -34,7 +43,7 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 
 try {
     $db = hwfcMemberDb();
-    $stmt = $db->prepare('SELECT application_uuid, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 } catch (Throwable $e) {
@@ -63,7 +72,7 @@ if (!$application) {
 <header class="adminHeader">
     <div class="adminShell adminHeaderInner">
         <p class="adminBrand"><strong>HWFC Administration</strong></p>
-        <p class="adminMode">Local Development · Read Only · Version 0.6a2</p>
+        <p class="adminMode">Local Development · Version 0.6a2</p>
     </div>
 </header>
 <main class="adminMain">
@@ -73,9 +82,34 @@ if (!$application) {
         <h1><?= adminEsc(trim($application['first_name'] . ' ' . $application['last_name'])) ?></h1>
         <p class="adminMeta">Reference <?= adminEsc(adminReference((string) $application['application_uuid'])) ?> · Status <?= adminEsc($application['status']) ?></p>
 
+        <?php if ($flash): ?><div class="adminSuccess" role="status"><?= adminEsc($flash) ?></div><?php endif; ?>
+        <?php if ($error): ?><div class="adminError" role="alert"><?= adminEsc($error) ?></div><?php endif; ?>
+
+        <?php if ($application['status'] === 'Pending'): ?>
+        <section class="adminActionPanel" aria-labelledby="applicationActionsHeading">
+            <h2 id="applicationActionsHeading">Application Actions</h2>
+            <p>Accepting assigns the next permanent HWFC Membership ID. Rejecting records the application as rejected and does not issue a Membership ID.</p>
+            <div class="adminActionRow">
+                <form method="post" action="/admin/application-status.php" onsubmit="return confirm('Accept this membership application and issue a permanent Membership ID?');">
+                    <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                    <input type="hidden" name="action" value="accept">
+                    <button class="button buttonPrimary" type="submit">Accept Application</button>
+                </form>
+                <form method="post" action="/admin/application-status.php" onsubmit="return confirm('Reject this membership application?');">
+                    <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                    <input type="hidden" name="action" value="reject">
+                    <button class="button buttonSecondary" type="submit">Reject Application</button>
+                </form>
+            </div>
+        </section>
+        <?php endif; ?>
+
         <section class="adminDetailPanel">
             <h2>Member Details</h2>
             <dl class="adminDetailGrid">
+                <?php if ($application['membership_id']): ?><div><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membership_id']) ?></strong></dd></div><?php endif; ?>
                 <div><dt>First Name</dt><dd><?= adminEsc($application['first_name']) ?></dd></div>
                 <div><dt>Last Name</dt><dd><?= adminEsc($application['last_name']) ?></dd></div>
                 <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferred_name'] ?: '—') ?></dd></div>
