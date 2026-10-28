@@ -43,7 +43,7 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 
 try {
     $db = hwfcMemberDb();
-    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, membership_start_date, membership_expiry_date, payment_status, last_payment_date, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 } catch (Throwable $e) {
@@ -147,6 +147,36 @@ if (!$application) {
                 <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferred_contact'])) ?></dd></div>
             </dl>
         </section>
+
+        <?php if ($application['status'] === 'Active' && $application['membership_id']): ?>
+        <section class="adminDetailPanel">
+            <h2>Membership And Payment</h2>
+            <form method="post" action="/admin/member-membership.php" class="adminMembershipForm">
+                <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
+                <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
+                <div class="adminFormGrid">
+                    <label>Membership Start Date
+                        <input type="date" name="membership_start_date" value="<?= adminEsc($application['membership_start_date'] ?? '') ?>">
+                    </label>
+                    <label>Membership Expiry Date
+                        <input type="date" name="membership_expiry_date" value="<?= adminEsc($application['membership_expiry_date'] ?? '') ?>">
+                    </label>
+                    <label>Payment Status
+                        <select name="payment_status">
+                            <?php foreach (['Not Recorded', 'Current', 'Overdue', 'Paid In Full', 'Waived'] as $paymentOption): ?>
+                                <option value="<?= adminEsc($paymentOption) ?>"<?= $application['payment_status'] === $paymentOption ? ' selected' : '' ?>><?= adminEsc($paymentOption) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
+                    <label>Last Payment Date
+                        <input type="date" name="last_payment_date" value="<?= adminEsc($application['last_payment_date'] ?? '') ?>">
+                    </label>
+                </div>
+                <p class="adminHelp">Membership payments are recorded manually after the club confirms the bank transfer.</p>
+                <button class="button buttonPrimary" type="submit">Save Membership Details</button>
+            </form>
+        </section>
+        <?php endif; ?>
 
         <section class="adminDetailPanel">
             <h2>Notes</h2>
