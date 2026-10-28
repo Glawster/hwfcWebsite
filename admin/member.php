@@ -43,7 +43,7 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 
 try {
     $db = hwfcMemberDb();
-    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, membership_start_date, membership_expiry_date, payment_status, last_payment_date, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare('SELECT application_uuid, membership_id, first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone, preferred_contact, photo_consent, privacy_version, admin_notes, membership_start_date, membership_expiry_date, payment_frequency, payment_status, last_payment_date, paid_through_date, next_payment_due_date, submitted_at, updated_at, status FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 } catch (Throwable $e) {
@@ -72,7 +72,7 @@ if (!$application) {
 <header class="adminHeader">
     <div class="adminShell adminHeaderInner">
         <p class="adminBrand"><strong>HWFC Administration</strong></p>
-        <p class="adminMode">Local Development · Version 0.6a2</p>
+        <p class="adminMode">Local Development · Version 0.6a3</p>
     </div>
 </header>
 <main class="adminMain">
@@ -161,9 +161,16 @@ if (!$application) {
                     <label>Membership Expiry Date
                         <input type="date" name="membership_expiry_date" value="<?= adminEsc($application['membership_expiry_date'] ?? '') ?>">
                     </label>
+                    <label>Payment Frequency
+                        <select name="payment_frequency">
+                            <?php foreach (['Not Set', 'Annual', 'Monthly'] as $frequencyOption): ?>
+                                <option value="<?= adminEsc($frequencyOption) ?>"<?= $application['payment_frequency'] === $frequencyOption ? ' selected' : '' ?>><?= adminEsc($frequencyOption) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
                     <label>Payment Status
                         <select name="payment_status">
-                            <?php foreach (['Not Recorded', 'Current', 'Overdue', 'Paid In Full', 'Waived'] as $paymentOption): ?>
+                            <?php foreach (['Not Recorded', 'Current', 'Payment Due', 'Overdue', 'Paid In Full', 'Waived'] as $paymentOption): ?>
                                 <option value="<?= adminEsc($paymentOption) ?>"<?= $application['payment_status'] === $paymentOption ? ' selected' : '' ?>><?= adminEsc($paymentOption) ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -171,8 +178,14 @@ if (!$application) {
                     <label>Last Payment Date
                         <input type="date" name="last_payment_date" value="<?= adminEsc($application['last_payment_date'] ?? '') ?>">
                     </label>
+                    <label>Paid Through
+                        <input type="date" name="paid_through_date" value="<?= adminEsc($application['paid_through_date'] ?? '') ?>">
+                    </label>
+                    <label>Next Payment Due
+                        <input type="date" value="<?= adminEsc($application['next_payment_due_date'] ?? '') ?>" readonly>
+                    </label>
                 </div>
-                <p class="adminHelp">Membership payments are recorded manually after the club confirms the bank transfer.</p>
+                <p class="adminHelp">Membership expiry is the end of the annual membership period. For monthly payments, Paid Through records how far payments currently cover the member; Next Payment Due is calculated as the following day. If an expiry date is left blank when a start date is saved, it is set automatically to one year less one day.</p>
                 <button class="button buttonPrimary" type="submit">Save Membership Details</button>
             </form>
         </section>
