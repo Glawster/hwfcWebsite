@@ -10,6 +10,10 @@ require_once __DIR__ . '/../members/lib/memberMail.php';
 
 hwfcRequireAdminDevelopmentAccess();
 
+if (empty($_SESSION['admin_csrf'])) {
+    $_SESSION['admin_csrf'] = bin2hex(random_bytes(24));
+}
+
 function acceptanceEsc(?string $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -33,6 +37,10 @@ try {
 
     $config = kitLoadConfig();
     $message = hwfcMembershipAcceptanceMessage($member, $config);
+
+    $sentCheck = $db->prepare("SELECT event_at FROM membership_audit WHERE application_uuid = :uuid AND event_type = 'acceptance_email_sent_manually' ORDER BY id DESC LIMIT 1");
+    $sentCheck->execute([':uuid' => $uuid]);
+    $sentRecord = $sentCheck->fetch();
 } catch (Throwable $e) {
     error_log('Admin membership acceptance preview failed: ' . $e->getMessage());
     $_SESSION['admin_error'] = $e->getMessage();
@@ -74,7 +82,20 @@ $mailto = 'mailto:' . rawurlencode($message['to']) . '?subject=' . rawurlencode(
         <h3>Email Preview</h3>
         <p><strong><?= acceptanceEsc($message['subject']) ?></strong></p>
         <pre style="white-space:pre-wrap"><?= acceptanceEsc($message['body']) ?></pre>
-        <p><a class="button buttonPrimary" href="<?= acceptanceEsc($mailto) ?>">Open In Email Client</a></p>
+
+        <?php if ($sentRecord): ?>
+            <div class="adminSuccess">Acceptance email has been marked as sent.</div>
+        <?php else: ?>
+            <div class="adminActionRow">
+                <a class="button buttonPrimary" href="<?= acceptanceEsc($mailto) ?>">Open In Email Client</a>
+                <form method="post" action="/admin/member-acceptance-complete.php">
+                    <input type="hidden" name="csrf" value="<?= acceptanceEsc($_SESSION['admin_csrf']) ?>">
+                    <input type="hidden" name="id" value="<?= acceptanceEsc($uuid) ?>">
+                    <button class="button buttonSecondary" type="submit">Mark Email Sent</button>
+                </form>
+            </div>
+            <p class="adminHelp">Open the prepared email, send it from your normal mail client, then mark it sent here so the membership audit record is complete.</p>
+        <?php endif; ?>
     </section>
 </div></main>
 </body>
