@@ -137,9 +137,28 @@ CREATE TABLE IF NOT EXISTS session_takings (
     total_pence INTEGER NOT NULL,
     collected_by TEXT,
     notes TEXT,
-    recorded_at TEXT NOT NULL
+    recorded_at TEXT NOT NULL,
+    attendance_source TEXT NOT NULL DEFAULT 'manual',
+    venue TEXT,
+    expected_total_pence INTEGER,
+    actual_total_pence INTEGER
 )
 SQL);
+
+    $takingsColumns = $db->query('PRAGMA table_info(session_takings)')->fetchAll();
+    $takingsColumnNames = array_column($takingsColumns, 'name');
+    if (!in_array('attendance_source', $takingsColumnNames, true)) {
+        $db->exec("ALTER TABLE session_takings ADD COLUMN attendance_source TEXT NOT NULL DEFAULT 'manual'");
+    }
+    if (!in_array('venue', $takingsColumnNames, true)) {
+        $db->exec('ALTER TABLE session_takings ADD COLUMN venue TEXT');
+    }
+    if (!in_array('expected_total_pence', $takingsColumnNames, true)) {
+        $db->exec('ALTER TABLE session_takings ADD COLUMN expected_total_pence INTEGER');
+    }
+    if (!in_array('actual_total_pence', $takingsColumnNames, true)) {
+        $db->exec('ALTER TABLE session_takings ADD COLUMN actual_total_pence INTEGER');
+    }
     $db->exec('CREATE INDEX IF NOT EXISTS session_takings_date_idx ON session_takings (session_date DESC, id DESC)');
 
     @chmod($path, 0600);
