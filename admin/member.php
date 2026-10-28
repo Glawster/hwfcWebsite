@@ -90,13 +90,13 @@ if (!$application) {
             <h2 id="applicationActionsHeading">Application Actions</h2>
             <p>Accepting assigns the next permanent HWFC Membership ID. Rejecting records the application as rejected and does not issue a Membership ID.</p>
             <div class="adminActionRow">
-                <form method="post" action="/admin/application-status.php" onsubmit="return confirm('Accept this membership application and issue a permanent Membership ID?');">
+                <form method="post" action="/admin/application-status.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
                     <input type="hidden" name="action" value="accept">
                     <button class="button buttonPrimary" type="submit">Accept Application</button>
                 </form>
-                <form method="post" action="/admin/application-status.php" onsubmit="return confirm('Reject this membership application?');">
+                <form method="post" action="/admin/application-status.php">
                     <input type="hidden" name="csrf" value="<?= adminEsc($_SESSION['admin_csrf']) ?>">
                     <input type="hidden" name="id" value="<?= adminEsc($uuid) ?>">
                     <input type="hidden" name="action" value="reject">
