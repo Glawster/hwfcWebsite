@@ -43,6 +43,11 @@
     font-size: 1rem;
 }
 
+.adminMeta {
+    margin-top: -.5rem;
+    color: #555;
+}
+
 .adminSummaryGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -63,12 +68,21 @@
     margin-top: .25rem;
 }
 
-.adminPanel {
+.adminPanel,
+.adminDetailPanel {
     border: 1px solid #ddd;
     border-radius: .75rem;
     background: #fff;
     overflow: hidden;
     margin-bottom: 1.5rem;
+}
+
+.adminDetailPanel {
+    padding: 1.25rem;
+}
+
+.adminDetailPanel h2 {
+    margin-top: 0;
 }
 
 .adminPanelHeader {
@@ -113,6 +127,13 @@
     border-bottom: 0;
 }
 
+.adminTableLink {
+    font-weight: 700;
+    color: inherit;
+    text-decoration-thickness: .08em;
+    text-underline-offset: .15em;
+}
+
 .adminStatus {
     display: inline-block;
     border: 1px solid currentColor;
@@ -120,6 +141,41 @@
     padding: .15rem .55rem;
     font-size: .78rem;
     white-space: nowrap;
+}
+
+.adminDetailGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+    margin: 0;
+}
+
+.adminDetailGrid > div {
+    min-width: 0;
+}
+
+.adminDetailGrid dt {
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #666;
+}
+
+.adminDetailGrid dd {
+    margin: .25rem 0 0;
+    overflow-wrap: anywhere;
+}
+
+.adminDetailWide {
+    grid-column: 1 / -1;
+}
+
+.adminNotice {
+    border-left: 4px solid #d51f3c;
+    background: #fff4f6;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
 }
 
 .adminEmpty,
@@ -152,5 +208,9 @@
     .adminHeaderInner {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .adminDetailGrid {
+        grid-template-columns: 1fr;
     }
 }
