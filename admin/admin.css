@@ -203,18 +203,6 @@
     font: inherit;
 }
 
-.adminTable .adminActionRow input[name="visitor_count"] {
-    width: 85px;
-}
-
-.adminTable .adminActionRow input[name="collected_by"] {
-    width: 170px;
-}
-
-.adminTable .adminActionRow input[name="notes"] {
-    width: 190px;
-}
-
 .adminTable .adminActionRow .button {
     flex: 0 0 auto;
     white-space: nowrap;
