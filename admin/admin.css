@@ -206,14 +206,32 @@
     grid-column: 1 / -1;
 }
 
+.adminFormGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.adminFormGrid label,
 .adminNotesForm label {
     display: block;
     font-weight: 700;
-    margin-bottom: .45rem;
+}
+
+.adminFormGrid input,
+.adminFormGrid select,
+.adminNotesForm textarea {
+    width: 100%;
+    margin-top: .45rem;
+    padding: .65rem .7rem;
+    border: 1px solid #bbb;
+    border-radius: .4rem;
+    background: #fff;
+    font: inherit;
 }
 
 .adminNotesForm textarea {
-    width: 100%;
     min-height: 8rem;
     resize: vertical;
     margin-bottom: .5rem;
@@ -259,7 +277,8 @@
         flex-direction: column;
     }
 
-    .adminDetailGrid {
+    .adminDetailGrid,
+    .adminFormGrid {
         grid-template-columns: 1fr;
     }
 }
