@@ -236,6 +236,11 @@ if (!$application) {
                 <div><dt>Paid Through</dt><dd><?= adminEsc(adminDisplayDate($application['paidThroughDate'])) ?></dd></div>
                 <div><dt>Next Payment Due</dt><dd><?= adminEsc(adminDisplayDate($application['nextPaymentDueDate'])) ?></dd></div>
             </dl>
+            <?php if ($application['status'] === 'Lapsed' && filter_var($application['email'], FILTER_VALIDATE_EMAIL)): ?>
+                <div class="adminActionRow" style="margin-top:1rem">
+                    <a class="button buttonPrimary" href="/admin/memberRenewalReminder.php?id=<?= adminEsc(rawurlencode($uuid)) ?>">Send Renewal Reminder</a>
+                </div>
+            <?php endif; ?>
         </section>
         <?php endif; ?>
 
