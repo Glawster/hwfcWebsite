@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     health_details TEXT,
     photo_consent INTEGER NOT NULL DEFAULT 0,
     privacy_version TEXT NOT NULL,
+    admin_notes TEXT,
     submitted_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Pending'
@@ -58,6 +59,9 @@ SQL);
     if (!in_array('membership_id', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_id TEXT');
         $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS membership_applications_membership_id_uq ON membership_applications (membership_id) WHERE membership_id IS NOT NULL');
+    }
+    if (!in_array('admin_notes', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN admin_notes TEXT');
     }
 
     $db->exec(<<<'SQL'
