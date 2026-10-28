@@ -69,7 +69,8 @@
 }
 
 .adminPanel,
-.adminDetailPanel {
+.adminDetailPanel,
+.adminActionPanel {
     border: 1px solid #ddd;
     border-radius: .75rem;
     background: #fff;
@@ -77,12 +78,46 @@
     margin-bottom: 1.5rem;
 }
 
-.adminDetailPanel {
+.adminDetailPanel,
+.adminActionPanel {
     padding: 1.25rem;
 }
 
-.adminDetailPanel h2 {
+.adminDetailPanel h2,
+.adminActionPanel h2 {
     margin-top: 0;
+}
+
+.adminActionPanel p {
+    margin-bottom: 1rem;
+}
+
+.adminActionRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: center;
+}
+
+.adminActionRow form {
+    margin: 0;
+}
+
+.adminSuccess,
+.adminError {
+    padding: 1rem 1.25rem;
+    margin: 1rem 0 1.5rem;
+    border-radius: .5rem;
+}
+
+.adminSuccess {
+    background: #eef8ef;
+    border: 1px solid #b9d9bd;
+}
+
+.adminError {
+    background: #fff1f1;
+    border: 1px solid #e7b8b8;
 }
 
 .adminPanelHeader {
@@ -179,13 +214,8 @@
 }
 
 .adminEmpty,
-.adminError,
 .adminPlaceholder {
     padding: 1.25rem;
-}
-
-.adminError {
-    background: #fff1f1;
 }
 
 .adminPlaceholderGrid {
