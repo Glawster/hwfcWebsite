@@ -103,6 +103,10 @@
     margin: 0;
 }
 
+.adminSectionAction {
+    margin-top: 1rem;
+}
+
 .adminSuccess,
 .adminError {
     padding: 1rem 1.25rem;
@@ -167,6 +171,20 @@
     color: inherit;
     text-decoration-thickness: .08em;
     text-underline-offset: .15em;
+}
+
+.adminClickableRow {
+    cursor: pointer;
+}
+
+.adminClickableRow:hover td,
+.adminClickableRow:focus td {
+    background: #f7f7f7;
+}
+
+.adminClickableRow:focus {
+    outline: 2px solid #d51f3c;
+    outline-offset: -2px;
 }
 
 .adminStatus {
@@ -284,7 +302,7 @@
     overflow-wrap: anywhere;
 }
 
-.adminMemberDetailGrid dd {
+.adminTabbedMember .adminDetailGrid dd {
     box-sizing: border-box;
     min-height: 2.5rem;
     padding: .6rem .75rem;
@@ -309,20 +327,23 @@
 }
 
 .adminFormGrid label,
-.adminNotesForm label {
+.adminNotesForm label,
+.adminInlinePreferenceForm label {
     display: block;
     font-weight: 700;
 }
 
 .adminFormGrid input,
 .adminFormGrid select,
-.adminNotesForm textarea {
+.adminNotesForm textarea,
+.adminInlinePreferenceForm select {
     width: 100%;
+    box-sizing: border-box;
     margin-top: .45rem;
     padding: .65rem .7rem;
-    border: 1px solid #bbb;
+    border: 0;
     border-radius: .4rem;
-    background: #fff;
+    background: #f2f2f2;
     font: inherit;
 }
 
@@ -330,6 +351,58 @@
     min-height: 8rem;
     resize: vertical;
     margin-bottom: .5rem;
+}
+
+.adminInlinePreferenceForm {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto;
+    gap: .75rem;
+    align-items: end;
+    margin-bottom: 1.25rem;
+}
+
+.adminMemberTabs {
+    display: flex;
+    gap: .25rem;
+    overflow-x: auto;
+    margin: 1.5rem 0 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.adminMemberTab {
+    display: inline-block;
+    flex: 0 0 auto;
+    padding: .75rem 1rem;
+    color: #444;
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: .5rem .5rem 0 0;
+}
+
+.adminMemberTab:hover,
+.adminMemberTab:focus {
+    background: #f2f2f2;
+}
+
+.adminMemberTabActive {
+    background: #151515;
+    color: #fff;
+}
+
+.adminMemberTabActive:hover,
+.adminMemberTabActive:focus {
+    background: #151515;
+}
+
+.adminMemberTabContent {
+    padding-top: 1.25rem;
+}
+
+.adminDataNotice {
+    padding: .8rem 1rem;
+    border-radius: .4rem;
+    background: #f2f2f2;
+    margin-bottom: 1rem;
 }
 
 .adminHelp {
@@ -390,5 +463,9 @@
 
     .adminMemberDetailGrid .adminDetailSpanTwo {
         grid-column: auto;
+    }
+
+    .adminInlinePreferenceForm {
+        grid-template-columns: 1fr;
     }
 }
