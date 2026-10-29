@@ -276,13 +276,13 @@
 
 .adminDetailGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem 1.5rem;
     margin: 0;
 }
 
 .adminMemberDetailGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .adminDetailGrid > div {
@@ -321,7 +321,7 @@
 
 .adminFormGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem 1.25rem;
     margin-bottom: 1rem;
 }
@@ -440,7 +440,9 @@
 }
 
 @media (max-width: 900px) {
-    .adminMemberDetailGrid {
+    .adminDetailGrid,
+    .adminMemberDetailGrid,
+    .adminFormGrid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
