@@ -319,6 +319,14 @@
     grid-column: span 2;
 }
 
+.adminDetailSpanThree {
+    grid-column: span 3;
+}
+
+.adminDetailRowStart {
+    grid-column-start: 1;
+}
+
 .adminFormGrid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -460,7 +468,8 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .adminMemberDetailGrid .adminDetailSpanTwo {
+    .adminMemberDetailGrid .adminDetailSpanTwo,
+    .adminMemberDetailGrid .adminDetailSpanThree {
         grid-column: 1 / -1;
     }
 }
@@ -477,7 +486,8 @@
         grid-template-columns: 1fr;
     }
 
-    .adminMemberDetailGrid .adminDetailSpanTwo {
+    .adminMemberDetailGrid .adminDetailSpanTwo,
+    .adminMemberDetailGrid .adminDetailSpanThree {
         grid-column: auto;
     }
 

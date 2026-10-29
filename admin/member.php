@@ -268,13 +268,13 @@ function memberTabUrl(string $uuid, string $tab): string
                     <div><dt>First Name</dt><dd><?= adminEsc($application['firstName']) ?></dd></div>
                     <div><dt>Last Name</dt><dd><?= adminEsc($application['lastName']) ?></dd></div>
                     <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferredName'] ?: '—') ?></dd></div>
+                    <?php if ($application['membershipId']): ?><div><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
                     <div class="adminDetailWide"><dt>Date Of Birth</dt><dd><?= adminEsc(adminDisplayDate($application['dateOfBirth'])) ?></dd></div>
-                    <div class="adminDetailSpanTwo"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
+                    <div class="adminDetailSpanThree"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
                     <div><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
-                    <div><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
+                    <div class="adminDetailRowStart"><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
                     <div><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
                     <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
-                    <?php if ($application['membershipId']): ?><div class="adminDetailWide"><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
                 </dl>
             </section>
 
