@@ -461,6 +461,15 @@
     margin-top: 0;
 }
 
+@media (min-width: 901px) {
+    .adminMemberDob { grid-area: 2 / 1 / 3 / 2; }
+    .adminMemberAddress { grid-area: 3 / 1 / 4 / 4; }
+    .adminMemberPostcode { grid-area: 3 / 4 / 4 / 5; }
+    .adminMemberEmail { grid-area: 4 / 1 / 5 / 2; }
+    .adminMemberTelephone { grid-area: 4 / 2 / 5 / 3; }
+    .adminMemberContact { grid-area: 4 / 3 / 5 / 4; }
+}
+
 @media (max-width: 900px) {
     .adminDetailGrid,
     .adminMemberDetailGrid,

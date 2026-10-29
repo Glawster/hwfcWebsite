@@ -269,12 +269,12 @@ function memberTabUrl(string $uuid, string $tab): string
                     <div><dt>Last Name</dt><dd><?= adminEsc($application['lastName']) ?></dd></div>
                     <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferredName'] ?: '—') ?></dd></div>
                     <?php if ($application['membershipId']): ?><div><dt>Membership ID</dt><dd><strong><?= adminEsc($application['membershipId']) ?></strong></dd></div><?php endif; ?>
-                    <div class="adminDetailRowStart"><dt>Date Of Birth</dt><dd><?= adminEsc(adminDisplayDate($application['dateOfBirth'])) ?></dd></div>
-                    <div class="adminDetailSpanThree adminDetailRowStart"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
-                    <div><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
-                    <div class="adminDetailRowStart"><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
-                    <div><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
-                    <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
+                    <div class="adminDetailRowStart adminMemberDob"><dt>Date Of Birth</dt><dd><?= adminEsc(adminDisplayDate($application['dateOfBirth'])) ?></dd></div>
+                    <div class="adminDetailSpanThree adminDetailRowStart adminMemberAddress"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
+                    <div class="adminMemberPostcode"><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
+                    <div class="adminDetailRowStart adminMemberEmail"><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
+                    <div class="adminMemberTelephone"><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
+                    <div class="adminMemberContact"><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
                 </dl>
             </section>
 
