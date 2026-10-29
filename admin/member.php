@@ -214,10 +214,10 @@ if (!$application) {
                 <div><dt>Last Name</dt><dd><?= adminEsc($application['lastName']) ?></dd></div>
                 <div><dt>Preferred Name</dt><dd><?= adminEsc($application['preferredName'] ?: '—') ?></dd></div>
                 <div><dt>Date Of Birth</dt><dd><?= adminEsc(adminDisplayDate($application['dateOfBirth'])) ?></dd></div>
-                <div class="adminDetailWide"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
+                <div class="adminDetailSpanTwo"><dt>Home Address</dt><dd><?= nl2br(adminEsc($application['address'])) ?></dd></div>
                 <div><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
-                <div><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
                 <div><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
+                <div><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
                 <div><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
             </dl>
         </section>
