@@ -1,5 +1,19 @@
 # Current increment
 
+## 006: Administration page — member-tab changes awaiting retest
+
+Branch: `feature/006-admin-page`
+
+[Requirement](requirements/features/006-adminPage.md) · [Operations and retest checklist](../documentation/membershipOperations.md#member-page-retest)
+
+The current local changes add separate Notes, History and Data Protection tabs, move consent controls to Data Protection, return note/consent saves to their respective tabs, use club red for the active tab and consent button, and remove inline-code styling from the Session Takings attendance-report help text. History shows stored events for the selected application only; GDPR export, correction and deletion remain CLI-only.
+
+PHP syntax and diff checks passed. Temporary SQLite rendering checks passed for History ordering, member isolation, escaped details, the empty state, and Data Protection tab selection and consent placement. Browser retesting and deployment remain outstanding.
+
+The local branch predates the fetched remote branch, which was force-updated. The edited member page and stylesheet, and the Session Takings, notes and consent handlers, were taken from the fetched remote version before applying these changes. Integrate the edits with that remote branch and its matching database/payment code before deploying or browser retesting; the older local database code alone does not support the newer member page.
+
+## Previous membership foundation increment
+
 ## 004: Membership application and management — 0.6a1
 
 [Requirement](requirements/features/004-membershipApplicationAndManagement.md)

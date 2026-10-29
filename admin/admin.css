@@ -103,6 +103,10 @@
     margin: 0;
 }
 
+.adminSectionAction {
+    margin-top: 1rem;
+}
+
 .adminSuccess,
 .adminError {
     padding: 1rem 1.25rem;
@@ -169,6 +173,20 @@
     text-underline-offset: .15em;
 }
 
+.adminClickableRow {
+    cursor: pointer;
+}
+
+.adminClickableRow:hover td,
+.adminClickableRow:focus td {
+    background: #f7f7f7;
+}
+
+.adminClickableRow:focus {
+    outline: 2px solid #d51f3c;
+    outline-offset: -2px;
+}
+
 .adminStatus {
     display: inline-block;
     border: 1px solid currentColor;
@@ -178,11 +196,93 @@
     white-space: nowrap;
 }
 
+.adminTable .adminMembershipForm {
+    min-width: 690px;
+}
+
+.adminTable .adminActionRow {
+    flex-wrap: nowrap;
+    align-items: flex-end;
+}
+
+.adminTable .adminActionRow label {
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.adminTable .adminActionRow input {
+    display: block;
+    width: 130px;
+    margin-top: .35rem;
+    padding: .55rem .6rem;
+    border: 1px solid #bbb;
+    border-radius: .4rem;
+    background: #fff;
+    font: inherit;
+}
+
+.adminTable .adminActionRow .button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.adminReconcileTable {
+    min-width: 1050px;
+    table-layout: fixed;
+}
+
+.adminReconcileTable th:nth-child(1),
+.adminReconcileTable td:nth-child(1) { width: 96px; }
+.adminReconcileTable th:nth-child(2),
+.adminReconcileTable td:nth-child(2) { width: 58px; }
+.adminReconcileTable th:nth-child(3),
+.adminReconcileTable td:nth-child(3) { width: 128px; }
+.adminReconcileTable th:nth-child(4),
+.adminReconcileTable td:nth-child(4) { width: 110px; }
+.adminReconcileTable th:nth-child(5),
+.adminReconcileTable td:nth-child(5) { width: 118px; }
+.adminReconcileTable th:nth-child(6),
+.adminReconcileTable td:nth-child(6) { width: 155px; }
+.adminReconcileTable th:nth-child(7),
+.adminReconcileTable td:nth-child(7) { width: 190px; }
+.adminReconcileTable th:nth-child(8),
+.adminReconcileTable td:nth-child(8) { width: 92px; }
+
+.adminReconcileTable td {
+    vertical-align: middle;
+}
+
+.adminReconcileTable td:nth-child(-n+4) {
+    white-space: nowrap;
+}
+
+.adminInlineInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .55rem .6rem;
+    border: 1px solid #bbb;
+    border-radius: .4rem;
+    background: #fff;
+    font: inherit;
+}
+
+.adminReconcileTable form {
+    margin: 0;
+}
+
+.adminReconcileTable .button {
+    white-space: nowrap;
+}
+
 .adminDetailGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem 1.5rem;
     margin: 0;
+}
+
+.adminMemberDetailGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .adminDetailGrid > div {
@@ -202,32 +302,48 @@
     overflow-wrap: anywhere;
 }
 
+.adminTabbedMember .adminDetailGrid dd {
+    box-sizing: border-box;
+    min-height: 2.5rem;
+    padding: .6rem .75rem;
+    border: 0;
+    border-radius: .35rem;
+    background: #f2f2f2;
+}
+
 .adminDetailWide {
     grid-column: 1 / -1;
 }
 
+.adminDetailSpanTwo {
+    grid-column: span 2;
+}
+
 .adminFormGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem 1.25rem;
     margin-bottom: 1rem;
 }
 
 .adminFormGrid label,
-.adminNotesForm label {
+.adminNotesForm label,
+.adminInlinePreferenceForm label {
     display: block;
     font-weight: 700;
 }
 
 .adminFormGrid input,
 .adminFormGrid select,
-.adminNotesForm textarea {
+.adminNotesForm textarea,
+.adminInlinePreferenceForm select {
     width: 100%;
+    box-sizing: border-box;
     margin-top: .45rem;
     padding: .65rem .7rem;
-    border: 1px solid #bbb;
+    border: 0;
     border-radius: .4rem;
-    background: #fff;
+    background: #f2f2f2;
     font: inherit;
 }
 
@@ -237,10 +353,76 @@
     margin-bottom: .5rem;
 }
 
+.adminInlinePreferenceForm {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto;
+    gap: .75rem;
+    align-items: end;
+    margin-bottom: 1.25rem;
+}
+
+.adminMemberTabs {
+    display: flex;
+    gap: .25rem;
+    overflow-x: auto;
+    margin: 1.5rem 0 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.adminMemberTab {
+    display: inline-block;
+    flex: 0 0 auto;
+    padding: .75rem 1rem;
+    color: #444;
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: .5rem .5rem 0 0;
+}
+
+.adminMemberTab:hover,
+.adminMemberTab:focus {
+    background: #f2f2f2;
+}
+
+.adminMemberTabActive {
+    background: var(--hwfcRed);
+    color: #fff;
+}
+
+.adminMemberTabActive:hover,
+.adminMemberTabActive:focus {
+    background: var(--hwfcRedDark);
+}
+
+.adminMemberTabContent {
+    padding-top: 1.25rem;
+}
+
+.adminDataNotice {
+    padding: .8rem 1rem;
+    border-radius: .4rem;
+    background: #f2f2f2;
+    margin-bottom: 1rem;
+}
+
 .adminHelp {
     margin: 0 0 1rem;
     color: #666;
     font-size: .9rem;
+}
+
+.adminAuditDetails {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.adminAuditDetails dt {
+    font-weight: 700;
+}
+
+.adminAuditDetails dd {
+    margin: 0 0 .5rem;
+    white-space: pre-wrap;
 }
 
 .adminNotice {
@@ -271,6 +453,18 @@
     margin-top: 0;
 }
 
+@media (max-width: 900px) {
+    .adminDetailGrid,
+    .adminMemberDetailGrid,
+    .adminFormGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .adminMemberDetailGrid .adminDetailSpanTwo {
+        grid-column: 1 / -1;
+    }
+}
+
 @media (max-width: 700px) {
     .adminHeaderInner {
         align-items: flex-start;
@@ -278,7 +472,16 @@
     }
 
     .adminDetailGrid,
+    .adminMemberDetailGrid,
     .adminFormGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .adminMemberDetailGrid .adminDetailSpanTwo {
+        grid-column: auto;
+    }
+
+    .adminInlinePreferenceForm {
         grid-template-columns: 1fr;
     }
 }

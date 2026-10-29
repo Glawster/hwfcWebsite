@@ -32,6 +32,10 @@ The administration area must not be linked from the public website navigation. D
 - Require explicit navigation to a protected record-detail view before sensitive information is shown.
 - Protect every state-changing administration action with authentication, authorisation and CSRF controls.
 - Record material administrator changes through the audit mechanisms required by the underlying feature.
+- Provide a Data Protection tab on each member record housing privacy-notice and consent information and the entry point for REQ-004 subject-access, correction, retention and erasure workflows. Clearly identify workflows that remain available only through protected command-line tooling.
+- House internal member notes in a separate Notes tab and return there after a save or validation error.
+- Provide a History tab on each member record showing all stored audit events for that application, newest first, with timestamps, event names and recorded details, including any recorded lapse and return events. State when no history is recorded; do not infer missing historical events.
+- Provide an Undo Acceptance action under the reversal rules in [REQ-004](004-membershipApplicationAndManagement.md), including an explanation that the allocated Membership ID is released for reuse.
 - Support responsive use on a laptop, tablet and mobile device where practical.
 
 ## Development-only local mode
@@ -61,6 +65,10 @@ The administration area must not be linked from the public website navigation. D
 5. Given an application list, when it is rendered, then it does not include health details or emergency-contact details in the list view.
 6. Given the public website, when its navigation is inspected, then no Admin link is present.
 7. Given future authenticated administration actions, when they mutate membership or kit data, then they must use the underlying feature's authoritative store and audit controls rather than maintaining a duplicate store.
+8. Given an accepted application, when an administrator uses Undo Acceptance, then the interface returns the application to `Pending` and confirms the Membership ID release according to REQ-004's audited acceptance-reversal rules.
+9. Given a member with recorded audit events, when the History tab is opened, then all audit events for that application are shown newest first with their timestamps and recorded details, and events for other applications are excluded. A record without audit events shows an empty-history message.
+10. Given a member record, when Notes is opened and saved, then notes are maintained in that tab and the response returns to Notes.
+11. Given a member record, when Data Protection is opened, then privacy-notice information, consent controls and the availability of subject-access, correction and retention/erasure workflows are shown. Updating consent returns to Data Protection.
 
 ## Dependencies and decisions
 
@@ -77,7 +85,13 @@ The administration area must not be linked from the public website navigation. D
 - Verify list data comes from `HWFC_MEMBER_DB`.
 - Verify no health/emergency-contact details appear in the dashboard list.
 - Review public navigation to ensure `/admin/` is not linked.
+- Verify Undo Acceptance returns the application to `Pending`, confirms the ID release, and uses REQ-004's audit and ID-reuse rules.
+- Verify History ordering, isolation between member records, escaped audit details and the empty-history message.
+- Follow the [member-page retest checklist](../../../documentation/membershipOperations.md#member-page-retest), including Notes, Data Protection, consent-save navigation and responsive tab use.
 
 ## Change history
 
+- 2026-10-29: updated — add a Data Protection tab housing privacy and consent controls and identifying the current availability of GDPR workflows.
+- 2026-10-29: updated — add a member History tab for the complete stored application audit trail, including recorded lapse and return events.
+- 2026-10-29: updated — document Undo Acceptance and link the Membership ID release behaviour to REQ-004; the first read-only slice remains historical scope.
 - 2026-10-28: created — define the shared private administration page and a safe local-only read-only development mode for the first `0.6a2` slice.

@@ -76,9 +76,44 @@ A pending membership application stores:
 
 The database does not store member banking credentials or account details.
 
+## Member administration tabs
+
+The member record at `/admin/member.php?id=<application UUID>` groups administration into tabs under [REQ-006](../project/requirements/features/006-adminPage.md). Membership and data-protection rules remain defined by [REQ-004](../project/requirements/features/004-membershipApplicationAndManagement.md).
+
+| Tab | Purpose |
+| --- | --- |
+| Member Details | Identity, contact information and application actions. |
+| Date Details | Membership dates and renewal information. |
+| Payment Details | Membership payment administration and recorded payments. |
+| Session Details | Attendance availability and a link to Session Takings. |
+| Notes | Internal administration notes. Saving or validation errors return to this tab. |
+| History | All stored audit events for this application, newest first, with timestamps and recorded details. |
+| Data Protection | Privacy notice, photography/publicity consent and the home for subject-access, correction, retention and erasure workflows. |
+
+The selected tab uses club red, with a darker red interaction state. Update Consent uses the same red primary-button style as other save actions, and returns to Data Protection after saving. Session Takings displays the attendance-report filename as ordinary text within its help paragraph.
+
+History is scoped to the application UUID, not a search across people with matching names or email addresses. Recorded lapse and return events appear together when they belong to that same application. Separate applications are not automatically linked, and missing historical events cannot be reconstructed. No audit events produces an explicit empty-history message. Audit details are displayed as escaped text.
+
+Undo Acceptance returns a mistakenly accepted application to Pending and releases its allocated Membership ID for reuse, with an audit record. A member lapsing or leaving does not release their ID.
+
+### Member-page retest
+
+Use test records and the same website build containing these changes.
+
+1. Open each member tab and confirm the selected tab is red and the URL selects the corresponding section.
+2. Open Notes, change and save a note, and confirm Notes remains selected and the saved text appears. Confirm notes no longer appear in Member Details.
+3. Open Data Protection and confirm the privacy-notice link, consent controls and subject-access, correction and retention/erasure descriptions are present. Confirm those GDPR actions are clearly described as CLI-only.
+4. Change photography/publicity consent on a test record. Confirm the red Update Consent button saves the choice and returns to Data Protection. Confirm consent controls no longer appear in Member Details.
+5. Open History and confirm the note and consent audit events appear, newest first, with their recorded details. Check a second member to confirm events are isolated. A record with no events must show the empty-history message.
+6. Where recorded lapse and return events exist for the same application, confirm both appear in History. This tab does not create lapse/return events or merge separate applications.
+7. Open Session Takings and confirm the attendance-report filename has the same font and size as its surrounding help text.
+8. Repeat the tab checks at a narrow mobile width; confirm tabs remain reachable and history tables scroll within their container.
+
 ## GDPR / data-subject operations
 
 The initial GDPR operations are deliberately CLI-only until authenticated administration is implemented.
+
+The member record's Data Protection tab groups privacy-notice information and photography/publicity consent controls, and identifies the availability of subject-access, correction and retention/erasure workflows under [REQ-006](../project/requirements/features/006-adminPage.md). Export, personal-data correction and deletion continue to use the protected CLI tooling below; browser controls for those operations are not yet implemented.
 
 Run them from the repository root using the same `HWFC_MEMBER_DB` environment value as the website.
 

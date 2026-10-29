@@ -45,7 +45,8 @@ The solution must support the club's data-protection obligations, including tran
 - Create or activate a member record when an application is accepted.
 - Assign each accepted member a unique, permanent Membership ID.
 - Make the Membership ID human-readable; an initial format such as `HWFC-000123` is acceptable, with the exact presentation kept configurable.
-- Never reuse a Membership ID that has previously been issued, including where the member subsequently lapses or leaves the club.
+- Never reuse a Membership ID that has previously been issued, including where the member subsequently lapses or leaves the club, except when the acceptance that allocated it is explicitly reversed.
+- Allow an administrator to undo mistaken acceptance, returning the application to `Pending` and releasing its allocated Membership ID for reuse. Record the reversal and released ID in the audit history.
 - Display Membership ID in the administrator member record and relevant exports.
 - Provide a private Members function within the administration area for authorised administrators.
 - Allow authorised administrators to view, add, edit and maintain member records.
@@ -128,6 +129,7 @@ The solution must support the club's data-protection obligations, including tran
 6. Given a pending application that is accepted, when membership is activated, then a unique permanent Membership ID is assigned and the member becomes available in the administrator Members function.
 7. Given two different accepted members, when their records are inspected, then their Membership IDs are different.
 8. Given a member whose membership has lapsed or ended, when another member is later accepted, then the former member's Membership ID is not reused.
+   Exception: given an application accepted by mistake, when acceptance is explicitly undone, then the application returns to `Pending`, its Membership ID is cleared and available for reuse, and the reversal and released ID are retained in the audit history.
 9. Given an authorised administrator, when they view the Members function, then they can view and maintain member records including membership status, Membership ID, current period, expiry and payment status.
 10. Given an unauthorised visitor, when they attempt to access member, payment, date-of-birth, address or emergency-contact data, then access is denied.
 11. Given a member required to pay a membership fee, when bank-transfer instructions are shown, then the displayed account name, sort code and account number are sourced from the same protected configuration used by the club shop.
@@ -158,7 +160,7 @@ The solution must support the club's data-protection obligations, including tran
 - REQ-003 Admin Authentication is required before private member-management functions are made available in production.
 - REQ-001 Member Kit Ordering and REQ-002 Kit Order Tracking may use the member register in future, but membership remains a separate source of truth from kit orders.
 - Membership application and member records must use the database as the authoritative data store; spreadsheets are an import/export mechanism only.
-- Membership ID is a permanent club identifier and is distinct from the internal database primary key and the application identifier.
+- Membership ID is a permanent club identifier and is distinct from the internal database primary key and the application identifier. Explicitly reversing the acceptance that allocated an ID releases that allocation for reuse; lapsing or leaving the club does not.
 - The exact Membership ID presentation should be configurable so the visible format can evolve without changing internal identity semantics.
 - Membership fee amount, membership duration and renewal/expiry policy must be configurable rather than embedded in application code.
 - Membership payments use bank transfer. The membership feature must reuse the club account name, sort code and account number from the protected club-shop configuration currently loaded through `kit/lib/kitConfig.php` / `config/kitConfig.json` (or a later shared configuration abstraction) rather than creating another source of bank details.
@@ -173,7 +175,7 @@ The solution must support the club's data-protection obligations, including tran
 - Form-validation tests covering every required membership application field.
 - Integration test proving a valid submission creates a `Pending` application with privacy-notice version and submission timestamp.
 - Tests for application acceptance, rejection and membership-status changes.
-- Tests proving Membership IDs are unique, permanent and never reused.
+- Tests proving Membership IDs are unique and permanent, are not reused after a member lapses or leaves, and can be reused after the acceptance that allocated them is explicitly reversed with an audit record.
 - Tests for membership-period creation, renewal, expiry and preservation of historical periods.
 - Tests proving expired members are not presented as currently active without a valid renewal period.
 - Tests for membership payment states, payment confirmation, payment correction and payment history preservation.
@@ -193,5 +195,6 @@ The solution must support the club's data-protection obligations, including tran
 
 ## Change history
 
+- 2026-10-29: clarified — explicitly reversed acceptance releases the allocated Membership ID for reuse; IDs remain reserved when membership lapses or ends.
 - 2026-10-15: created — add online membership applications, member database administration, GDPR-supporting controls, permanent Membership IDs and a club-branded virtual membership card with optional photograph support.
 - 2026-10-15: updated — add membership fee payment tracking, membership periods and expiry/renewal history, and require bank-transfer details to reuse the protected club-shop bank configuration.
