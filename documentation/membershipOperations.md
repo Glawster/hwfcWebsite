@@ -92,7 +92,7 @@ The member record at `/admin/member.php?id=<application UUID>` groups administra
 
 The selected tab uses club red, with a darker red interaction state. Update Consent uses the same red primary-button style as other save actions, and returns to Data Protection after saving. Session Takings displays the attendance-report filename as ordinary text within its help paragraph.
 
-History is scoped to the application UUID, not a search across people with matching names or email addresses. Recorded lapse and return events appear together when they belong to that same application. Separate applications are not automatically linked, and missing historical events cannot be reconstructed. No audit events produces an explicit empty-history message. Audit details are displayed as escaped text.
+History is scoped to the application UUID, not a search across people with matching names or email addresses. Recorded lapse and return events appear together when they belong to that same application. Separate applications are not automatically linked, and missing historical events cannot be reconstructed. No audit events produces an explicit empty-history message. Audit details are displayed as escaped text in From, To and Who columns: previous values go under From, new values and other recorded context under To, and the recorded actor under Who. Missing values display a dash; historical actor labels are shown as recorded.
 
 Undo Acceptance returns a mistakenly accepted application to Pending and releases its allocated Membership ID for reuse, with an audit record. A member lapsing or leaving does not release their ID.
 

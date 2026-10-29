@@ -63,6 +63,32 @@ function adminRenewalDate(?string $expiryDate): string
     }
 }
 
+function adminAuditColumns(?string $json): array
+{
+    $columns = ['from' => [], 'to' => [], 'who' => []];
+    $details = json_decode((string) $json, true);
+    if (!is_array($details)) {
+        if ($json !== null && $json !== '') {
+            $columns['to']['Recorded details'] = $json;
+        }
+        return $columns;
+    }
+    foreach ($details as $key => $value) {
+        $key = (string) $key;
+        $column = 'to';
+        if (in_array($key, ['actor', 'who'], true)) {
+            $column = 'who';
+        } elseif (preg_match('/^from(?:_|[A-Z]|$)|(?:Before|_before)$/', $key)) {
+            $column = 'from';
+        }
+        $label = preg_replace('/^(?:from|to)(?:_|(?=[A-Z]))|(?:Before|After|_before|_after)$/', '', $key);
+        $label = ucfirst(str_replace('_', ' ', (string) preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', (string) $label)));
+        $columns[$column][$label] = is_bool($value) ? ($value ? 'Yes' : 'No')
+            : (is_string($value) ? $value : (string) json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+    return $columns;
+}
+
 function adminMoney(int $pence): string
 {
     return '£' . number_format($pence / 100, 2);
@@ -417,25 +443,26 @@ function memberTabUrl(string $uuid, string $tab): string
                 <?php else: ?>
                     <div class="adminTableWrap">
                         <table class="adminTable">
-                            <thead><tr><th scope="col">Date And Time</th><th scope="col">Event</th><th scope="col">Details</th></tr></thead>
+                            <thead><tr><th scope="col">Date And Time</th><th scope="col">Event</th><th scope="col">From</th><th scope="col">To</th><th scope="col">Who</th></tr></thead>
                             <tbody>
                             <?php foreach ($auditHistory as $event): ?>
                                 <tr>
                                     <td><?= adminEsc(adminDate((string) $event['event_at'])) ?></td>
                                     <td><?= adminEsc(ucwords(str_replace('_', ' ', (string) $event['event_type']))) ?></td>
+                                    <?php foreach (adminAuditColumns($event['details']) as $column => $values): ?>
                                     <td>
-                                        <?php $details = json_decode((string) ($event['details'] ?? ''), true); ?>
-                                        <?php if (is_array($details) && $details): ?>
+                                        <?php if ($values): ?>
                                             <dl class="adminAuditDetails">
-                                                <?php foreach ($details as $key => $value): ?>
-                                                    <dt><?= adminEsc(ucfirst(str_replace('_', ' ', (string) preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', (string) $key)))) ?></dt>
-                                                    <dd><?= adminEsc(is_string($value) ? $value : (string) json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) ?></dd>
+                                                <?php foreach ($values as $label => $value): ?>
+                                                    <?php if ($column !== 'who'): ?><dt><?= adminEsc($label) ?></dt><?php endif; ?>
+                                                    <dd><?= adminEsc($value) ?></dd>
                                                 <?php endforeach; ?>
                                             </dl>
                                         <?php else: ?>
-                                            <?= adminEsc($event['details'] ?: '—') ?>
+                                            —
                                         <?php endif; ?>
                                     </td>
+                                    <?php endforeach; ?>
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>
