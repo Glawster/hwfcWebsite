@@ -33,6 +33,8 @@ if (!preg_match('/^[a-f0-9]{32}$/', $uuid)) {
     exit('Invalid request.');
 }
 
+$returnUrl = '/admin/member.php?id=' . rawurlencode($uuid) . '&tab=payments';
+
 $allowedPaymentFrequencies = ['Not Set', 'Annual', 'Monthly'];
 if (!in_array($paymentFrequency, $allowedPaymentFrequencies, true)) {
     http_response_code(400);
@@ -66,7 +68,7 @@ function nextPaymentDueFromPaidThrough(string $paidThroughDate): string
 
 if (!validAdminDate($startDate) || !validAdminDate($expiryDate) || !validAdminDate($lastPaymentDate) || !validAdminDate($paidThroughDate)) {
     $_SESSION['admin_error'] = 'Membership and payment dates must be valid dates.';
-    header('Location: /admin/member.php?id=' . rawurlencode($uuid));
+    header('Location: ' . $returnUrl);
     exit;
 }
 
@@ -76,13 +78,13 @@ if ($startDate !== '' && $expiryDate === '') {
 
 if ($startDate !== '' && $expiryDate !== '' && $expiryDate < $startDate) {
     $_SESSION['admin_error'] = 'Membership expiry date cannot be before the start date.';
-    header('Location: /admin/member.php?id=' . rawurlencode($uuid));
+    header('Location: ' . $returnUrl);
     exit;
 }
 
 if ($paidThroughDate !== '' && $startDate !== '' && $paidThroughDate < $startDate) {
     $_SESSION['admin_error'] = 'Paid-through date cannot be before the membership start date.';
-    header('Location: /admin/member.php?id=' . rawurlencode($uuid));
+    header('Location: ' . $returnUrl);
     exit;
 }
 
@@ -157,5 +159,5 @@ if ($redirectToAcceptancePreview) {
     exit;
 }
 
-header('Location: /admin/member.php?id=' . rawurlencode($uuid));
+header('Location: ' . $returnUrl);
 exit;
