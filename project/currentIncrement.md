@@ -10,7 +10,7 @@ The current local changes add separate Notes, History and Data Protection tabs, 
 
 PHP syntax and diff checks passed. Temporary SQLite rendering checks passed for History ordering, member isolation, escaped details, the empty state, and Data Protection tab selection and consent placement. Browser retesting and deployment remain outstanding.
 
-The local branch predates the fetched remote branch, which was force-updated. The edited member page and stylesheet, and the Session Takings, notes and consent handlers, were taken from the fetched remote version before applying these changes. Integrate the edits with that remote branch and its matching database/payment code before deploying or browser retesting; the older local database code alone does not support the newer member page.
+The newer remote admin implementation and matching database/payment code have been integrated into `feature/006-admin-page`. Browser retesting remains outstanding.
 
 ## Previous membership foundation increment
 

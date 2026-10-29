@@ -22,7 +22,7 @@ if (!hash_equals($_SESSION['admin_csrf'] ?? '', $csrf)) {
 
 $uuid = trim((string) ($_POST['id'] ?? ''));
 $action = trim((string) ($_POST['action'] ?? ''));
-if (!preg_match('/^[a-f0-9]{32}$/', $uuid) || !in_array($action, ['accept', 'reject', 'undo_acceptance', 'undo_rejection'], true)) {
+if (!preg_match('/^[a-f0-9]{32}$/', $uuid) || !in_array($action, ['accept', 'reject', 'undoAcceptance', 'undoRejection'], true)) {
     http_response_code(400);
     exit('Invalid request.');
 }
@@ -33,7 +33,7 @@ $successMessage = null;
 try {
     $db->beginTransaction();
 
-    $stmt = $db->prepare('SELECT status, membership_id FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
+    $stmt = $db->prepare('SELECT status, membership_id AS membershipId FROM membership_applications WHERE application_uuid = :uuid LIMIT 1');
     $stmt->execute([':uuid' => $uuid]);
     $application = $stmt->fetch();
 
@@ -47,7 +47,7 @@ try {
         if ($application['status'] !== 'Pending') {
             throw new RuntimeException('Only pending applications can be accepted.');
         }
-        $membershipId = $application['membership_id'] ?: hwfcNextMembershipId($db);
+        $membershipId = $application['membershipId'] ?: hwfcNextMembershipId($db);
         $update = $db->prepare("UPDATE membership_applications SET status = 'Active', membership_id = :membership_id, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Pending'");
         $update->execute([
             ':membership_id' => $membershipId,
@@ -58,9 +58,9 @@ try {
             throw new RuntimeException('Application status changed before it could be accepted.');
         }
         hwfcAudit($db, $uuid, 'application_accepted', [
-            'from_status' => 'Pending',
-            'to_status' => 'Active',
-            'membership_id' => $membershipId,
+            'fromStatus' => 'Pending',
+            'toStatus' => 'Active',
+            'membershipId' => $membershipId,
             'actor' => 'local-development-admin',
         ]);
         $successMessage = 'Application accepted and Membership ID ' . $membershipId . ' assigned.';
@@ -77,17 +77,17 @@ try {
             throw new RuntimeException('Application status changed before it could be rejected.');
         }
         hwfcAudit($db, $uuid, 'application_rejected', [
-            'from_status' => 'Pending',
-            'to_status' => 'Rejected',
+            'fromStatus' => 'Pending',
+            'toStatus' => 'Rejected',
             'actor' => 'local-development-admin',
         ]);
         $successMessage = 'Application rejected.';
-    } elseif ($action === 'undo_acceptance') {
+    } elseif ($action === 'undoAcceptance') {
         if ($application['status'] !== 'Active') {
             throw new RuntimeException('Only active applications can have acceptance undone.');
         }
-        $releasedMembershipId = (string) ($application['membership_id'] ?? '');
-        $update = $db->prepare("UPDATE membership_applications SET status = 'Pending', membership_id = NULL, membership_start_date = NULL, membership_expiry_date = NULL, payment_status = 'Not Recorded', last_payment_date = NULL, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Active'");
+        $releasedMembershipId = (string) ($application['membershipId'] ?? '');
+        $update = $db->prepare("UPDATE membership_applications SET status = 'Pending', membership_id = NULL, membership_start_date = NULL, membership_expiry_date = NULL, payment_frequency = 'Not Set', payment_status = 'Not Recorded', last_payment_date = NULL, paid_through_date = NULL, next_payment_due_date = NULL, updated_at = :updated_at WHERE application_uuid = :uuid AND status = 'Active'");
         $update->execute([
             ':updated_at' => $now,
             ':uuid' => $uuid,
@@ -96,10 +96,10 @@ try {
             throw new RuntimeException('Application status changed before acceptance could be undone.');
         }
         hwfcAudit($db, $uuid, 'application_acceptance_undone', [
-            'from_status' => 'Active',
-            'to_status' => 'Pending',
-            'released_membership_id' => $releasedMembershipId,
-            'membership_details_cleared' => true,
+            'fromStatus' => 'Active',
+            'toStatus' => 'Pending',
+            'releasedMembershipId' => $releasedMembershipId,
+            'membershipDetailsCleared' => true,
             'actor' => 'local-development-admin',
         ]);
         $successMessage = $releasedMembershipId !== ''
@@ -118,8 +118,8 @@ try {
             throw new RuntimeException('Application status changed before rejection could be undone.');
         }
         hwfcAudit($db, $uuid, 'application_rejection_undone', [
-            'from_status' => 'Rejected',
-            'to_status' => 'Pending',
+            'fromStatus' => 'Rejected',
+            'toStatus' => 'Pending',
             'actor' => 'local-development-admin',
         ]);
         $successMessage = 'Rejection undone. Application returned to Pending.';

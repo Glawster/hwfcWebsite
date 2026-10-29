@@ -1,14 +1,16 @@
+<?php
+$activeNav = 'about';
+?>
 <!doctype html>
 <html lang="en-GB">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>About HWFC | Hillsborough Walking Football Club</title><meta name="description" content="About Hillsborough Walking Football Club, our football community and club life."><link rel="icon" type="image/png" href="/assets/hwfc-logo.png"><link rel="stylesheet" href="/styles.css"></head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a href="/kit/">Kit</a><a aria-current="page" href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
+<?php require __DIR__ . '/../includes/site-header.php'; ?>
 <main id="mainContent">
 <section class="pageHero"><div class="shell narrow"><p class="eyebrow">Our club</p><h1>About Hillsborough Walking Football Club</h1><p class="heroLead">HWFC brings together people who want to enjoy football, stay active and be part of a friendly club community.</p><p>We provide regular walking football opportunities for men and women, with sessions ranging from gentle and social through to more competitive football.</p></div></section>
 <section class="section"><div class="shell narrow"><p class="eyebrow">Who we are</p><h2>Football, fitness and friendship</h2><p class="lead">HWFC is built around the idea that football can continue to be part of people's lives for many years.</p><p>Our members include experienced players, people returning to football after a long break, and people who are new to the game. Alongside regular weekly sessions, the club can take part in fixtures, tournaments, social events and other activities.</p></div></section>
 <section class="section sectionSoft"><div class="shell socialBar"><div><p class="eyebrow">Club life</p><h2>More than the football</h2><p>HWFC members also take part in social events, fundraising, tournaments, visits and community activities. Current photographs and day-to-day club updates are shared mainly through Facebook.</p></div><a class="button buttonSecondary" href="https://www.facebook.com/profile.php?id=100082995559544" target="_blank" rel="noopener">Follow HWFC on Facebook</a></div></section>
 <section class="section sectionDark"><div class="shell ctaGrid"><div><p class="eyebrow">Want to know more?</p><h2>Get in touch with HWFC.</h2><p>If you have a question about our sessions, fixtures or club activities, send us a message through the website.</p></div><div class="buttonStack"><a class="button buttonLight" href="/contact/">Contact HWFC</a></div></div></section>
 </main>
-<footer class="siteFooter"><div class="shell footerGrid"><div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div><div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a></div><div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div></div></footer>
+<?php require __DIR__ . '/../includes/site-footer.php'; ?>
 </body></html>

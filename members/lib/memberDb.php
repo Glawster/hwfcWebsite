@@ -47,8 +47,11 @@ CREATE TABLE IF NOT EXISTS membership_applications (
     admin_notes TEXT,
     membership_start_date TEXT,
     membership_expiry_date TEXT,
+    payment_frequency TEXT NOT NULL DEFAULT 'Not Set',
     payment_status TEXT NOT NULL DEFAULT 'Not Recorded',
     last_payment_date TEXT,
+    paid_through_date TEXT,
+    next_payment_due_date TEXT,
     submitted_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Pending'
@@ -73,11 +76,20 @@ SQL);
     if (!in_array('membership_expiry_date', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN membership_expiry_date TEXT');
     }
+    if (!in_array('payment_frequency', $columnNames, true)) {
+        $db->exec("ALTER TABLE membership_applications ADD COLUMN payment_frequency TEXT NOT NULL DEFAULT 'Not Set'");
+    }
     if (!in_array('payment_status', $columnNames, true)) {
         $db->exec("ALTER TABLE membership_applications ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'Not Recorded'");
     }
     if (!in_array('last_payment_date', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN last_payment_date TEXT');
+    }
+    if (!in_array('paid_through_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN paid_through_date TEXT');
+    }
+    if (!in_array('next_payment_due_date', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN next_payment_due_date TEXT');
     }
 
     $db->exec(<<<'SQL'
@@ -97,6 +109,57 @@ CREATE TABLE IF NOT EXISTS membership_audit (
     details TEXT
 )
 SQL);
+
+    $db->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS membership_payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    application_uuid TEXT NOT NULL,
+    membership_id TEXT NOT NULL,
+    payment_date TEXT NOT NULL,
+    amount_pence INTEGER NOT NULL,
+    payment_type TEXT NOT NULL,
+    paid_through_date TEXT,
+    recorded_at TEXT NOT NULL,
+    FOREIGN KEY (application_uuid) REFERENCES membership_applications(application_uuid)
+)
+SQL);
+    $db->exec('CREATE INDEX IF NOT EXISTS membership_payments_application_idx ON membership_payments (application_uuid, payment_date DESC, id DESC)');
+
+    $db->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS session_takings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_date TEXT NOT NULL,
+    session_name TEXT NOT NULL,
+    member_count INTEGER NOT NULL DEFAULT 0,
+    visitor_count INTEGER NOT NULL DEFAULT 0,
+    member_rate_pence INTEGER NOT NULL DEFAULT 200,
+    visitor_rate_pence INTEGER NOT NULL DEFAULT 300,
+    total_pence INTEGER NOT NULL,
+    collected_by TEXT,
+    notes TEXT,
+    recorded_at TEXT NOT NULL,
+    attendance_source TEXT NOT NULL DEFAULT 'manual',
+    venue TEXT,
+    expected_total_pence INTEGER,
+    actual_total_pence INTEGER
+)
+SQL);
+
+    $takingsColumns = $db->query('PRAGMA table_info(session_takings)')->fetchAll();
+    $takingsColumnNames = array_column($takingsColumns, 'name');
+    if (!in_array('attendance_source', $takingsColumnNames, true)) {
+        $db->exec("ALTER TABLE session_takings ADD COLUMN attendance_source TEXT NOT NULL DEFAULT 'manual'");
+    }
+    if (!in_array('venue', $takingsColumnNames, true)) {
+        $db->exec('ALTER TABLE session_takings ADD COLUMN venue TEXT');
+    }
+    if (!in_array('expected_total_pence', $takingsColumnNames, true)) {
+        $db->exec('ALTER TABLE session_takings ADD COLUMN expected_total_pence INTEGER');
+    }
+    if (!in_array('actual_total_pence', $takingsColumnNames, true)) {
+        $db->exec('ALTER TABLE session_takings ADD COLUMN actual_total_pence INTEGER');
+    }
+    $db->exec('CREATE INDEX IF NOT EXISTS session_takings_date_idx ON session_takings (session_date DESC, id DESC)');
 
     @chmod($path, 0600);
     return $db;

@@ -1,9 +1,11 @@
+<?php
+$activeNav = 'ladies';
+?>
 <!doctype html>
 <html lang="en-GB">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ladies' Walking Football | Hillsborough Walking Football Club</title><meta name="description" content="Ladies' walking football at HWFC for women aged 35 and over. No previous football experience required."><link rel="icon" type="image/png" href="/assets/hwfc-logo.png"><link rel="stylesheet" href="/styles.css"></head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a href="/mens/">Men's</a><a aria-current="page" href="/ladies/">Ladies'</a><a href="/kit/">Kit</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
+<?php require __DIR__ . '/../includes/site-header.php'; ?>
 <main id="mainContent">
 <section class="pageHero"><div class="shell narrow"><p class="eyebrow">Women 35+</p><h1>Ladies' Walking Football</h1><p class="heroLead">Regular opportunities for coaching, development and match play — with no previous football experience required.</p><p>Whether you have played before, are returning after a long break, or are completely new to the game, you are welcome.</p><div class="buttonRow"><a class="button buttonPrimary" href="/contact/?topic=try">I'd Like to Try Walking Football</a></div></div></section>
 <section class="section"><div class="shell narrow"><p class="eyebrow">A welcoming route into football</p><h2>Walking football for women aged 35+</h2><p class="lead">The aim is to provide a welcoming way into the game while giving players opportunities to improve, play matches and take part in team events.</p><a class="textLink" href="/play/">Play Walking Football →</a></div></section>
@@ -11,5 +13,5 @@
 <section class="section"><div class="shell narrow"><p class="eyebrow">First visit</p><h2>New to walking football?</h2><p class="lead">You do not need to know the rules or have played organised football before coming to HWFC.</p><p>Get in touch with us beforehand and we will make sure someone is there to greet you, introduce you to the group and help you get settled into the session. There is no separate trial-session format — you simply come along and join the session with support from the group.</p><div class="buttonRow"><a class="button buttonPrimary" href="/contact/?topic=try">I'd Like to Try Walking Football</a></div></div></section>
 <section class="section sectionSoft"><div class="shell socialBar"><div><p class="eyebrow">Club life</p><h2>Keep up with the Ladies' team</h2><p>Training photographs, events and current club updates are shared through HWFC's Facebook page.</p></div><a class="button buttonSecondary" href="https://www.facebook.com/profile.php?id=100082995559544" target="_blank" rel="noopener">Follow HWFC on Facebook</a></div></section>
 </main>
-<footer class="siteFooter"><div class="shell footerGrid"><div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div><div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a></div><div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div></div></footer>
+<?php require __DIR__ . '/../includes/site-footer.php'; ?>
 </body></html>

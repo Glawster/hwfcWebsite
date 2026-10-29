@@ -1,3 +1,6 @@
+<?php
+$activeNav = 'play';
+?>
 <!doctype html>
 <html lang="en-GB">
 <head>
@@ -9,15 +12,11 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a aria-current="page" href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a href="/kit/">Kit</a><a href="/about/">About</a><a href="/contact/">Contact</a></nav></div></header>
+<?php require __DIR__ . '/../includes/site-header.php'; ?>
 <main id="mainContent">
 <section class="pageHero"><div class="shell narrow"><p class="eyebrow">Get involved</p><h1>Play Walking Football</h1><p class="heroLead">You do not need to be an experienced footballer, and you do not need to be match-fit before you start. HWFC has sessions for different levels of experience and intensity.</p><div class="buttonRow"><a class="button buttonPrimary" href="#sessions">Find a Session</a><a class="button buttonSecondary" href="/contact/?topic=try">I'd Like to Try Walking Football</a></div></div></section>
-
 <section class="section"><div class="shell narrow"><p class="eyebrow">The game</p><h2>What is walking football?</h2><p class="lead">Walking football keeps the passing, movement, teamwork and enjoyment of football while players move at a walking pace rather than running.</p><p>It can be played socially, competitively, or somewhere in between. For some people it is a way back into football after many years away. For others it is a way to keep playing the game they already love. Some people start without having played organised football before.</p></div></section>
-
 <section class="section sectionSoft"><div class="shell"><p class="eyebrow">Eligibility</p><h2>Is walking football for me?</h2><div class="definitionList"><div><dt>Men's walking football</dt><dd>Generally for players aged 50 and over.</dd></div><div><dt>Ladies' walking football</dt><dd>For women aged 35 and over.</dd></div><div><dt>Experience</dt><dd>Experienced, returning, beginner and completely new players are welcome.</dd></div></div><p class="infoStrip">Competitive teams may be entered in age-banded competitions such as U55, U65 and U70 when required. These competition categories are separate from normal weekly-session eligibility.</p></div></section>
-
 <section class="section" id="sessions"><div class="shell"><div class="sectionHeading"><div><p class="eyebrow">Weekly sessions</p><h2>Find a session that suits you</h2></div><p>If you are unsure where to start, <a class="textLink" href="/contact/?topic=try">contact us and we will help you choose</a>.</p></div><div class="sessionGrid">
 <article class="sessionCard"><p class="sessionDay">Tuesday</p><h3>All abilities</h3><p class="sessionTime">10:30–11:30</p><p class="sessionMeta">Lisburn Leisure Centre<br>Lisburn, BT28 1LP</p><p>Suitable for players of all abilities.</p></article>
 <article class="sessionCard"><p class="sessionDay">Wednesday</p><h3>Gentle / social</h3><p class="sessionTime">11:00–12:00</p><p class="sessionMeta">Football Factory<br>162 Moira Road, Lisburn, BT28 1JA</p><p>Best for new players, returning players or anyone looking for a gentler session.</p></article>
@@ -26,13 +25,10 @@
 <article class="sessionCard"><p class="sessionDay">Sunday</p><h3>Competitive</h3><p class="sessionTime">11:00–12:00</p><p class="sessionMeta">Football Factory<br>162 Moira Road, Lisburn, BT28 1JA</p><p>For players looking for competitive walking football.</p></article>
 <article class="sessionCard"><p class="sessionDay">Sunday</p><h3>Ladies' match session</h3><p class="sessionTime">14:00–15:00</p><p class="sessionMeta">Football Factory<br>162 Moira Road, Lisburn, BT28 1JA</p><p>Match-focused walking football for women of all abilities.</p></article>
 </div></div></section>
-
 <section class="section sectionSoft"><div class="shell contentGrid"><article class="infoCard"><p class="eyebrow">Costs</p><h2>What does it cost?</h2><p><strong>Members:</strong> £2 per session<br><strong>Non-members:</strong> £3 per session<br><strong>Membership:</strong> £60 per year, payable at £5 per month</p><p>Session fees are paid online.</p></article><article class="infoCard"><p class="eyebrow">Kit</p><h2>What should I bring?</h2><p>Wear comfortable sports clothing and bring water.</p><p>Sessions are played on 3G pitches, so moulded-stud football boots are recommended. Trainers are also suitable at the Football Factory.</p></article></div></section>
-
 <section class="section"><div class="shell narrow"><p class="eyebrow">Members</p><h2>Keep your member details up to date</h2><p class="lead">If you are already an HWFC member, please complete our member details form so we have the contact, emergency and other information we may need to administer the club and help keep members safe.</p><p>The form is hosted using Google Forms. Please see our <a class="textLink" href="/privacy/">Privacy Policy</a> for information about how HWFC handles personal information.</p><div class="buttonRow"><a class="button buttonPrimary" href="https://docs.google.com/forms/d/e/1FAIpQLScyUqbWcvOLKTFX0r_Er9qADa1iV08DMU2hHMEUonuDbf6NBw/viewform" target="_blank" rel="noopener">Complete Member Details Form</a></div></div></section>
-
 <section class="section sectionSoft"><div class="shell narrow"><p class="eyebrow">First visit</p><h2>Coming along for the first time?</h2><p class="lead">Contact HWFC beforehand and tell us which session you are interested in. There is no special trial-session format.</p><div class="contentGrid"><div class="infoCard"><h3>When you arrive</h3><p>We will make sure someone is there to greet you, introduce you to the group and help you get settled into the session.</p></div><div class="infoCard"><h3>During the session</h3><p>Join in at a level that suits you. Nobody expects a new player to know all the walking-football rules or club routines before they arrive.</p></div></div><div class="buttonRow"><a class="button buttonPrimary" href="/contact/?topic=try">I'd Like to Try Walking Football</a><a class="button buttonSecondary" href="/contact/">Contact HWFC</a></div></div></section>
 </main>
-<footer class="siteFooter"><div class="shell footerGrid"><div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div><div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a></div><div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div></div></footer>
+<?php require __DIR__ . '/../includes/site-footer.php'; ?>
 </body>
 </html>

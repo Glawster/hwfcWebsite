@@ -1,9 +1,11 @@
+<?php
+$activeNav = 'contact';
+?>
 <!doctype html>
 <html lang="en-GB">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Contact HWFC | Hillsborough Walking Football Club</title><meta name="description" content="Contact Hillsborough Walking Football Club about trying walking football, sessions, fixtures or general enquiries."><link rel="icon" type="image/png" href="/assets/hwfc-logo.png"><link rel="stylesheet" href="/styles.css"></head>
 <body>
-<a class="skipLink" href="#mainContent">Skip to main content</a>
-<header class="siteHeader"><div class="shell headerInner"><a class="brand" href="/" aria-label="Hillsborough Walking Football Club home"><img class="brandLogo" src="/assets/hwfc-logo.png" alt="" width="64" height="64"><span class="brandName">Hillsborough Walking Football Club</span></a><nav class="mainNav" aria-label="Main navigation"><a href="/">Home</a><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a><a href="/kit/">Kit</a><a href="/about/">About</a><a aria-current="page" href="/contact/">Contact</a></nav></div></header>
+<?php require __DIR__ . '/../includes/site-header.php'; ?>
 <main id="mainContent">
 <section class="pageHero"><div class="shell narrow"><p class="eyebrow">Get in touch</p><h1>Contact Hillsborough Walking Football Club</h1><p class="heroLead">Have a question about walking football, our sessions, fixtures or visiting HWFC? Send us a message and someone from the club will get back to you.</p><p>If you are thinking about playing, you do not need to commit to joining. Tell us which session interests you and we can help you get started.</p></div></section>
 <section class="section"><div class="shell contentGrid"><div>
@@ -26,7 +28,7 @@
 <article class="infoCard" style="margin-top:1rem"><p class="eyebrow">Other ways to contact us</p><h3>Facebook Messenger</h3><p>If you already use Facebook, you can message HWFC through our Facebook page.</p><p><a class="textLink" href="https://www.facebook.com/profile.php?id=100082995559544" target="_blank" rel="noopener">Message HWFC on Facebook →</a></p><h3>Email</h3><p><a class="textLink" href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></p></article>
 </aside></div></section>
 </main>
-<footer class="siteFooter"><div class="shell footerGrid"><div><strong>Hillsborough Walking Football Club</strong><p>Football for life.</p></div><div><a href="/play/">Play</a><a href="/mens/">Men's</a><a href="/ladies/">Ladies'</a></div><div><a href="/about/">About</a><a href="/contact/">Contact</a><a href="/privacy/">Privacy Policy</a><a href="mailto:info@hillsboroughwalkingfootball.com">info@hillsboroughwalkingfootball.com</a></div></div></footer>
+<?php require __DIR__ . '/../includes/site-footer.php'; ?>
 <script>
 (function () {
     const params = new URLSearchParams(window.location.search);
