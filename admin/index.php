@@ -93,10 +93,10 @@ function adminMoney(int $pence): string
     <div class="adminShell">
         <p class="eyebrow">Administration Dashboard</p>
         <h1>Club Administration</h1>
-        <p class="lead">Manage membership applications, membership payments and lightweight club session income records.</p>
+        <p class="lead">Manage member details, membership payments and lightweight club session income records.</p>
 
-        <div class="adminSummaryGrid" aria-label="Membership application summary">
-            <div class="adminSummaryCard"><span>Total Applications</span><strong><?= $counts['total'] ?></strong></div>
+        <div class="adminSummaryGrid" aria-label="Membership summary">
+            <div class="adminSummaryCard"><span>Member Records</span><strong><?= $counts['total'] ?></strong></div>
             <div class="adminSummaryCard"><span>Pending</span><strong><?= $counts['pending'] ?></strong></div>
             <div class="adminSummaryCard"><span>Active</span><strong><?= $counts['active'] ?></strong></div>
             <div class="adminSummaryCard"><span>Lapsed</span><strong><?= $counts['lapsed'] ?></strong></div>
@@ -104,40 +104,40 @@ function adminMoney(int $pence): string
             <div class="adminSummaryCard"><span>Session Income Recorded</span><strong><?= adminEsc(adminMoney($sessionIncomePence)) ?></strong></div>
         </div>
 
-        <section class="adminPanel" aria-labelledby="membershipApplicationsHeading">
+        <section class="adminPanel" aria-labelledby="memberDetailsHeading">
             <div class="adminPanelHeader">
-                <h2 id="membershipApplicationsHeading">Membership Applications</h2>
-                <p>Sensitive health and emergency-contact information is deliberately excluded until authenticated admin access is implemented.</p>
+                <h2 id="memberDetailsHeading">Member Details</h2>
+                <p>Select any member record to open their details. Sensitive health and emergency-contact information remains excluded until authenticated admin access is implemented.</p>
             </div>
             <?php if ($error !== null): ?>
                 <div class="adminError" role="alert"><?= adminEsc($error) ?></div>
             <?php elseif (!$applications): ?>
-                <div class="adminEmpty">No membership applications have been submitted to this database yet.</div>
+                <div class="adminEmpty">No member records have been submitted to this database yet.</div>
             <?php else: ?>
                 <div class="adminTableWrap">
                     <table class="adminTable">
                         <thead>
                         <tr>
                             <th>Reference</th>
-                            <th>Membership ID</th>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Telephone</th>
                             <th>Status</th>
                             <th>Submitted</th>
+                            <th>Membership ID</th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($applications as $application): ?>
                             <?php $detailUrl = '/admin/member.php?id=' . rawurlencode((string) $application['applicationUuid']); ?>
-                            <tr>
-                                <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(adminReference((string) $application['applicationUuid'])) ?></a></td>
-                                <td><?= adminEsc($application['membershipId'] ?: '—') ?></td>
+                            <tr class="adminClickableRow" data-href="<?= adminEsc($detailUrl) ?>" tabindex="0" role="link" aria-label="Open <?= adminEsc(trim($application['firstName'] . ' ' . $application['lastName'])) ?>">
+                                <td><?= adminEsc(adminReference((string) $application['applicationUuid'])) ?></td>
                                 <td><a class="adminTableLink" href="<?= adminEsc($detailUrl) ?>"><?= adminEsc(trim($application['firstName'] . ' ' . $application['lastName'])) ?></a></td>
                                 <td><?= adminEsc($application['email']) ?></td>
                                 <td><?= adminEsc($application['phone']) ?></td>
                                 <td><span class="adminStatus"><?= adminEsc($application['status']) ?></span></td>
                                 <td><?= adminEsc(adminDate((string) $application['submittedAt'])) ?></td>
+                                <td><?= adminEsc($application['membershipId'] ?: '—') ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -164,5 +164,20 @@ function adminMoney(int $pence): string
         </section>
     </div>
 </main>
+<script>
+document.querySelectorAll('.adminClickableRow').forEach((row) => {
+    const openRow = () => { window.location.href = row.dataset.href; };
+    row.addEventListener('click', (event) => {
+        if (event.target.closest('a, button, input, select, textarea')) return;
+        openRow();
+    });
+    row.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openRow();
+        }
+    });
+});
+</script>
 </body>
 </html>
