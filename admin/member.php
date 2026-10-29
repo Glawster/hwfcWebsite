@@ -314,7 +314,7 @@ function memberTabUrl(string $uuid, string $tab): string
                     <dl class="adminDetailGrid">
                         <div><dt>Payment Plan</dt><dd><?= adminEsc($application['paymentFrequency'] ?: 'Not Set') ?></dd></div>
                         <div><dt>Payment Status</dt><dd><?= adminEsc($application['paymentStatus'] ?: 'Not Recorded') ?></dd></div>
-                        <div><dt>Last Payment</dt><dd><?= adminEsc(adminDisplayDate($application['lastPaymentDate'])) ?></dd></div>
+                        <div class="adminDetailRowStart"><dt>Last Payment</dt><dd><?= adminEsc(adminDisplayDate($application['lastPaymentDate'])) ?></dd></div>
                         <div><dt>Paid Through</dt><dd><?= adminEsc(adminDisplayDate($application['paidThroughDate'])) ?></dd></div>
                         <div><dt>Next Payment Due</dt><dd><?= adminEsc(adminDisplayDate($application['nextPaymentDueDate'])) ?></dd></div>
                     </dl>

@@ -94,6 +94,8 @@ The selected tab uses club red, with a darker red interaction state. Update Cons
 
 On desktop, Member Details places Membership ID beside the three name fields. Date Of Birth occupies the first column on its own row. Home Address starts the next row and spans three columns with Postcode in the fourth. Email starts a separate contact row followed by Telephone and Preferred Contact. The grid adapts to two columns on tablet and one on mobile, with Home Address spanning the available width.
 
+Payment Details places Last Payment, Paid Through and Next Payment Due together on a separate desktop row below Payment Plan and Payment Status. These fields wrap to the available columns on smaller screens.
+
 History is scoped to the application UUID, not a search across people with matching names or email addresses. Recorded lapse and return events appear together when they belong to that same application. Separate applications are not automatically linked, and missing historical events cannot be reconstructed. No audit events produces an explicit empty-history message. Audit details are displayed as escaped text in From, To and Who columns: previous values go under From, new values and other recorded context under To, and the recorded actor under Who. Missing values display a dash; historical actor labels are shown as recorded.
 
 Undo Acceptance returns a mistakenly accepted application to Pending and releases its allocated Membership ID for reuse, with an audit record. A member lapsing or leaving does not release their ID.
