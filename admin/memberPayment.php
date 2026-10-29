@@ -136,5 +136,5 @@ SQL);
     $_SESSION['admin_error'] = $e->getMessage();
 }
 
-header('Location: /admin/member.php?id=' . rawurlencode($uuid));
+header('Location: /admin/member.php?id=' . rawurlencode($uuid) . '&tab=payments');
 exit;
