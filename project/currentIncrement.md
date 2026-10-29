@@ -45,4 +45,10 @@ Before 0.6 is deployed for real applications:
 - verify no database file or exported personal data is tracked by Git;
 - review the production retention process against the published privacy policy.
 
-REQ-004 remains `ToDo`/partially implemented until the full requirement is delivered; this increment intentionally delivers only the public/data foundation needed before the 0.7 administration work.
+REQ-004 remains `InProgress`/partially implemented until the full requirement is delivered; this increment intentionally delivers only the public/data foundation needed before the 0.7 administration work.
+
+## Integration with main
+
+Main's kit-order fixes and requirement statuses have been integrated while retaining the administration branch's shared PHP pages and member layouts. Requirements 001 and 005 are Completed; 004 remains InProgress. The incoming kit-window requirement was renumbered to 008 because 006 already identifies the Administration Page. Requirement 007 now references 008; the next available requirement number is 009.
+
+Merge verification: PHP syntax checks passed for 35 admin, kit, membership and public-page files. History and Data Protection SQLite rendering checks passed. The HTTP suite could not start because this session blocks local sockets (`PermissionError`); PHPUnit was not available in this environment. Browser/HTTP retesting remains required.

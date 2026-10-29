@@ -2,7 +2,7 @@
 
 ## Status
 
-ToDo
+InProgress
 
 ## Outcome
 
@@ -198,3 +198,4 @@ The solution must support the club's data-protection obligations, including tran
 - 2026-10-29: clarified — explicitly reversed acceptance releases the allocated Membership ID for reuse; IDs remain reserved when membership lapses or ends.
 - 2026-10-15: created — add online membership applications, member database administration, GDPR-supporting controls, permanent Membership IDs and a club-branded virtual membership card with optional photograph support.
 - 2026-10-15: updated — add membership fee payment tracking, membership periods and expiry/renewal history, and require bank-transfer details to reuse the protected club-shop bank configuration.
+- 2026-10-27: status ToDo -> InProgress — myBoard.

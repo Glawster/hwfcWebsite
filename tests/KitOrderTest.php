@@ -31,7 +31,6 @@ final class KitOrderTest extends TestCase
             'name'=>'Test Member',
             'email'=>'member@example.invalid',
             'phone'=>'+44 7700 900123',
-            'section'=>"Men's",
             'accountHolder'=>'Test Account',
             'notes'=>'Please check sizes',
             'human'=>'yes',
@@ -52,6 +51,26 @@ final class KitOrderTest extends TestCase
         $now = new DateTimeImmutable($date);
         self::assertSame($state, kitWindowState($this->c, $now));
         self::assertSame($state !== 'open', count(kitValidateOrder($this->input(), $this->c, $now)['errors']) > 0);
+    }
+
+    public function testWindowCanBeOmittedForContinuousOrdering(): void
+    {
+        $c = $this->c;
+        unset($c['window']);
+        kitValidateConfig($c);
+        self::assertSame('open', kitWindowState($c, $this->now));
+        self::assertSame([], kitValidateOrder($this->input(), $c, $this->now)['errors']);
+        $o = kitAcceptOrder($this->input(), $c, $this->now);
+        self::assertSame('continuous', $o['batchId']);
+        self::assertSame('Continuous Ordering', $o['batchName']);
+    }
+
+    public function testWindowCanBeNullForContinuousOrdering(): void
+    {
+        $c = $this->c;
+        $c['window'] = null;
+        kitValidateConfig($c);
+        self::assertSame('open', kitWindowState($c, $this->now));
     }
 
     public function testTotalsUseCamelCaseFields(): void
@@ -130,6 +149,7 @@ final class KitOrderTest extends TestCase
         foreach (['batch_id','batch_name','submitted_at','manager_mail','member_mail','manager_attempts','claim_free','delivery_pence','total_pence'] as $key) self::assertArrayNotHasKey($key, $stored);
         self::assertArrayHasKey('unitPence', $stored['lines'][0]);
         self::assertArrayNotHasKey('unit_pence', $stored['lines'][0]);
+        self::assertArrayNotHasKey('section', $stored['member']);
     }
 
     public function testReferenceSequenceIsDaily(): void
@@ -166,7 +186,8 @@ final class KitOrderTest extends TestCase
         self::assertSame('sent', $sent['managerMail']);
         self::assertSame('sent', $sent['memberMail']);
         self::assertSame($this->c['managerEmail'], $messages[0]['to']);
-        foreach (['Test Member','Test Account','Size: L','Quantity: 2','Supplier-applied initials: AW'] as $text) self::assertStringContainsString($text, $messages[0]['body']);
+        foreach (['Test Member','Test Account','Size: L','Quantity: 2','Supplier-Applied Initials: AW'] as $text) self::assertStringContainsString($text, $messages[0]['body']);
+        self::assertStringNotContainsString('Section:', $messages[0]['body']);
     }
 
     public function testReviewRetainsOnlyValidatedFormFields(): void
@@ -174,10 +195,12 @@ final class KitOrderTest extends TestCase
         $i = $this->input();
         $i['bankAccount'] = 'do not retain';
         $i['totalPence'] = '0';
+        $i['section'] = "Men's";
         $result = kitValidateOrder($i, $this->c, $this->now);
         $canonical = kitCanonicalInput($result['order']);
         self::assertArrayNotHasKey('bankAccount', $canonical);
         self::assertArrayNotHasKey('totalPence', $canonical);
+        self::assertArrayNotHasKey('section', $canonical);
         self::assertSame($result, kitValidateOrder($canonical, $this->c, $this->now));
     }
 }

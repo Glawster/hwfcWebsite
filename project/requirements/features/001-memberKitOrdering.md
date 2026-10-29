@@ -2,7 +2,7 @@
 
 ## Status
 
-InProgress
+Completed
 
 ## Outcome
 
@@ -296,3 +296,4 @@ A member-facing status portal is not required by this requirement.
 - 2026-10-08: added explicit new-member checkpoint and one-free-shirt entitlement handling.
 - 2026-10-08: clarified that entitlement history is retained manually by the kit manager until a future member register is introduced.
 - 2026-10-08: implementation started; requirement moved to `InProgress`.
+- 2026-10-27: status InProgress -> Completed — myBoard.
