@@ -91,6 +91,10 @@ SQL);
     if (!in_array('next_payment_due_date', $columnNames, true)) {
         $db->exec('ALTER TABLE membership_applications ADD COLUMN next_payment_due_date TEXT');
     }
+    if (!in_array('form_answers', $columnNames, true)) {
+        $db->exec('ALTER TABLE membership_applications ADD COLUMN form_answers TEXT');
+        hwfcMoveFormAnswersFromNotes($db);
+    }
 
     $db->exec(<<<'SQL'
 CREATE TABLE IF NOT EXISTS membership_id_sequence (
@@ -198,4 +202,89 @@ function hwfcAudit(PDO $db, string $uuid, string $event, array $details = []): v
         ':at' => gmdate('c'),
         ':details' => $details ? json_encode($details, JSON_UNESCAPED_SLASHES) : null,
     ]);
+}
+
+/**
+ * Member responses form answers kept as labelled lines in form_answers, one per line, so the
+ * record reads as a single block while import/export can still address each answer.
+ */
+const HWFC_MEMBER_FORM_ANSWER_LABELS = [
+    'membershipType' => 'Membership type',
+    'clubNews' => 'Club news and updates',
+    'whatsApp' => 'Club WhatsApp group',
+    'photoConsent' => 'Photographs or videos',
+    'helping' => 'Helping with club activities',
+    'accuracyConfirmed' => 'Information accurate',
+    'changesConfirmed' => 'Will report changes',
+    'riskConfirmed' => 'Physical activity understood',
+    'privacyAcknowledged' => 'Privacy notice acknowledged',
+];
+
+function hwfcFormAnswersParse(?string $text): array
+{
+    $answers = [];
+    $keys = array_flip(HWFC_MEMBER_FORM_ANSWER_LABELS);
+    foreach (preg_split('/\R/u', (string) $text) ?: [] as $line) {
+        $parts = explode(': ', $line, 2);
+        if (count($parts) === 2 && isset($keys[$parts[0]])) {
+            $answers[$keys[$parts[0]]] = trim($parts[1]);
+        }
+    }
+    return $answers;
+}
+
+function hwfcFormAnswersBuild(array $answers): ?string
+{
+    $lines = [];
+    foreach (HWFC_MEMBER_FORM_ANSWER_LABELS as $key => $label) {
+        $value = trim(preg_replace('/\s*\R\s*/u', ' ', (string) ($answers[$key] ?? '')) ?? '');
+        if ($value !== '') {
+            $lines[] = $label . ': ' . $value;
+        }
+    }
+    return $lines ? implode("\n", $lines) : null;
+}
+
+/** One-off migration: earlier imports stored the form answers as lines in admin_notes. */
+function hwfcMoveFormAnswersFromNotes(PDO $db): void
+{
+    $noteLabels = [
+        'Membership type' => 'membershipType',
+        'Club news and updates' => 'clubNews',
+        'Club WhatsApp group' => 'whatsApp',
+        'Photographs or videos answer' => 'photoConsent',
+        'Helping with club activities' => 'helping',
+    ];
+    $rows = $db->query('SELECT application_uuid, admin_notes FROM membership_applications WHERE admin_notes IS NOT NULL')->fetchAll();
+    $update = $db->prepare('UPDATE membership_applications SET admin_notes = :notes, form_answers = :answers WHERE application_uuid = :uuid');
+
+    $db->beginTransaction();
+    try {
+        foreach ($rows as $row) {
+            $answers = [];
+            $kept = [];
+            foreach (preg_split('/\R/u', (string) $row['admin_notes']) ?: [] as $line) {
+                $parts = explode(': ', $line, 2);
+                if (count($parts) === 2 && isset($noteLabels[$parts[0]])) {
+                    $answers[$noteLabels[$parts[0]]] = $parts[1];
+                } else {
+                    $kept[] = $line;
+                }
+            }
+            if (!$answers) {
+                continue;
+            }
+            $notes = trim(implode("\n", $kept));
+            $update->execute([
+                ':notes' => $notes !== '' ? $notes : null,
+                ':answers' => hwfcFormAnswersBuild($answers),
+                ':uuid' => $row['application_uuid'],
+            ]);
+            hwfcAudit($db, $row['application_uuid'], 'form_answers_moved_from_notes', ['fields' => array_keys($answers), 'actor' => 'system']);
+        }
+        $db->commit();
+    } catch (Throwable $e) {
+        $db->rollBack();
+        throw $e;
+    }
 }

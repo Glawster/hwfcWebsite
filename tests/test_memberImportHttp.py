@@ -245,8 +245,15 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual(alex['health_relevant'], 1)
         self.assertEqual(alex['health_details'], 'Medical condition: Test condition <b>\nSecond line\nEmergency medication: Test inhaler\nIn kit bag')
         self.assertEqual((sam['health_relevant'], sam['health_details']), (0, None))
-        self.assertIn('Membership type: Playing member', alex['admin_notes'])
-        self.assertIn('Photographs or videos answer: Please ask me first', alex['admin_notes'])
+        self.assertEqual(alex['admin_notes'], 'Imported from the Member Responses Google Form (spreadsheet row 2).')
+        self.assertEqual(alex['form_answers'], '\n'.join([
+            'Membership type: Playing member', 'Club news and updates: Yes', 'Club WhatsApp group: Yes',
+            'Photographs or videos: Please ask me first', 'Helping with club activities: Maybe',
+            'Information accurate: I confirm', 'Will report changes: I confirm',
+            'Physical activity understood: I confirm', 'Privacy notice acknowledged: I confirm']))
+        page = self.get('/admin/member.php?id=' + alex['application_uuid'])
+        self.assertIn('Form Answers', page)
+        self.assertIn('Photographs or videos: Please ask me first', page)
         self.assertEqual(sam['second_emergency_name'], 'Second Contact')
         self.assertIsNone(alex['membership_id'])
         with sqlite3.connect(self.db_path) as db:
@@ -325,7 +332,8 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual((alex[HEADERS[18]], alex[HEADERS[19]]), ('Yes', 'Test inhaler\nIn kit bag'))
         self.assertEqual(alex[HEADERS[25]], 'Please ask me first')
         self.assertEqual((alex['Membership type'], alex[HEADERS[26]]), ('Playing member', 'Maybe'))
-        self.assertEqual(alex[HEADERS[30]], '')
+        self.assertEqual(alex[HEADERS[30]], 'I confirm')
+        self.assertEqual(by_email['web@example.test']['Membership type'], '')
         self.assertEqual(by_email['sam@example.test']['Home address'], '\'=HYPERLINK("x")')
         web = by_email['web@example.test']
         self.assertEqual(web['Telephone number'], '+44 7000 000003')
@@ -401,6 +409,40 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual(len(details), 1)
         self.assertIn('"Home address"', details[0])
         self.assertNotIn('New Road', details[0])
+
+    def test_update_mode_changes_form_answers(self):
+        self.import_and_accept()
+        heading, records = self.rows_of(self.export())
+        alex = next(r for r in records if r['Membership ID'] == 'HWFC-000001')
+        alex.update({'Membership type': 'Non-playing member', HEADERS[25]: 'Yes', 'Would you like to receive club news and updates?': ''})
+        page = self.upload(self.to_csv(heading, records), 'edited.csv', update=True)
+        self.assertIn('Membership type:</strong> Playing member → Non-playing member', page)
+        self.assertIn('Photographs or videos:</strong> Please ask me first → Yes', page)
+        self.commit()
+        updated = self.members()['alex@example.test']
+        self.assertEqual(updated['photo_consent'], 1)
+        self.assertIn('Membership type: Non-playing member', updated['form_answers'])
+        self.assertIn('Photographs or videos: Yes', updated['form_answers'])
+        self.assertIn('Club news and updates: Yes', updated['form_answers'])
+        self.assertEqual(updated['admin_notes'], 'Imported from the Member Responses Google Form (spreadsheet row 2).')
+        self.assertIn('"Membership type"', self.audit('member_import_updated')[0])
+
+    def test_answers_in_notes_move_to_form_answers(self):
+        db_path = self.private / 'legacy.sqlite'
+        php = os.environ.get('HWFC_TEST_PHP', 'php')
+        open_db = f"require '{ROOT}/members/lib/memberDb.php'; hwfcMemberDb();"
+        subprocess.run([php, '-r', open_db], env=dict(os.environ, HWFC_MEMBER_DB=str(db_path)), check=True)
+        with sqlite3.connect(db_path) as db:
+            db.execute('ALTER TABLE membership_applications DROP COLUMN form_answers')
+            db.execute("INSERT INTO membership_applications (application_uuid, first_name, last_name, date_of_birth, address, postcode, email, phone, preferred_contact, emergency_name, emergency_relationship, emergency_phone, privacy_version, submitted_at, updated_at, admin_notes) VALUES ('c'||hex(randomblob(15)), 'Old', 'Import', '1950-01-02', 'A', 'B', 'old@example.test', '1', 'email', 'C', 'R', '1', 'v', 't', 't', ?)",
+                       ('Imported from the Member Responses Google Form (spreadsheet row 4).\nMembership type: Playing member\nClub WhatsApp group: Yes\nPhotographs or videos answer: Please ask me first\nCommittee to call back',))
+        subprocess.run([php, '-r', open_db], env=dict(os.environ, HWFC_MEMBER_DB=str(db_path)), check=True)
+        with sqlite3.connect(db_path) as db:
+            notes, answers = db.execute('SELECT admin_notes, form_answers FROM membership_applications').fetchone()
+            events = db.execute("SELECT count(*) FROM membership_audit WHERE event_type = 'form_answers_moved_from_notes'").fetchone()[0]
+        self.assertEqual(notes, 'Imported from the Member Responses Google Form (spreadsheet row 4).\nCommittee to call back')
+        self.assertEqual(answers, 'Membership type: Playing member\nClub WhatsApp group: Yes\nPhotographs or videos: Please ask me first')
+        self.assertEqual(events, 1)
 
     def test_update_mode_rejects_bad_rows_and_stale_previews(self):
         self.import_and_accept()

@@ -419,6 +419,11 @@
     font-size: .9rem;
 }
 
+.adminFormAnswers {
+    margin: 0 0 1rem;
+    overflow-wrap: anywhere;
+}
+
 .adminCheckboxLabel {
     display: flex;
     gap: .5rem;

@@ -43,6 +43,9 @@ const HWFC_MEMBER_IMPORT_COLUMNS = [
     'whatsApp' => 'Are you happy to be added to the club WhatsApp group?',
     'photoConsent' => 'Can we use photographs or videos featuring you on our social media or website?',
     'helping' => 'Would you be interested in helping with club activities or events?',
+    'accuracyConfirmed' => 'I confirm that the information I have provided is accurate.',
+    'changesConfirmed' => 'I will inform the club if my emergency contacts or relevant health information change.',
+    'riskConfirmed' => 'I understand that walking football is a physical activity and that I should seek medical advice if I am unsure whether I can participate safely.',
     'privacyAcknowledged' => 'I acknowledge that I have been provided with the club privacy notice.',
 ];
 
@@ -442,12 +445,8 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v, ?string $defaultSta
     $notes = array_filter([
         'Imported from the ' . HWFC_MEMBER_IMPORT_SOURCE . ' (spreadsheet row ' . $rowNumber . ').',
         $dateOfBirthMissing ? 'Date of birth was missing from the form; 01/01/1970 is a placeholder and must be amended.' : null,
-        $v['membershipType'] !== '' ? 'Membership type: ' . $v['membershipType'] : null,
-        $v['clubNews'] !== '' ? 'Club news and updates: ' . $v['clubNews'] : null,
-        $v['whatsApp'] !== '' ? 'Club WhatsApp group: ' . $v['whatsApp'] : null,
-        $v['photoConsent'] !== '' ? 'Photographs or videos answer: ' . $v['photoConsent'] : null,
-        $v['helping'] !== '' ? 'Helping with club activities: ' . $v['helping'] : null,
     ]);
+    $formAnswers = hwfcFormAnswersBuild(array_intersect_key($v, HWFC_MEMBER_FORM_ANSWER_LABELS));
 
     return [
         'rowNumber' => $rowNumber,
@@ -481,6 +480,7 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v, ?string $defaultSta
             'health_details' => $healthLines ? implode("\n", $healthLines) : null,
             'photo_consent' => strtolower($v['photoConsent']) === 'yes' ? 1 : 0,
             'admin_notes' => implode("\n", $notes),
+            'form_answers' => $formAnswers,
             'membership_start_date' => $startDate,
             'membership_expiry_date' => $expiryDate,
             'submitted_at' => $submittedAt,
@@ -632,7 +632,7 @@ INSERT INTO membership_applications (
     emergency_name, emergency_relationship, emergency_phone,
     second_emergency_name, second_emergency_phone, second_emergency_relationship,
     health_relevant, health_details, photo_consent,
-    privacy_version, admin_notes, membership_start_date, membership_expiry_date,
+    privacy_version, admin_notes, form_answers, membership_start_date, membership_expiry_date,
     submitted_at, updated_at, status
 ) VALUES (
     :uuid, :first_name, :last_name, :preferred_name, :date_of_birth,
@@ -640,7 +640,7 @@ INSERT INTO membership_applications (
     :emergency_name, :emergency_relationship, :emergency_phone,
     :second_emergency_name, :second_emergency_phone, :second_emergency_relationship,
     :health_relevant, :health_details, :photo_consent,
-    :privacy_version, :admin_notes, :membership_start_date, :membership_expiry_date,
+    :privacy_version, :admin_notes, :form_answers, :membership_start_date, :membership_expiry_date,
     :submitted_at, :updated_at, 'Pending'
 )
 SQL);
@@ -741,12 +741,12 @@ function hwfcMemberExportValues(array $member): array
     $values['secondEmergencyPhone'] = (string) $member['second_emergency_phone'];
     $values = array_merge($values, hwfcMemberExportHealth((int) $member['health_relevant'], (string) $member['health_details']));
 
-    $notes = (string) $member['admin_notes'];
-    $values['membershipType'] = hwfcMemberExportNote($notes, 'Membership type');
-    $values['clubNews'] = hwfcMemberExportNote($notes, 'Club news and updates');
-    $values['whatsApp'] = hwfcMemberExportNote($notes, 'Club WhatsApp group');
-    $values['helping'] = hwfcMemberExportNote($notes, 'Helping with club activities');
-    $photoAnswer = hwfcMemberExportNote($notes, 'Photographs or videos answer');
+    $answers = hwfcFormAnswersParse($member['form_answers'] ?? null);
+    foreach (array_keys(HWFC_MEMBER_FORM_ANSWER_LABELS) as $key) {
+        $values[$key] = $answers[$key] ?? '';
+    }
+    // The consent flag can be changed on the member record, so it decides Yes; the form answer keeps "Please ask me first".
+    $photoAnswer = $answers['photoConsent'] ?? '';
     $values['photoConsent'] = (int) $member['photo_consent'] === 1 ? 'Yes' : ($photoAnswer !== '' && strtolower($photoAnswer) !== 'yes' ? $photoAnswer : 'No');
 
     $values['membershipStartDate'] = hwfcMemberExportDate($member['membership_start_date']);
@@ -815,11 +815,6 @@ function hwfcMemberExportHealth(int $healthRelevant, string $healthDetails): arr
     }
 
     return $values;
-}
-
-function hwfcMemberExportNote(string $notes, string $label): string
-{
-    return preg_match('/^' . preg_quote($label, '/') . ': (.*)$/mu', $notes, $match) ? trim($match[1]) : '';
 }
 
 function hwfcMemberExportDateTime(string $iso): string
@@ -977,11 +972,26 @@ function hwfcMemberImportUpdateChanges(array $existing, array $v): array
         }
     }
 
-    if ($v['photoConsent'] !== '' && $v['photoConsent'] !== $old['photoConsent']) {
-        $consent = strtolower($v['photoConsent']) === 'yes' ? 1 : 0;
-        if ($consent !== (int) $existing['photo_consent']) {
-            $record('Photographs or videos', $consent ? 'No' : 'Yes', $consent ? 'Yes' : 'No', ['photo_consent' => $consent]);
+    // Form answers are rewritten as a block; the photo answer also sets the consent flag.
+    $answers = hwfcFormAnswersParse($existing['form_answers'] ?? null);
+    $answersChanged = false;
+    foreach (HWFC_MEMBER_FORM_ANSWER_LABELS as $key => $label) {
+        if ($v[$key] === '' || $v[$key] === $old[$key]) {
+            continue;
         }
+        $columns = [];
+        if ($key === 'photoConsent') {
+            $consent = strtolower($v[$key]) === 'yes' ? 1 : 0;
+            if ($consent !== (int) $existing['photo_consent']) {
+                $columns['photo_consent'] = $consent;
+            }
+        }
+        $answers[$key] = $v[$key];
+        $answersChanged = true;
+        $record($label, $old[$key], $v[$key], $columns);
+    }
+    if ($answersChanged) {
+        $set['form_answers'] = hwfcFormAnswersBuild($answers);
     }
 
     // Health columns are compared as a group; the preview never shows their content.

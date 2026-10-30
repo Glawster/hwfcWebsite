@@ -53,7 +53,7 @@ if ($command === 'correct') {
         'first_name', 'last_name', 'preferred_name', 'date_of_birth', 'address', 'postcode',
         'email', 'phone', 'preferred_contact', 'membership_section', 'emergency_name',
         'emergency_relationship', 'emergency_phone', 'second_emergency_name',
-        'second_emergency_phone', 'health_details', 'photo_consent'
+        'second_emergency_phone', 'health_details', 'photo_consent', 'form_answers'
     ];
     if (!in_array($field, $allowed, true)) {
         fwrite(STDERR, "Field is not permitted for correction through this tool.\n");

@@ -123,6 +123,7 @@ SELECT application_uuid AS applicationUuid,
        photo_consent AS photoConsent,
        privacy_version AS privacyVersion,
        admin_notes AS adminNotes,
+       form_answers AS formAnswers,
        membership_start_date AS membershipStartDate,
        membership_expiry_date AS membershipExpiryDate,
        payment_frequency AS paymentFrequency,
@@ -278,7 +279,15 @@ function memberTabUrl(string $uuid, string $tab): string
                 </dl>
             </section>
 
-
+            <section class="adminDetailPanel" aria-labelledby="formAnswersHeading">
+                <h2 id="formAnswersHeading">Form Answers</h2>
+                <?php if (trim((string) ($application['formAnswers'] ?? '')) === ''): ?>
+                    <p class="adminHelp">No member responses form answers are recorded for this member.</p>
+                <?php else: ?>
+                    <p class="adminFormAnswers"><?= nl2br(adminEsc($application['formAnswers'])) ?></p>
+                    <p class="adminHelp">Answers from the member responses Google Form. Change them by importing an edited export with update mode on the Member Import/Export page.</p>
+                <?php endif; ?>
+            </section>
 
             <div class="adminNotice">Emergency-contact and health information will be exposed here only after authenticated admin access is implemented.</div>
 

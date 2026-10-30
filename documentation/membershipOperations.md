@@ -131,6 +131,8 @@ Every New and Update row has a tick box, ticked by default. Check All and Unchec
 
 A missing date of birth does not block the import: the member is saved with `01/01/1970` as a placeholder, the preview shows a warning, and Notes records that the date must be amended. Correct it on the member record once known.
 
+Earlier imports kept the form answers as lines in Notes. Opening the database with this version moves those lines into Form Answers once, leaves any other notes in place, and records a `form_answers_moved_from_notes` History event.
+
 Imported members remain `Pending`. Accept each one from their member record to allocate a Membership ID.
 
 Mapping from the form:
@@ -140,8 +142,8 @@ Mapping from the form:
 - Email addresses are saved in lowercase with any spaces removed.
 - An optional "Membership start date" column (`dd/mm/yyyy`) sets each member's start date; the club adds it to the sheet. Rows without one use the optional default start date on the upload form. Membership expiry is set to one year less a day after the start date, matching Date Details. Accepting the member keeps these dates; payment plan and status are still set on the member record.
 - Medical, allergy, emergency-medication, mobility and other support answers are combined into the member's health information. "No", "None" and "N/A" style answers are ignored.
-- Photography/publicity consent is recorded only for "Yes"; "Please ask me first" is stored as no consent, and the original answer is kept in Notes.
-- Membership type, club news, WhatsApp group and volunteering answers are added to Notes because the member record has no fields for them yet.
+- Photography/publicity consent is recorded only for "Yes"; "Please ask me first" is stored as no consent, and the original answer is kept in Form Answers.
+- Membership type, club news, WhatsApp group, photo, volunteering and the four confirmation answers are stored together in the member's **Form Answers** field, one labelled line each (for example `Membership type: Playing member`). Form Answers is shown as one block on Member Details and is separate from the administrators' Notes, which receive only the import line and any date-of-birth placeholder note.
 - The form has no relationship field for the second emergency contact, so it is left blank unless the sheet has a "Second emergency contact relationship" column, as the export does.
 - A "Membership expiry date" column overrides the calculated expiry. Payment columns are ignored for new members, who are Pending; set payment details after acceptance.
 - A row with a Membership ID that is not in the register is Invalid. Leave Membership ID blank to add a new member.
@@ -152,8 +154,8 @@ Mapping from the form:
 Export CSV on the same page downloads every `Pending`, `Active` and `Lapsed` member in the same column layout as the Google Form, followed by Membership start date, Membership ID, Status, Membership expiry date, Payment plan, Payment status, Last payment date, Paid through date, Next payment due date, Second emergency contact relationship and Application reference. The file can be worked on offline and read by the import. Rejected applications are excluded.
 
 - Health information is split back into the form's questions using the labels the import created. Health text from the website application form has no labels, so it is placed under the medical-condition question.
-- Membership type, club news, WhatsApp, volunteering and the original photo answer are read back from the import lines in Notes. They are blank for members who did not come from the Google Form.
-- The four confirmation columns and the trailing "Email Address" column are left blank because the website does not hold those answers separately.
+- Membership type, club news, WhatsApp, volunteering, the original photo answer and the four confirmation answers are read from Form Answers by their labels. They are blank for members who applied on the website.
+- The trailing "Email Address" column is always blank.
 - Values that a spreadsheet would treat as a formula are prefixed with an apostrophe; the import removes it again.
 
 The file name defaults to `yyyymmdd HWFC Member Export.csv` using today's date and can be changed before downloading; `.csv` is added automatically.
@@ -163,7 +165,8 @@ The file name defaults to `yyyymmdd HWFC Member Export.csv` using today's date a
 Tick "Update existing members matched by Membership ID" when uploading an edited export. Rows with a Membership ID are compared with that member in export format, so an unedited export shows every member as Unchanged.
 
 - Blank cells leave the stored value unchanged; clear values on the member record instead.
-- Membership ID, Status, Timestamp, Application reference, Next payment due date, the confirmation columns and the Notes answers (membership type, club news, WhatsApp, volunteering) are not changed by import. A changed Status is reported as a warning; accept, reject or undo from the member record.
+- Membership ID, Status, Timestamp, Application reference and Next payment due date are not changed by import.
+- Changed form answers (membership type, club news, WhatsApp, photo, volunteering, confirmations) are shown individually in the preview and rewrite the Form Answers block. A changed photo answer also sets the photography consent: only "Yes" counts as consent. A changed Status is reported as a warning; accept, reject or undo from the member record.
 - Changing the start date without changing the expiry date moves expiry to one year less a day after the new start, as on Date Details.
 - Payment plan (`Not Set`, `Annual`, `Monthly`), payment status, last payment date and paid-through date can be changed only for `Active` members, using the same values as the Payment Details tab. Next payment due is recalculated as the day after paid-through.
 - Health columns are compared together. If they differ, the member's health information is rebuilt from the row.

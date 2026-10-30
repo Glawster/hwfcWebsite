@@ -96,6 +96,7 @@ The administration area must not be linked from the public website navigation. D
 
 ## Change history
 
+- 2026-10-30: updated — keep member responses form answers in a Form Answers block on Member Details, separate from Notes, and include them in export and update mode.
 - 2026-10-30: updated — rename the Member Import page to Member Import/Export.
 - 2026-10-30: updated — add opt-in update mode matched by Membership ID with row selection, membership and payment columns in the export, and a nameable export file.
 - 2026-10-30: updated — add a CSV export in the member responses layout to Member Import for offline work.

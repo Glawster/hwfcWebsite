@@ -182,15 +182,15 @@ $actionable = $counts['New'] + $counts['Update'];
         <ul>
             <li>New members are added as <strong>Pending</strong>. Accept each one from their member record to allocate a Membership ID.</li>
             <li>Rows matching an existing member by name and date of birth or email address, or by Membership ID, are skipped. Existing records are not changed unless you tick update mode.</li>
-            <li>In update mode, rows with a Membership ID update that member. Status, Membership ID, Timestamp, Application reference, Next payment due date and the Notes answers are not changed by import. Payment details can only be changed for active members.</li>
+            <li>In update mode, rows with a Membership ID update that member. Status, Membership ID, Timestamp, Application reference and Next payment due date are not changed by import. Payment details can only be changed for active members.</li>
             <li>The preview lets you choose which rows to apply.</li>
             <li>Rows with missing or invalid required details are skipped. Correct them in the spreadsheet and import again.</li>
             <li>Add a “Membership start date” column to the sheet to give members individual start dates, or set a default above.</li>
             <li>Names written like “OHara” are imported as “O'Hara”, and email addresses are saved in lowercase.</li>
             <li>A missing date of birth is imported as 01/01/1970 and noted on the member's record so it can be amended.</li>
             <li>Health, allergy, medication and support answers are combined into the member's health information.</li>
-            <li>Membership type, club news, WhatsApp and volunteering answers are added to the member's Notes.</li>
-            <li>Photo consent is recorded only for a plain “Yes”; “Please ask me first” is recorded as no consent.</li>
+            <li>Membership type, club news, WhatsApp, photo, volunteering and confirmation answers are kept together as the member's Form Answers, shown on Member Details.</li>
+            <li>Photo consent is recorded only for a plain “Yes”; “Please ask me first” is recorded as no consent and kept in Form Answers.</li>
         </ul>
     </section>
     <?php else: ?>
@@ -277,7 +277,7 @@ $actionable = $counts['New'] + $counts['Update'];
                 <input type="text" name="exportFileName" value="<?= importEsc(importDefaultExportName()) ?>" maxlength="120">
             </label>
             <p class="adminHelp">“.csv” is added automatically. Letters, numbers, spaces, dots, hyphens, underscores and brackets are kept.</p>
-            <p class="adminHelp">Downloads every Pending, Active and Lapsed member as a CSV file with the same columns as the member responses Google Form, followed by Membership start date, Membership ID, status, membership and payment dates, payment plan and status, second emergency contact relationship and application reference. It can be worked on offline and imported again. Rejected applications are not included. The confirmation columns are left blank because the website does not record those answers separately.</p>
+            <p class="adminHelp">Downloads every Pending, Active and Lapsed member as a CSV file with the same columns as the member responses Google Form, followed by Membership start date, Membership ID, status, membership and payment dates, payment plan and status, second emergency contact relationship and application reference. It can be worked on offline and imported again. Rejected applications are not included. Members who applied on the website have no form answers, so those columns are blank for them.</p>
             <p class="adminHelp">The file contains health and emergency-contact details. Keep it on a club device only and delete it when you have finished. To apply offline changes, import it with “Update existing members matched by Membership ID” ticked.</p>
             <button class="button buttonPrimary" type="submit">Export CSV</button>
         </form>
