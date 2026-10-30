@@ -115,7 +115,7 @@ Use test records and the same website build containing these changes.
 
 ## Member import
 
-`/admin/memberImport.php` imports existing members from the "Hillsborough Walking Football Club – Member Responses" Google Form under the [REQ-004](../project/requirements/features/004-membershipApplicationAndManagement.md) import rules. Download the responses sheet from Google Sheets as Microsoft Excel (`.xlsx`) or as CSV for the Form Responses sheet. The column headings must match the form; a file with missing headings is rejected before preview.
+The Member Import/Export page at `/admin/memberImport.php` imports existing members from the "Hillsborough Walking Football Club – Member Responses" Google Form under the [REQ-004](../project/requirements/features/004-membershipApplicationAndManagement.md) import rules. Download the responses sheet from Google Sheets as Microsoft Excel (`.xlsx`) or as CSV for the Form Responses sheet. The column headings must match the form; a file with missing headings is rejected before preview.
 
 Uploading shows a preview and saves nothing. Each row is marked:
 
@@ -179,7 +179,7 @@ The export contains health and emergency-contact details. Keep downloaded files 
 
 Run on staging (`HWFC_ENV=staging`, `HWFC_ADMIN_STAGING_MODE=1`) against a staging copy of the member database, never the production database.
 
-1. Confirm the admin header shows the deployed version and Admin Tools links to Member Import.
+1. Confirm the admin header shows the deployed version and Admin Tools links to Member Import/Export.
 2. Upload the member responses `.xlsx` and confirm the preview counts, that rows needing correction are marked Invalid with a reason, and that no health details appear.
 3. Cancel and confirm no member records were added.
 4. Upload again, confirm the import, and spot-check imported members: names, Pending status, health information, Notes and the `member_imported` History event.

@@ -140,7 +140,7 @@ $actionable = $counts['New'] + $counts['Update'];
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Member Import | HWFC Administration</title>
+    <title>Member Import/Export | HWFC Administration</title>
     <meta name="robots" content="noindex,nofollow,noarchive">
     <link rel="icon" type="image/png" href="/assets/hwfc-logo.png">
     <link rel="stylesheet" href="/styles.css">
@@ -151,8 +151,8 @@ $actionable = $counts['New'] + $counts['Update'];
 <main class="adminMain"><div class="adminShell">
     <p><a class="textLink" href="/admin/">← Back To Administration</a></p>
     <p class="eyebrow">Members</p>
-    <h1>Member Import</h1>
-    <p class="lead">Import existing members from the club's member responses Google Form. Review the preview before anything is saved.</p>
+    <h1>Member Import/Export</h1>
+    <p class="lead">Import members from the club's member responses Google Form, update existing members, or export the register as CSV. Review the preview before anything is saved.</p>
 
     <?php if ($flash): ?><div class="adminSuccess" role="status"><?= importEsc($flash) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="adminError" role="alert"><?= importEsc($error) ?></div><?php endif; ?>

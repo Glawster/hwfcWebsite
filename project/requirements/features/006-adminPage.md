@@ -36,7 +36,7 @@ The administration area must not be linked from the public website navigation. D
 - House internal member notes in a separate Notes tab and return there after a save or validation error.
 - Provide a History tab on each member record showing all stored audit events for that application, newest first, with timestamps, event names and recorded details, including any recorded lapse and return events. State when no history is recorded; do not infer missing historical events.
 - Provide an Undo Acceptance action under the reversal rules in [REQ-004](004-membershipApplicationAndManagement.md), including an explanation that the allocated Membership ID is released for reuse.
-- Provide a Member Import page implementing the [REQ-004](004-membershipApplicationAndManagement.md) spreadsheet import for the club's member responses Google Form: preview before saving, report duplicate and invalid rows, and add only new members as `Pending` applications. Provide a CSV export of the member register in the same layout, plus membership, payment and reference columns, so it can be worked on offline and re-imported. Offer an opt-in update mode that matches rows by Membership ID, previews changed fields and applies only the rows the administrator selects.
+- Provide a Member Import/Export page implementing the [REQ-004](004-membershipApplicationAndManagement.md) spreadsheet import for the club's member responses Google Form: preview before saving, report duplicate and invalid rows, and add only new members as `Pending` applications. Provide a CSV export of the member register in the same layout, plus membership, payment and reference columns, so it can be worked on offline and re-imported. Offer an opt-in update mode that matches rows by Membership ID, previews changed fields and applies only the rows the administrator selects.
 - Support responsive use on a laptop, tablet and mobile device where practical.
 
 ## Development-only local mode
@@ -70,8 +70,8 @@ The administration area must not be linked from the public website navigation. D
 9. Given a member with recorded audit events, when the History tab is opened, then all audit events for that application are shown newest first with their timestamps and recorded details, and events for other applications are excluded. A record without audit events shows an empty-history message.
 10. Given a member record, when Notes is opened and saved, then notes are maintained in that tab and the response returns to Notes.
 11. Given a member record, when Data Protection is opened, then privacy-notice information, consent controls and the availability of subject-access, correction and retention/erasure workflows are shown. Updating consent returns to Data Protection.
-12. Given a member responses spreadsheet, when it is uploaded to Member Import, then a preview identifies new, duplicate and invalid rows without saving anything or showing health details; confirming saves only the new rows as `Pending` applications with audit events and never changes an existing member.
-13. Given member records, when an administrator exports from Member Import, then a CSV with the Google Form's columns is downloaded containing every non-rejected member, and importing that file into an empty register recreates the same member details.
+12. Given a member responses spreadsheet, when it is uploaded to Member Import/Export, then a preview identifies new, duplicate and invalid rows without saving anything or showing health details; confirming saves only the new rows as `Pending` applications with audit events and never changes an existing member.
+13. Given member records, when an administrator exports from Member Import/Export, then a CSV with the Google Form's columns is downloaded containing every non-rejected member, and importing that file into an empty register recreates the same member details.
 14. Given an edited export, when it is uploaded with update mode, then rows matched by Membership ID show their changed fields (health shown only as changed) and unedited rows show as unchanged. Applying changes only the selected rows, skips members edited since the preview, never clears values from blank cells and records the changed field names in History.
 
 ## Dependencies and decisions
@@ -96,6 +96,7 @@ The administration area must not be linked from the public website navigation. D
 
 ## Change history
 
+- 2026-10-30: updated — rename the Member Import page to Member Import/Export.
 - 2026-10-30: updated — add opt-in update mode matched by Membership ID with row selection, membership and payment columns in the export, and a nameable export file.
 - 2026-10-30: updated — add a CSV export in the member responses layout to Member Import for offline work.
 - 2026-10-30: updated — add a Member Import page for the member responses Google Form, implementing REQ-004's preview-first, non-destructive spreadsheet import.
