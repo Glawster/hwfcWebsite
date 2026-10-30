@@ -238,7 +238,7 @@ SQL);
     <link rel="stylesheet" href="/admin/admin.css">
 </head>
 <body>
-<header class="adminHeader"><div class="adminShell adminHeaderInner"><p class="adminBrand"><strong>HWFC Administration</strong></p><p class="adminMode">Local Development · Version 0.6a6</p></div></header>
+<header class="adminHeader"><div class="adminShell adminHeaderInner"><p class="adminBrand"><strong>HWFC Administration</strong></p><p class="adminMode">Local Development · Version 0.6a5</p></div></header>
 <main class="adminMain"><div class="adminShell">
     <p><a class="textLink" href="/admin/">← Back To Administration</a></p>
     <p class="eyebrow">Club Income</p>

@@ -86,7 +86,7 @@ function adminMoney(int $pence): string
 <header class="adminHeader">
     <div class="adminShell adminHeaderInner">
         <p class="adminBrand"><strong>HWFC Administration</strong></p>
-        <p class="adminMode">Local Development · Version 0.6a6</p>
+        <p class="adminMode">Local Development · Version 0.6a5</p>
     </div>
 </header>
 <main class="adminMain">
