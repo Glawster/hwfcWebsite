@@ -48,6 +48,13 @@ HEADERS = [
 ]
 
 
+EXPORT_EXTRA = [
+    'Membership start date', 'Membership ID', 'Status', 'Membership expiry date', 'Payment plan', 'Payment status',
+    'Last payment date', 'Paid through date', 'Next payment due date', 'Second emergency contact relationship',
+    'Application reference',
+]
+
+
 def member(full_name, email, dob_serial, **overrides):
     row = {
         'Timestamp': 46322.5, 'Full name': full_name, 'Date of birth': dob_serial,
@@ -173,7 +180,7 @@ class MemberImportHttpTest(unittest.TestCase):
     def post(self, fields, file_name=None, content=b''):
         boundary = uuid.uuid4().hex
         body = b''
-        for name, value in fields.items():
+        for name, value in (fields.items() if isinstance(fields, dict) else fields):
             body += f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'.encode()
         if file_name is not None:
             body += f'--{boundary}\r\nContent-Disposition: form-data; name="memberSpreadsheet"; filename="{file_name}"\r\nContent-Type: application/octet-stream\r\n\r\n'.encode() + content + b'\r\n'
@@ -182,11 +189,26 @@ class MemberImportHttpTest(unittest.TestCase):
         with self.opener.open(request) as response:
             return html.unescape(response.read().decode())
 
-    def upload(self, content, file_name='Member Responses.xlsx', default_start=''):
-        return self.post({'csrf': self.csrf(), 'action': 'preview', 'defaultStartDate': default_start}, file_name, content)
+    def upload(self, content, file_name='Member Responses.xlsx', default_start='', update=False):
+        fields = {'csrf': self.csrf(), 'action': 'preview', 'defaultStartDate': default_start}
+        if update:
+            fields['updateExisting'] = '1'
+        return self.post(fields, file_name, content)
 
-    def commit(self):
-        return self.post({'csrf': self.csrf(), 'action': 'commit'})
+    def commit(self, rows=None):
+        page = self.get()
+        if rows is None:
+            rows = re.findall(r'name="rows\[\]" value="(\d+)"', page)
+        csrf = re.search(r'name="csrf" value="([^"]+)"', page).group(1)
+        return self.post([('csrf', csrf), ('action', 'commit')] + [('rows[]', str(row)) for row in rows])
+
+    def accept(self, email, membership_id):
+        with sqlite3.connect(self.db_path) as db:
+            db.execute("UPDATE membership_applications SET status = 'Active', membership_id = ? WHERE email = ?", (membership_id, email))
+
+    def audit(self, event):
+        with sqlite3.connect(self.db_path) as db:
+            return [row[0] for row in db.execute('SELECT details FROM membership_audit WHERE event_type = ?', (event,))]
 
     def members(self):
         if not self.db_path.exists():
@@ -197,7 +219,7 @@ class MemberImportHttpTest(unittest.TestCase):
 
     def test_xlsx_preview_commit_and_reimport_is_non_destructive(self):
         page = self.upload(build_xlsx(ROWS), default_start='2026-11-01')
-        self.assertIn('Import 3 New Members', page)
+        self.assertIn('Apply <span data-selected-count>3</span> Selected Rows', page)
         self.assertIn('alex@example.test', page)
         self.assertNotIn('Alex@Example.TEST', page)
         self.assertIn('Repeats spreadsheet row 2.', page)
@@ -206,7 +228,7 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual(self.members(), {})
 
         page = self.commit()
-        self.assertIn('3 member records imported as Pending. 1 duplicate or invalid row was skipped.', page)
+        self.assertIn('3 new member records imported as Pending. 0 existing member records updated.', page)
         members = self.members()
         self.assertEqual(set(members), {'alex@example.test', 'sam@example.test', 'robin@example.test'})
         self.assertEqual(members['robin@example.test']['date_of_birth'], '1970-01-01')
@@ -233,7 +255,7 @@ class MemberImportHttpTest(unittest.TestCase):
         with sqlite3.connect(self.db_path) as db:
             db.execute("UPDATE membership_applications SET phone = 'kept' WHERE email = 'alex@example.test'")
         page = self.upload(build_xlsx(ROWS))
-        self.assertNotIn('New Members</button>', page)
+        self.assertNotIn('Selected Row', page)
         self.assertIn('Matches existing member', page)
         self.assertEqual(self.members()['alex@example.test']['phone'], 'kept')
 
@@ -254,14 +276,32 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertIn('No member records were changed.', page)
         self.assertEqual(self.members(), {})
 
-    def export(self):
+    def export(self, file_name=None, with_disposition=False):
+        fields = {'csrf': self.csrf(), 'action': 'export'}
+        if file_name is not None:
+            fields['exportFileName'] = file_name
         boundary = uuid.uuid4().hex
-        body = ''.join(f'--{boundary}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n' for k, v in {'csrf': self.csrf(), 'action': 'export'}.items()) + f'--{boundary}--\r\n'
+        body = ''.join(f'--{boundary}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n' for k, v in fields.items()) + f'--{boundary}--\r\n'
         request = urllib.request.Request(self.url + '/admin/memberImport.php', data=body.encode(), headers={'Content-Type': f'multipart/form-data; boundary={boundary}'})
         with self.opener.open(request) as response:
             self.assertEqual(response.headers.get_content_type(), 'text/csv')
             self.assertIn('attachment;', response.headers['Content-Disposition'])
-            return response.read()
+            content = response.read()
+            return (content, response.headers['Content-Disposition']) if with_disposition else content
+
+    @staticmethod
+    def rows_of(content):
+        rows = list(csv.reader(io.StringIO(content.decode('utf-8-sig'))))
+        return rows[0], [dict(zip(rows[0], row)) for row in rows[1:]]
+
+    @staticmethod
+    def to_csv(heading, records):
+        out = io.StringIO()
+        writer = csv.writer(out)
+        writer.writerow(heading)
+        for record in records:
+            writer.writerow([record[h] for h in heading])
+        return out.getvalue().encode()
 
     def test_export_matches_form_layout_and_round_trips(self):
         self.upload(build_xlsx(ROWS), default_start='2026-11-01')
@@ -272,7 +312,7 @@ class MemberImportHttpTest(unittest.TestCase):
             db.execute("INSERT INTO membership_applications (application_uuid, first_name, last_name, date_of_birth, address, postcode, email, phone, preferred_contact, emergency_name, emergency_relationship, emergency_phone, privacy_version, submitted_at, updated_at, status) VALUES ('b'||hex(randomblob(15)), 'Rejected', 'Person', '1950-01-02', 'Addr', 'BT1', 'rejected@example.test', '1', 'email', 'C', 'R', '1', 'v', '2026-10-28T10:00:00+00:00', '2026-10-28T10:00:00+00:00', 'Rejected')")
         content = self.export()
         rows = list(csv.reader(io.StringIO(content.decode('utf-8-sig'))))
-        self.assertEqual(rows[0], HEADERS + ['Membership start date'])
+        self.assertEqual(rows[0], HEADERS + EXPORT_EXTRA)
         by_email = {row[7]: dict(zip(rows[0], row)) for row in rows[1:]}
         self.assertEqual(set(by_email), {'alex@example.test', 'sam@example.test', 'robin@example.test', 'web@example.test'})
         alex = by_email['alex@example.test']
@@ -292,8 +332,8 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual((web[HEADERS[14]], web[HEADERS[15]]), ('Yes', 'Free text from the website form'))
 
         page = self.upload(content, 'export.csv')
-        self.assertIn('Ready To Import', page)
-        self.assertNotIn('New Members</button>', page)
+        self.assertIn('New Members', page)
+        self.assertNotIn('Selected Row', page)
 
         before = self.members()
         with sqlite3.connect(self.db_path) as db:
@@ -307,6 +347,98 @@ class MemberImportHttpTest(unittest.TestCase):
         for email in ('alex@example.test', 'sam@example.test'):
             self.assertEqual({k: after[email][k] for k in compared}, {k: before[email][k] for k in compared}, email)
         self.assertEqual(after['web@example.test']['health_details'], 'Medical condition: Free text from the website form')
+
+    def import_and_accept(self):
+        self.upload(build_xlsx(ROWS), default_start='2026-11-01')
+        self.commit()
+        self.accept('alex@example.test', 'HWFC-000001')
+        self.accept('sam@example.test', 'HWFC-000002')
+
+    def test_unedited_export_has_no_updates(self):
+        self.import_and_accept()
+        page = self.upload(self.export(), 'export.csv', update=True)
+        self.assertEqual(re.findall(r'<span class="adminStatus">(\w+)</span>', page).count('Unchanged'), 2)
+        self.assertNotIn('Selected Row', page)
+
+    def test_update_mode_previews_changes_and_applies_selected_rows(self):
+        self.import_and_accept()
+        heading, records = self.rows_of(self.export())
+        by_id = {r['Membership ID']: r for r in records}
+        alex, sam = by_id['HWFC-000001'], by_id['HWFC-000002']
+        alex.update({'Home address': '2 New Road', 'Email address': 'Alex.New@Example.test', 'Payment plan': 'annual',
+                     'Payment status': 'Paid In Full', 'Paid through date': '31/10/2027', 'Postcode': '',
+                     'Second emergency contact relationship': 'Sister', 'Status': 'Lapsed', 'Next payment due date': '01/01/2030',
+                     HEADERS[18]: 'No', HEADERS[19]: ''})
+        sam['Home address'] = '3 Other Road'
+        content = self.to_csv(heading, records)
+
+        page = self.upload(content, 'edited.csv')
+        self.assertIn('Matches existing member HWFC-000001', page)
+        self.assertNotIn('Selected Row', page)
+
+        page = self.upload(content, 'edited.csv', update=True)
+        self.assertIn('Home address:</strong> 1 Test Street, Testtown → 2 New Road', page)
+        self.assertIn('Email address:</strong> alex@example.test → alex.new@example.test', page)
+        self.assertIn('Health information:</strong> Previous → Changed', page)
+        self.assertIn('Status is not changed by import', page)
+        self.assertNotIn('Test inhaler', page)
+        self.assertNotIn('Postcode:', page)
+        self.assertIn('Check All', page)
+        self.assertIn('Uncheck All', page)
+
+        alex_row = re.search(r'name="rows\[\]" value="(\d+)"[^>]*>\s*</td>\s*<td>\d+</td>\s*<td>Alex', page).group(1)
+        page = self.commit([alex_row])
+        self.assertIn('0 new member records imported as Pending. 1 existing member record updated.', page)
+        members = self.members()
+        updated = members['alex.new@example.test']
+        self.assertEqual((updated['address'], updated['postcode'], updated['status']), ('2 New Road', 'BT00 1AA', 'Active'))
+        self.assertEqual((updated['payment_frequency'], updated['payment_status']), ('Annual', 'Paid In Full'))
+        self.assertEqual((updated['paid_through_date'], updated['next_payment_due_date']), ('2027-10-31', '2027-11-01'))
+        self.assertEqual(updated['second_emergency_relationship'], 'Sister')
+        self.assertEqual(updated['health_details'], 'Medical condition: Test condition <b>\nSecond line')
+        self.assertEqual(members['sam@example.test']['address'], '1 Test Street, Testtown')
+        details = self.audit('member_import_updated')
+        self.assertEqual(len(details), 1)
+        self.assertIn('"Home address"', details[0])
+        self.assertNotIn('New Road', details[0])
+
+    def test_update_mode_rejects_bad_rows_and_stale_previews(self):
+        self.import_and_accept()
+        heading, records = self.rows_of(self.export())
+        by_id = {r['Membership ID']: r for r in records}
+        by_id['HWFC-000001']['Home address'] = '2 New Road'
+        by_id['HWFC-000002']['Payment plan'] = 'Weekly'
+        robin = next(r for r in records if r['Email address'] == 'robin@example.test')
+        robin.update({'Membership ID': 'HWFC-999999'})
+        page = self.upload(self.to_csv(heading, records), 'edited.csv', update=True)
+        self.assertIn('Payment plan must be one of: Not Set, Annual, Monthly.', page)
+        self.assertIn('Membership ID HWFC-999999 was not found.', page)
+
+        with sqlite3.connect(self.db_path) as db:
+            db.execute("UPDATE membership_applications SET updated_at = 'later', phone = 'edited on website' WHERE membership_id = 'HWFC-000001'")
+        page = self.commit()
+        self.assertIn('1 row was skipped because the register changed after the preview', page)
+        self.assertEqual(self.members()['alex@example.test']['address'], '1 Test Street, Testtown')
+
+        self.upload(build_xlsx(ROWS))
+        page = self.commit([])
+        self.assertIn('Select at least one row to import or update.', page)
+
+    def test_update_mode_refuses_payment_changes_for_pending_members(self):
+        self.upload(build_xlsx(ROWS[:1]))
+        self.commit()
+        with sqlite3.connect(self.db_path) as db:
+            db.execute("UPDATE membership_applications SET membership_id = 'HWFC-000005'")
+        heading, records = self.rows_of(self.export())
+        records[0]['Payment status'] = 'Waived'
+        page = self.upload(self.to_csv(heading, records), 'edited.csv', update=True)
+        self.assertIn('Payment details can only be changed for an active member.', page)
+
+    def test_export_file_name(self):
+        _, disposition = self.export(with_disposition=True)
+        self.assertRegex(disposition, r'filename="\d{8} HWFC Member Export\.csv"')
+        _, disposition = self.export('Committee copy "v2"/../x.csv', with_disposition=True)
+        self.assertIn('filename="Committee copy v2..x.csv"', disposition)
 
     def test_invalid_csrf_is_rejected(self):
         self.csrf()

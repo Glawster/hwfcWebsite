@@ -419,6 +419,19 @@
     font-size: .9rem;
 }
 
+.adminCheckboxLabel {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: .25rem;
+    font-weight: 600;
+}
+
+.adminCheckboxLabel input {
+    width: auto;
+    margin: 0;
+}
+
 .adminAuditDetails {
     margin: 0;
     overflow-wrap: anywhere;

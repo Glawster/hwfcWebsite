@@ -63,7 +63,7 @@ $mailto = 'mailto:' . $message['to'] . '?subject=' . rawurlencode($message['subj
     <link rel="stylesheet" href="/admin/admin.css">
 </head>
 <body>
-<header class="adminHeader"><div class="adminShell adminHeaderInner"><p class="adminBrand"><strong>HWFC Administration</strong></p><p class="adminMode">Version 0.6a5</p></div></header>
+<header class="adminHeader"><div class="adminShell adminHeaderInner"><p class="adminBrand"><strong>HWFC Administration</strong></p><p class="adminMode">Version 0.6a6</p></div></header>
 <main class="adminMain"><div class="adminShell">
     <p><a class="textLink" href="/admin/member.php?id=<?= acceptanceEsc($uuid) ?>">← Back To Member</a></p>
     <p class="eyebrow">Membership Onboarding</p>

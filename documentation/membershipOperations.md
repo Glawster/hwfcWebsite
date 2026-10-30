@@ -122,10 +122,12 @@ Uploading shows a preview and saves nothing. Each row is marked:
 | Result | Meaning |
 | --- | --- |
 | New | Saved as a `Pending` application when the import is confirmed. |
-| Duplicate | Matches an existing member, or an earlier row, by first and last name plus date of birth or email address. Skipped; the existing record is never changed. |
+| Update | Update mode only: the row's Membership ID matches a member and at least one value differs. The changed fields are listed with old and new values; health information shows only that it changed. |
+| Unchanged | Update mode only: the row matches a member and nothing differs. |
+| Duplicate | Matches an existing member, or an earlier row, by first and last name plus date of birth or email address, or by Membership ID when update mode is off. Skipped; the existing record is not changed. |
 | Invalid | Missing or invalid required details, such as an invalid date of birth or one that makes the member under 16. Skipped; correct the spreadsheet and import again. |
 
-Duplicates are checked again when the import is confirmed. Each imported record gets a `member_imported` audit event with the file name and spreadsheet row. Re-importing the same spreadsheet is safe: rows already imported appear as duplicates.
+Every New and Update row has a tick box, ticked by default. Check All and Uncheck All select or clear them all, and only ticked rows are applied. Duplicates are checked again when the import is confirmed. Each imported record gets a `member_imported` audit event with the file name and spreadsheet row. Re-importing the same spreadsheet is safe: rows already imported appear as duplicates.
 
 A missing date of birth does not block the import: the member is saved with `01/01/1970` as a placeholder, the preview shows a warning, and Notes records that the date must be amended. Correct it on the member record once known.
 
@@ -140,19 +142,34 @@ Mapping from the form:
 - Medical, allergy, emergency-medication, mobility and other support answers are combined into the member's health information. "No", "None" and "N/A" style answers are ignored.
 - Photography/publicity consent is recorded only for "Yes"; "Please ask me first" is stored as no consent, and the original answer is kept in Notes.
 - Membership type, club news, WhatsApp group and volunteering answers are added to Notes because the member record has no fields for them yet.
-- The form has no relationship field for the second emergency contact, so it is left blank.
+- The form has no relationship field for the second emergency contact, so it is left blank unless the sheet has a "Second emergency contact relationship" column, as the export does.
+- A "Membership expiry date" column overrides the calculated expiry. Payment columns are ignored for new members, who are Pending; set payment details after acceptance.
+- A row with a Membership ID that is not in the register is Invalid. Leave Membership ID blank to add a new member.
 - The privacy-notice version is recorded as `Member Responses Google Form`.
 
 ### Member export
 
-Export CSV on the same page downloads every `Pending`, `Active` and `Lapsed` member in the same column layout as the Google Form, plus a final "Membership start date" column, so the file can be worked on offline and read by the import. Rejected applications are excluded.
+Export CSV on the same page downloads every `Pending`, `Active` and `Lapsed` member in the same column layout as the Google Form, followed by Membership start date, Membership ID, Status, Membership expiry date, Payment plan, Payment status, Last payment date, Paid through date, Next payment due date, Second emergency contact relationship and Application reference. The file can be worked on offline and read by the import. Rejected applications are excluded.
 
 - Health information is split back into the form's questions using the labels the import created. Health text from the website application form has no labels, so it is placed under the medical-condition question.
 - Membership type, club news, WhatsApp, volunteering and the original photo answer are read back from the import lines in Notes. They are blank for members who did not come from the Google Form.
 - The four confirmation columns and the trailing "Email Address" column are left blank because the website does not hold those answers separately.
 - Values that a spreadsheet would treat as a formula are prefixed with an apostrophe; the import removes it again.
 
-Importing an edited export only adds members who are not already in the register. It does not apply changes to existing members, so offline edits to existing records must still be made on each member record.
+The file name defaults to `yyyymmdd HWFC Member Export.csv` using today's date and can be changed before downloading; `.csv` is added automatically.
+
+### Updating members from an edited export
+
+Tick "Update existing members matched by Membership ID" when uploading an edited export. Rows with a Membership ID are compared with that member in export format, so an unedited export shows every member as Unchanged.
+
+- Blank cells leave the stored value unchanged; clear values on the member record instead.
+- Membership ID, Status, Timestamp, Application reference, Next payment due date, the confirmation columns and the Notes answers (membership type, club news, WhatsApp, volunteering) are not changed by import. A changed Status is reported as a warning; accept, reject or undo from the member record.
+- Changing the start date without changing the expiry date moves expiry to one year less a day after the new start, as on Date Details.
+- Payment plan (`Not Set`, `Annual`, `Monthly`), payment status, last payment date and paid-through date can be changed only for `Active` members, using the same values as the Payment Details tab. Next payment due is recalculated as the day after paid-through.
+- Health columns are compared together. If they differ, the member's health information is rebuilt from the row.
+- When applying, a member edited on the website after the preview is skipped and reported; upload again to review the latest values.
+- Each update records a `member_import_updated` History event listing the changed field names, file name and spreadsheet row. Values are not copied into the audit trail.
+- Rows without a Membership ID are handled as new members, with the usual duplicate checks.
 
 Open the CSV in a spreadsheet as text, or check telephone numbers and dates before saving: Excel and Google Sheets can drop the leading zero from telephone numbers that have no spaces.
 
@@ -169,6 +186,9 @@ Run on staging (`HWFC_ENV=staging`, `HWFC_ADMIN_STAGING_MODE=1`) against a stagi
 5. Upload the same file again and confirm every imported row is a Duplicate and the import button is not offered.
 6. Export CSV, open it in a spreadsheet, and confirm the columns match the Google Form and rejected applications are absent. Delete the downloaded file afterwards.
 7. Upload the exported CSV and confirm all rows are Duplicates.
+8. Accept two imported members, export, change one member's address and payment plan, and the other's address. Upload with update mode ticked and confirm both appear as Update with old and new values, and the rest as Unchanged.
+9. Use Uncheck All, tick only the first member, apply, and confirm only that member changed and their History shows `member_import_updated` with field names only.
+10. Confirm the export file name defaults to today's `yyyymmdd HWFC Member Export.csv` and that a typed name is used instead.
 
 The preview omits health details. Uploaded files are not kept; the parsed preview is held in the administrator's server-side session until the import is confirmed or cancelled.
 

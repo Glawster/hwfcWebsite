@@ -81,12 +81,36 @@ const HWFC_MEMBER_RESPONSES_HEADINGS = [
     'privacyAcknowledged' => 'I acknowledge that I have been provided with the club privacy notice.',
     'formEmail' => 'Email Address',
     'membershipStartDate' => 'Membership start date',
+    'membershipId' => 'Membership ID',
+    'status' => 'Status',
+    'membershipExpiryDate' => 'Membership expiry date',
+    'paymentPlan' => 'Payment plan',
+    'paymentStatus' => 'Payment status',
+    'lastPaymentDate' => 'Last payment date',
+    'paidThroughDate' => 'Paid through date',
+    'nextPaymentDueDate' => 'Next payment due date',
+    'secondEmergencyRelationship' => 'Second emergency contact relationship',
+    'applicationReference' => 'Application reference',
 ];
 
-/** Columns the club may add to the form sheet; blank or absent values are allowed. */
+/**
+ * Columns the club may add to the form sheet, or that come from the export; blank or absent
+ * values are allowed. Status, Next payment due date and Application reference are export-only.
+ */
 const HWFC_MEMBER_IMPORT_OPTIONAL_COLUMNS = [
     'membershipStartDate' => 'Membership start date',
+    'membershipId' => 'Membership ID',
+    'status' => 'Status',
+    'membershipExpiryDate' => 'Membership expiry date',
+    'paymentPlan' => 'Payment plan',
+    'paymentStatus' => 'Payment status',
+    'lastPaymentDate' => 'Last payment date',
+    'paidThroughDate' => 'Paid through date',
+    'secondEmergencyRelationship' => 'Second emergency contact relationship',
 ];
+
+const HWFC_MEMBER_PAYMENT_PLANS = ['Not Set', 'Annual', 'Monthly'];
+const HWFC_MEMBER_PAYMENT_STATUSES = ['Not Recorded', 'Current', 'Payment Due', 'Overdue', 'Paid In Full', 'Waived'];
 
 function hwfcMemberImportReadFile(string $path): array
 {
@@ -363,8 +387,15 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v, ?string $defaultSta
     } elseif ($defaultStartDate !== null) {
         $startDate = $defaultStartDate;
     }
-    if ($startDate !== null) {
-        $expiryDate = (new DateTimeImmutable($startDate))->modify('+1 year -1 day')->format('Y-m-d');
+    if ($v['membershipExpiryDate'] !== '') {
+        $expiryDate = hwfcMemberImportDate($v['membershipExpiryDate'], true);
+        if ($expiryDate === null) {
+            $errors[] = 'Membership expiry date is invalid.';
+        } elseif ($startDate === null || $expiryDate < $startDate) {
+            $errors[] = 'Membership expiry date needs a start date on or before it.';
+        }
+    } elseif ($startDate !== null) {
+        $expiryDate = hwfcMemberAnnualExpiry($startDate);
     }
 
     $required = [
@@ -445,6 +476,7 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v, ?string $defaultSta
             'emergency_phone' => $v['emergencyPhone'],
             'second_emergency_name' => $v['secondEmergencyName'] !== '' ? $v['secondEmergencyName'] : null,
             'second_emergency_phone' => $v['secondEmergencyPhone'] !== '' ? $v['secondEmergencyPhone'] : null,
+            'second_emergency_relationship' => $v['secondEmergencyRelationship'] !== '' ? $v['secondEmergencyRelationship'] : null,
             'health_relevant' => $healthLines ? 1 : 0,
             'health_details' => $healthLines ? implode("\n", $healthLines) : null,
             'photo_consent' => strtolower($v['photoConsent']) === 'yes' ? 1 : 0,
@@ -454,7 +486,13 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v, ?string $defaultSta
             'submitted_at' => $submittedAt,
         ],
         'privacyAcknowledged' => strtolower($v['privacyAcknowledged']) === 'i confirm',
+        'values' => $v,
     ];
+}
+
+function hwfcMemberAnnualExpiry(string $startDate): string
+{
+    return (new DateTimeImmutable($startDate))->modify('+1 year -1 day')->format('Y-m-d');
 }
 
 function hwfcMemberImportIsNone(string $answer): bool
@@ -518,11 +556,22 @@ function hwfcMemberImportDateTime(string $value): ?string
     return $date->setTimezone(new DateTimeZone('UTC'))->format('c');
 }
 
-/** Marks candidates that match an existing member or an earlier row in the same file. */
-function hwfcMemberImportMarkDuplicates(PDO $db, array $candidates): array
+/**
+ * Marks candidates that match an existing member or an earlier row in the same file. Rows with a
+ * Membership ID are matched by that ID: in update mode they become Update or Unchanged rows,
+ * otherwise they are Duplicates.
+ */
+function hwfcMemberImportMarkDuplicates(PDO $db, array $candidates, bool $updateMode = false): array
 {
     $seen = [];
+    $seenIds = [];
     foreach ($candidates as &$candidate) {
+        $membershipId = strtoupper(trim((string) ($candidate['values']['membershipId'] ?? '')));
+        if ($membershipId !== '') {
+            $candidate = hwfcMemberImportMatchMembershipId($db, $candidate, $membershipId, $updateMode, $seenIds);
+            $seenIds[$membershipId] ??= $candidate['rowNumber'];
+            continue;
+        }
         if ($candidate['result'] === 'Invalid') {
             continue;
         }
@@ -570,15 +619,18 @@ SQL);
     return $match['membershipId'] ?: strtoupper(substr((string) $match['applicationUuid'], 0, 10));
 }
 
-/** Inserts New candidates as Pending applications in one transaction. Returns [imported, skipped]. */
-function hwfcMemberImportCommit(PDO $db, array $candidates, string $fileName, string $actor): array
+/**
+ * Inserts New candidates as Pending applications and applies Update candidates in one
+ * transaction. Returns [imported, updated, skipped].
+ */
+function hwfcMemberImportCommit(PDO $db, array $candidates, string $fileName, string $actor, bool $updateMode = false): array
 {
     $insert = $db->prepare(<<<'SQL'
 INSERT INTO membership_applications (
     application_uuid, first_name, last_name, preferred_name, date_of_birth,
     address, postcode, email, phone, preferred_contact,
     emergency_name, emergency_relationship, emergency_phone,
-    second_emergency_name, second_emergency_phone,
+    second_emergency_name, second_emergency_phone, second_emergency_relationship,
     health_relevant, health_details, photo_consent,
     privacy_version, admin_notes, membership_start_date, membership_expiry_date,
     submitted_at, updated_at, status
@@ -586,19 +638,37 @@ INSERT INTO membership_applications (
     :uuid, :first_name, :last_name, :preferred_name, :date_of_birth,
     :address, :postcode, :email, :phone, :preferred_contact,
     :emergency_name, :emergency_relationship, :emergency_phone,
-    :second_emergency_name, :second_emergency_phone,
+    :second_emergency_name, :second_emergency_phone, :second_emergency_relationship,
     :health_relevant, :health_details, :photo_consent,
     :privacy_version, :admin_notes, :membership_start_date, :membership_expiry_date,
     :submitted_at, :updated_at, 'Pending'
 )
 SQL);
 
+    $previewedAt = [];
+    foreach ($candidates as $candidate) {
+        if (isset($candidate['update'])) {
+            $previewedAt[$candidate['rowNumber']] = $candidate['update']['updatedAt'];
+        }
+    }
+
     $imported = 0;
+    $updated = 0;
     $skipped = 0;
     $db->beginTransaction();
     try {
         // Re-check against the database inside the transaction so a stale preview cannot create duplicates.
-        foreach (hwfcMemberImportMarkDuplicates($db, $candidates) as $candidate) {
+        foreach (hwfcMemberImportMarkDuplicates($db, $candidates, $updateMode) as $candidate) {
+            if ($candidate['result'] === 'Update') {
+                // Skip members edited on the website since the preview rather than apply changes nobody reviewed.
+                if (($previewedAt[$candidate['rowNumber']] ?? null) !== $candidate['update']['updatedAt']) {
+                    $skipped++;
+                    continue;
+                }
+                hwfcMemberImportApplyUpdate($db, $candidate, $fileName, $actor);
+                $updated++;
+                continue;
+            }
             if ($candidate['result'] !== 'New') {
                 $skipped++;
                 continue;
@@ -626,7 +696,7 @@ SQL);
         throw $e;
     }
 
-    return [$imported, $skipped];
+    return [$imported, $updated, $skipped];
 }
 
 /**
@@ -635,56 +705,69 @@ SQL);
  */
 function hwfcMemberExportRows(PDO $db): array
 {
-    $members = $db->query(<<<'SQL'
-SELECT first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone,
-       preferred_contact, emergency_name, emergency_relationship, emergency_phone,
-       second_emergency_name, second_emergency_phone, health_relevant, health_details,
-       photo_consent, admin_notes, membership_start_date, submitted_at
-FROM membership_applications
-WHERE status <> 'Rejected'
-ORDER BY submitted_at, id
-SQL)->fetchAll();
+    $members = $db->query("SELECT * FROM membership_applications WHERE status <> 'Rejected' ORDER BY submitted_at, id")->fetchAll();
 
     $rows = [array_values(HWFC_MEMBER_RESPONSES_HEADINGS)];
     foreach ($members as $member) {
-        $values = array_fill_keys(array_keys(HWFC_MEMBER_RESPONSES_HEADINGS), '');
-        $values['timestamp'] = hwfcMemberExportDateTime((string) $member['submitted_at']);
-        $values['fullName'] = trim($member['first_name'] . ' ' . $member['last_name']);
-        $values['preferredName'] = (string) $member['preferred_name'];
-        $date = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $member['date_of_birth']);
-        $values['dateOfBirth'] = $date === false ? (string) $member['date_of_birth'] : $date->format('d/m/Y');
-        $values['address'] = (string) $member['address'];
-        $values['postcode'] = (string) $member['postcode'];
-        $values['phone'] = (string) $member['phone'];
-        $values['email'] = (string) $member['email'];
-        $values['preferredContact'] = match ((string) $member['preferred_contact']) {
-            'text' => 'Text message',
-            'whatsapp' => 'WhatsApp',
-            'phone' => 'Phone call',
-            'email' => 'Email',
-            default => (string) $member['preferred_contact'],
-        };
-        $values['emergencyName'] = (string) $member['emergency_name'];
-        $values['emergencyRelationship'] = (string) $member['emergency_relationship'];
-        $values['emergencyPhone'] = (string) $member['emergency_phone'];
-        $values['secondEmergencyName'] = (string) $member['second_emergency_name'];
-        $values['secondEmergencyPhone'] = (string) $member['second_emergency_phone'];
-        $values = array_merge($values, hwfcMemberExportHealth((int) $member['health_relevant'], (string) $member['health_details']));
-
-        $notes = (string) $member['admin_notes'];
-        $values['membershipType'] = hwfcMemberExportNote($notes, 'Membership type');
-        $values['clubNews'] = hwfcMemberExportNote($notes, 'Club news and updates');
-        $values['whatsApp'] = hwfcMemberExportNote($notes, 'Club WhatsApp group');
-        $values['helping'] = hwfcMemberExportNote($notes, 'Helping with club activities');
-        $photoAnswer = hwfcMemberExportNote($notes, 'Photographs or videos answer');
-        $start = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $member['membership_start_date']);
-        $values['membershipStartDate'] = $start === false ? '' : $start->format('d/m/Y');
-        $values['photoConsent'] = (int) $member['photo_consent'] === 1 ? 'Yes' : ($photoAnswer !== '' && strtolower($photoAnswer) !== 'yes' ? $photoAnswer : 'No');
-
-        $rows[] = array_map('hwfcMemberExportCell', array_values($values));
+        $rows[] = array_map('hwfcMemberExportCell', array_values(hwfcMemberExportValues($member)));
     }
 
     return $rows;
+}
+
+/** Maps one membership_applications row to the export columns, keyed as HWFC_MEMBER_RESPONSES_HEADINGS. */
+function hwfcMemberExportValues(array $member): array
+{
+    $values = array_fill_keys(array_keys(HWFC_MEMBER_RESPONSES_HEADINGS), '');
+    $values['timestamp'] = hwfcMemberExportDateTime((string) $member['submitted_at']);
+    $values['fullName'] = trim($member['first_name'] . ' ' . $member['last_name']);
+    $values['preferredName'] = (string) $member['preferred_name'];
+    $values['dateOfBirth'] = hwfcMemberExportDate($member['date_of_birth']);
+    $values['address'] = (string) $member['address'];
+    $values['postcode'] = (string) $member['postcode'];
+    $values['phone'] = (string) $member['phone'];
+    $values['email'] = (string) $member['email'];
+    $values['preferredContact'] = match ((string) $member['preferred_contact']) {
+        'text' => 'Text message',
+        'whatsapp' => 'WhatsApp',
+        'phone' => 'Phone call',
+        'email' => 'Email',
+        default => (string) $member['preferred_contact'],
+    };
+    $values['emergencyName'] = (string) $member['emergency_name'];
+    $values['emergencyRelationship'] = (string) $member['emergency_relationship'];
+    $values['emergencyPhone'] = (string) $member['emergency_phone'];
+    $values['secondEmergencyName'] = (string) $member['second_emergency_name'];
+    $values['secondEmergencyPhone'] = (string) $member['second_emergency_phone'];
+    $values = array_merge($values, hwfcMemberExportHealth((int) $member['health_relevant'], (string) $member['health_details']));
+
+    $notes = (string) $member['admin_notes'];
+    $values['membershipType'] = hwfcMemberExportNote($notes, 'Membership type');
+    $values['clubNews'] = hwfcMemberExportNote($notes, 'Club news and updates');
+    $values['whatsApp'] = hwfcMemberExportNote($notes, 'Club WhatsApp group');
+    $values['helping'] = hwfcMemberExportNote($notes, 'Helping with club activities');
+    $photoAnswer = hwfcMemberExportNote($notes, 'Photographs or videos answer');
+    $values['photoConsent'] = (int) $member['photo_consent'] === 1 ? 'Yes' : ($photoAnswer !== '' && strtolower($photoAnswer) !== 'yes' ? $photoAnswer : 'No');
+
+    $values['membershipStartDate'] = hwfcMemberExportDate($member['membership_start_date']);
+    $values['membershipId'] = (string) $member['membership_id'];
+    $values['status'] = (string) $member['status'];
+    $values['membershipExpiryDate'] = hwfcMemberExportDate($member['membership_expiry_date']);
+    $values['paymentPlan'] = (string) $member['payment_frequency'];
+    $values['paymentStatus'] = (string) $member['payment_status'];
+    $values['lastPaymentDate'] = hwfcMemberExportDate($member['last_payment_date']);
+    $values['paidThroughDate'] = hwfcMemberExportDate($member['paid_through_date']);
+    $values['nextPaymentDueDate'] = hwfcMemberExportDate($member['next_payment_due_date']);
+    $values['secondEmergencyRelationship'] = (string) $member['second_emergency_relationship'];
+    $values['applicationReference'] = strtoupper(substr((string) $member['application_uuid'], 0, 10));
+
+    return $values;
+}
+
+function hwfcMemberExportDate(?string $isoDate): string
+{
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $isoDate);
+    return $date === false ? (string) $isoDate : $date->format('d/m/Y');
 }
 
 /** Splits stored health information back into the form's question columns. */
@@ -768,4 +851,256 @@ function hwfcMemberExportCsv(array $rows): string
     $csv = (string) stream_get_contents($handle);
     fclose($handle);
     return $csv;
+}
+
+/** Resolves a row carrying a Membership ID against the register. */
+function hwfcMemberImportMatchMembershipId(PDO $db, array $candidate, string $membershipId, bool $updateMode, array $seenIds): array
+{
+    $stmt = $db->prepare('SELECT * FROM membership_applications WHERE upper(membership_id) = :membership_id LIMIT 1');
+    $stmt->execute([':membership_id' => $membershipId]);
+    $existing = $stmt->fetch();
+    unset($candidate['update'], $candidate['changes']);
+
+    if (isset($seenIds[$membershipId])) {
+        return ['result' => 'Invalid', 'messages' => ['Repeats Membership ID ' . $membershipId . ' from spreadsheet row ' . $seenIds[$membershipId] . '.']] + $candidate;
+    }
+    if (!$existing) {
+        return ['result' => 'Invalid', 'messages' => ['Membership ID ' . $membershipId . ' was not found. Leave Membership ID blank to add a new member.']] + $candidate;
+    }
+    if (!$updateMode) {
+        return ['result' => 'Duplicate', 'messages' => ['Matches existing member ' . $existing['membership_id'] . '; the existing record will not be changed.']] + $candidate;
+    }
+
+    [$set, $changes, $errors, $warnings] = hwfcMemberImportUpdateChanges($existing, $candidate['values']);
+    $candidate['summary']['name'] = trim(($set['first_name'] ?? $existing['first_name']) . ' ' . ($set['last_name'] ?? $existing['last_name']));
+    $candidate['summary']['email'] = $set['email'] ?? $existing['email'];
+    $candidate['summary']['dateOfBirth'] = $set['date_of_birth'] ?? $existing['date_of_birth'];
+    $candidate['summary']['membershipStartDate'] = array_key_exists('membership_start_date', $set) ? $set['membership_start_date'] : $existing['membership_start_date'];
+    $candidate['summary']['membershipId'] = $existing['membership_id'];
+
+    if ($errors) {
+        return ['result' => 'Invalid', 'messages' => $errors] + $candidate;
+    }
+
+    $candidate['result'] = $set ? 'Update' : 'Unchanged';
+    $candidate['messages'] = $warnings;
+    $candidate['changes'] = $changes;
+    $candidate['update'] = [
+        'uuid' => $existing['application_uuid'],
+        'membershipId' => $existing['membership_id'],
+        'updatedAt' => $existing['updated_at'],
+        'set' => $set,
+    ];
+    return $candidate;
+}
+
+/**
+ * Compares an import row with the existing member in export format. Blank cells leave values
+ * unchanged. Returns [column => new value, preview changes, errors, warnings].
+ */
+function hwfcMemberImportUpdateChanges(array $existing, array $v): array
+{
+    $old = hwfcMemberExportValues($existing);
+    $set = [];
+    $changes = [];
+    $errors = [];
+    $warnings = [];
+    $record = static function (string $label, string $from, string $to, array $columns) use (&$set, &$changes): void {
+        $set = array_merge($set, $columns);
+        $changes[] = ['field' => $label, 'from' => $from, 'to' => $to];
+    };
+
+    $fullName = hwfcMemberImportName($v['fullName']);
+    if ($fullName !== '' && $fullName !== $old['fullName']) {
+        $parts = preg_split('/\s+/u', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        if (count($parts) < 2) {
+            $errors[] = 'Full name must include a first and last name.';
+        } else {
+            $lastName = (string) array_pop($parts);
+            $record('Full name', $old['fullName'], $fullName, ['first_name' => implode(' ', $parts), 'last_name' => $lastName]);
+        }
+    }
+
+    $text = [
+        'preferredName' => ['Preferred name', 'preferred_name'],
+        'address' => ['Home address', 'address'],
+        'postcode' => ['Postcode', 'postcode'],
+        'phone' => ['Telephone number', 'phone'],
+        'email' => ['Email address', 'email'],
+        'emergencyName' => ['Emergency contact name', 'emergency_name'],
+        'emergencyRelationship' => ['Emergency contact relationship', 'emergency_relationship'],
+        'emergencyPhone' => ['Emergency contact telephone number', 'emergency_phone'],
+        'secondEmergencyName' => ['Second emergency contact name', 'second_emergency_name'],
+        'secondEmergencyPhone' => ['Second emergency contact telephone number', 'second_emergency_phone'],
+        'secondEmergencyRelationship' => ['Second emergency contact relationship', 'second_emergency_relationship'],
+    ];
+    foreach ($text as $key => [$label, $column]) {
+        $value = match ($key) {
+            'preferredName', 'emergencyName', 'secondEmergencyName' => hwfcMemberImportName($v[$key]),
+            'postcode' => strtoupper($v[$key]),
+            'email' => strtolower(preg_replace('/\s+/u', '', $v[$key]) ?? $v[$key]),
+            default => $v[$key],
+        };
+        if ($value === '' || $value === $old[$key]) {
+            continue;
+        }
+        if ($key === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Email address is invalid.';
+            continue;
+        }
+        $record($label, $old[$key], $value, [$column => $value]);
+    }
+
+    if ($v['dateOfBirth'] !== '' && $v['dateOfBirth'] !== $old['dateOfBirth']) {
+        $dateOfBirth = hwfcMemberImportDate($v['dateOfBirth']);
+        if ($dateOfBirth === null) {
+            $errors[] = 'Date of birth is invalid.';
+        } elseif ($dateOfBirth > (new DateTimeImmutable('today'))->modify('-16 years')->format('Y-m-d')) {
+            $errors[] = 'Date of birth looks wrong (the member would be under 16).';
+        } elseif ($dateOfBirth !== $existing['date_of_birth']) {
+            $record('Date of birth', $old['dateOfBirth'], hwfcMemberExportDate($dateOfBirth), ['date_of_birth' => $dateOfBirth]);
+        }
+    }
+
+    if ($v['preferredContact'] !== '' && $v['preferredContact'] !== $old['preferredContact']) {
+        $contact = match (strtolower($v['preferredContact'])) {
+            'text message', 'text' => 'text',
+            'whatsapp' => 'whatsapp',
+            'phone call', 'phone', 'telephone' => 'phone',
+            'email' => 'email',
+            default => null,
+        };
+        if ($contact === null) {
+            $errors[] = 'Preferred method of contact is not recognised.';
+        } elseif ($contact !== $existing['preferred_contact']) {
+            $record('Preferred method of contact', $old['preferredContact'], $v['preferredContact'], ['preferred_contact' => $contact]);
+        }
+    }
+
+    if ($v['photoConsent'] !== '' && $v['photoConsent'] !== $old['photoConsent']) {
+        $consent = strtolower($v['photoConsent']) === 'yes' ? 1 : 0;
+        if ($consent !== (int) $existing['photo_consent']) {
+            $record('Photographs or videos', $consent ? 'No' : 'Yes', $consent ? 'Yes' : 'No', ['photo_consent' => $consent]);
+        }
+    }
+
+    // Health columns are compared as a group; the preview never shows their content.
+    $healthKeys = ['medical', 'medicalDetails', 'allergies', 'allergyDetails', 'medication', 'medicationDetails', 'mobility', 'otherSupport'];
+    $rowHealth = array_intersect_key($v, array_flip($healthKeys));
+    if (implode('', $rowHealth) !== '' && $rowHealth != array_intersect_key($old, array_flip($healthKeys))) {
+        $lines = array_values(array_filter([
+            hwfcMemberImportHealthLine('Medical condition', $v['medical'], $v['medicalDetails']),
+            hwfcMemberImportHealthLine('Allergies', $v['allergies'], $v['allergyDetails']),
+            hwfcMemberImportHealthLine('Emergency medication', $v['medication'], $v['medicationDetails']),
+            hwfcMemberImportHealthLine('Mobility, balance, hearing or sight', $v['mobility'], ''),
+            hwfcMemberImportHealthLine('Other safety information', $v['otherSupport'], ''),
+        ]));
+        $details = $lines ? implode("\n", $lines) : null;
+        if ($details !== ($existing['health_details'] ?: null)) {
+            $record('Health information', 'Previous', 'Changed', ['health_relevant' => $lines ? 1 : 0, 'health_details' => $details]);
+        }
+    }
+
+    // Membership dates: a changed start date with an unchanged expiry moves the expiry to one year less a day.
+    $start = $existing['membership_start_date'];
+    $expiry = $existing['membership_expiry_date'];
+    $datesChanged = false;
+    if ($v['membershipStartDate'] !== '' && $v['membershipStartDate'] !== $old['membershipStartDate']) {
+        $parsed = hwfcMemberImportDate($v['membershipStartDate'], true);
+        if ($parsed === null) {
+            $errors[] = 'Membership start date is invalid.';
+        } elseif ($parsed !== $start) {
+            $start = $parsed;
+            $datesChanged = true;
+            $expiry = hwfcMemberAnnualExpiry($start);
+        }
+    }
+    if ($v['membershipExpiryDate'] !== '' && $v['membershipExpiryDate'] !== $old['membershipExpiryDate']) {
+        $parsed = hwfcMemberImportDate($v['membershipExpiryDate'], true);
+        if ($parsed === null) {
+            $errors[] = 'Membership expiry date is invalid.';
+        } else {
+            $expiry = $parsed;
+            $datesChanged = $datesChanged || $parsed !== $existing['membership_expiry_date'];
+        }
+    }
+    if ($datesChanged) {
+        if ($start === null || $expiry < $start) {
+            $errors[] = 'Membership expiry date cannot be before the start date.';
+        } else {
+            if ($start !== $existing['membership_start_date']) {
+                $record('Membership start date', $old['membershipStartDate'], hwfcMemberExportDate($start), ['membership_start_date' => $start]);
+            }
+            if ($expiry !== $existing['membership_expiry_date']) {
+                $record('Membership expiry date', $old['membershipExpiryDate'], hwfcMemberExportDate($expiry), ['membership_expiry_date' => $expiry]);
+            }
+        }
+    }
+
+    // Payment details follow the Date Details rules, which apply only to active members.
+    $payment = [];
+    foreach (['paymentPlan' => HWFC_MEMBER_PAYMENT_PLANS, 'paymentStatus' => HWFC_MEMBER_PAYMENT_STATUSES] as $key => $allowed) {
+        if ($v[$key] === '' || $v[$key] === $old[$key]) {
+            continue;
+        }
+        $match = array_values(array_filter($allowed, static fn(string $option): bool => strcasecmp($option, $v[$key]) === 0));
+        if (!$match) {
+            $errors[] = HWFC_MEMBER_RESPONSES_HEADINGS[$key] . ' must be one of: ' . implode(', ', $allowed) . '.';
+        } elseif ($match[0] !== $old[$key]) {
+            $payment[$key] = $match[0];
+        }
+    }
+    foreach (['lastPaymentDate', 'paidThroughDate'] as $key) {
+        if ($v[$key] === '' || $v[$key] === $old[$key]) {
+            continue;
+        }
+        $parsed = hwfcMemberImportDate($v[$key], true);
+        if ($parsed === null) {
+            $errors[] = HWFC_MEMBER_RESPONSES_HEADINGS[$key] . ' is invalid.';
+        } elseif (hwfcMemberExportDate($parsed) !== $old[$key]) {
+            $payment[$key] = $parsed;
+        }
+    }
+    if ($payment && $existing['status'] !== 'Active') {
+        $errors[] = 'Payment details can only be changed for an active member.';
+    } elseif (isset($payment['paidThroughDate']) && $start !== null && $payment['paidThroughDate'] < $start) {
+        $errors[] = 'Paid through date cannot be before the membership start date.';
+    } else {
+        $columns = ['paymentPlan' => 'payment_frequency', 'paymentStatus' => 'payment_status', 'lastPaymentDate' => 'last_payment_date', 'paidThroughDate' => 'paid_through_date'];
+        foreach ($payment as $key => $value) {
+            $isDate = str_ends_with($key, 'Date');
+            $update = [$columns[$key] => $value];
+            if ($key === 'paidThroughDate') {
+                $update['next_payment_due_date'] = (new DateTimeImmutable($value))->modify('+1 day')->format('Y-m-d');
+            }
+            $record(HWFC_MEMBER_RESPONSES_HEADINGS[$key], $old[$key], $isDate ? hwfcMemberExportDate($value) : $value, $update);
+        }
+    }
+
+    if ($v['status'] !== '' && strcasecmp($v['status'], (string) $existing['status']) !== 0) {
+        $warnings[] = 'Status is not changed by import; use the member record to accept, reject or undo.';
+    }
+
+    return [$set, $changes, $errors, $warnings];
+}
+
+function hwfcMemberImportApplyUpdate(PDO $db, array $candidate, string $fileName, string $actor): void
+{
+    $set = $candidate['update']['set'];
+    $assignments = implode(', ', array_map(static fn(string $column): string => $column . ' = :' . $column, array_keys($set)));
+    $stmt = $db->prepare('UPDATE membership_applications SET ' . $assignments . ', updated_at = :updated_at WHERE application_uuid = :uuid');
+    $params = [':updated_at' => gmdate('c'), ':uuid' => $candidate['update']['uuid']];
+    foreach ($set as $column => $value) {
+        $params[':' . $column] = $value;
+    }
+    $stmt->execute($params);
+
+    // Field names only: the audit trail does not copy personal data.
+    hwfcAudit($db, $candidate['update']['uuid'], 'member_import_updated', [
+        'membershipId' => $candidate['update']['membershipId'],
+        'changedFields' => array_column($candidate['changes'], 'field'),
+        'fileName' => $fileName,
+        'spreadsheetRow' => $candidate['rowNumber'],
+        'actor' => $actor,
+    ]);
 }

@@ -4,7 +4,7 @@
 
 Branch: `feature/006-admin-page`
 
-Version: `0.6a5` (staging build)
+Version: `0.6a6` (staging build)
 
 [Requirement](requirements/features/006-adminPage.md) · [Operations and retest checklist](../documentation/membershipOperations.md#member-page-retest)
 
@@ -12,7 +12,7 @@ The current local changes add separate Notes, History and Data Protection tabs, 
 
 PHP syntax and diff checks passed. Temporary SQLite rendering checks passed for History ordering, member isolation, escaped details, the empty state, and Data Protection tab selection and consent placement. Browser retesting and deployment remain outstanding.
 
-Member Import (`/admin/memberImport.php`) has been added for the member responses Google Form spreadsheet, with a CSV export in the same layout; see [member import](../documentation/membershipOperations.md#member-import). `tests/test_memberImportHttp.py` passes. Staging retest is in progress for `0.6a5`; follow the [member import and export retest](../documentation/membershipOperations.md#member-import-and-export-retest).
+Member Import (`/admin/memberImport.php`) has been added for the member responses Google Form spreadsheet, with a CSV export in the same layout and an opt-in update mode matched by Membership ID; see [member import](../documentation/membershipOperations.md#member-import). `tests/test_memberImportHttp.py` passes. Staging retest is in progress for `0.6a6`; follow the [member import and export retest](../documentation/membershipOperations.md#member-import-and-export-retest).
 
 The newer remote admin implementation and matching database/payment code have been integrated into `feature/006-admin-page`. Browser retesting remains outstanding.
 
