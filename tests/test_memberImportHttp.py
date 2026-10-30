@@ -254,6 +254,10 @@ class MemberImportHttpTest(unittest.TestCase):
         page = self.get('/admin/member.php?id=' + alex['application_uuid'])
         self.assertIn('Form Answers', page)
         self.assertIn('Photographs or videos: Please ask me first', page)
+        self.assertIn('<dt>Preferred Contact</dt><dd>Text Message</dd>', page)
+        page = self.get('/admin/member.php?id=' + sam['application_uuid'])
+        self.assertIn('<dt>Preferred Contact</dt><dd>WhatsApp</dd>', page)
+        self.assertNotIn('Whatsapp', page)
         self.assertEqual(sam['second_emergency_name'], 'Second Contact')
         self.assertIsNone(alex['membership_id'])
         with sqlite3.connect(self.db_path) as db:

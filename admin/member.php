@@ -275,7 +275,12 @@ function memberTabUrl(string $uuid, string $tab): string
                     <div class="adminMemberPostcode"><dt>Postcode</dt><dd><?= adminEsc($application['postcode']) ?></dd></div>
                     <div class="adminDetailRowStart adminMemberEmail"><dt>Email</dt><dd><?= adminEsc($application['email']) ?></dd></div>
                     <div class="adminMemberTelephone"><dt>Telephone</dt><dd><?= adminEsc($application['phone']) ?></dd></div>
-                    <div class="adminMemberContact"><dt>Preferred Contact</dt><dd><?= adminEsc(ucfirst((string) $application['preferredContact'])) ?></dd></div>
+                    <div class="adminMemberContact"><dt>Preferred Contact</dt><dd><?= adminEsc(match ((string) $application['preferredContact']) {
+                        'whatsapp' => 'WhatsApp',
+                        'text' => 'Text Message',
+                        'phone' => 'Phone Call',
+                        default => ucfirst((string) $application['preferredContact']),
+                    }) ?></dd></div>
                 </dl>
             </section>
 
