@@ -279,7 +279,7 @@ $actionable = $counts['New'] + $counts['Update'];
             <p class="adminHelp">“.csv” is added automatically. Letters, numbers, spaces, dots, hyphens, underscores and brackets are kept.</p>
             <p class="adminHelp">Downloads every Pending, Active and Lapsed member as a CSV file with the same columns as the member responses Google Form, followed by Membership start date, Membership ID, status, membership and payment dates, payment plan and status, second emergency contact relationship and application reference. It can be worked on offline and imported again. Rejected applications are not included. The confirmation columns are left blank because the website does not record those answers separately.</p>
             <p class="adminHelp">The file contains health and emergency-contact details. Keep it on a club device only and delete it when you have finished. To apply offline changes, import it with “Update existing members matched by Membership ID” ticked.</p>
-            <button class="button buttonSecondary" type="submit">Export CSV</button>
+            <button class="button buttonPrimary" type="submit">Export CSV</button>
         </form>
     </section>
 </div></main>
