@@ -36,6 +36,7 @@ The administration area must not be linked from the public website navigation. D
 - House internal member notes in a separate Notes tab and return there after a save or validation error.
 - Provide a History tab on each member record showing all stored audit events for that application, newest first, with timestamps, event names and recorded details, including any recorded lapse and return events. State when no history is recorded; do not infer missing historical events.
 - Provide an Undo Acceptance action under the reversal rules in [REQ-004](004-membershipApplicationAndManagement.md), including an explanation that the allocated Membership ID is released for reuse.
+- Provide a Member Import page implementing the [REQ-004](004-membershipApplicationAndManagement.md) spreadsheet import for the club's member responses Google Form: preview before saving, report duplicate and invalid rows, and add only new members as `Pending` applications. Provide a CSV export of the member register in the same layout so it can be worked on offline and re-imported.
 - Support responsive use on a laptop, tablet and mobile device where practical.
 
 ## Development-only local mode
@@ -69,6 +70,8 @@ The administration area must not be linked from the public website navigation. D
 9. Given a member with recorded audit events, when the History tab is opened, then all audit events for that application are shown newest first with their timestamps and recorded details, and events for other applications are excluded. A record without audit events shows an empty-history message.
 10. Given a member record, when Notes is opened and saved, then notes are maintained in that tab and the response returns to Notes.
 11. Given a member record, when Data Protection is opened, then privacy-notice information, consent controls and the availability of subject-access, correction and retention/erasure workflows are shown. Updating consent returns to Data Protection.
+12. Given a member responses spreadsheet, when it is uploaded to Member Import, then a preview identifies new, duplicate and invalid rows without saving anything or showing health details; confirming saves only the new rows as `Pending` applications with audit events and never changes an existing member.
+13. Given member records, when an administrator exports from Member Import, then a CSV with the Google Form's columns is downloaded containing every non-rejected member, and importing that file into an empty register recreates the same member details.
 
 ## Dependencies and decisions
 
@@ -87,10 +90,13 @@ The administration area must not be linked from the public website navigation. D
 - Review public navigation to ensure `/admin/` is not linked.
 - Verify Undo Acceptance returns the application to `Pending`, confirms the ID release, and uses REQ-004's audit and ID-reuse rules.
 - Verify History ordering, isolation between member records, escaped audit details and the empty-history message.
+- `tests/test_memberImportHttp.py` covers XLSX and CSV preview, commit, duplicate and invalid rows, re-import, cancellation, template mismatch, CSRF and the CSV export round trip.
 - Follow the [member-page retest checklist](../../../documentation/membershipOperations.md#member-page-retest), including Notes, Data Protection, consent-save navigation and responsive tab use.
 
 ## Change history
 
+- 2026-10-30: updated — add a CSV export in the member responses layout to Member Import for offline work.
+- 2026-10-30: updated — add a Member Import page for the member responses Google Form, implementing REQ-004's preview-first, non-destructive spreadsheet import.
 - 2026-10-29: updated — add a Data Protection tab housing privacy and consent controls and identifying the current availability of GDPR workflows.
 - 2026-10-29: updated — add a member History tab for the complete stored application audit trail, including recorded lapse and return events.
 - 2026-10-29: updated — document Undo Acceptance and link the Membership ID release behaviour to REQ-004; the first read-only slice remains historical scope.

@@ -113,6 +113,60 @@ Use test records and the same website build containing these changes.
 7. Open Session Takings and confirm the attendance-report filename has the same font and size as its surrounding help text.
 8. Repeat the tab checks at a narrow mobile width; confirm tabs remain reachable and history tables scroll within their container.
 
+## Member import
+
+`/admin/memberImport.php` imports existing members from the "Hillsborough Walking Football Club – Member Responses" Google Form under the [REQ-004](../project/requirements/features/004-membershipApplicationAndManagement.md) import rules. Download the responses sheet from Google Sheets as Microsoft Excel (`.xlsx`) or as CSV for the Form Responses sheet. The column headings must match the form; a file with missing headings is rejected before preview.
+
+Uploading shows a preview and saves nothing. Each row is marked:
+
+| Result | Meaning |
+| --- | --- |
+| New | Saved as a `Pending` application when the import is confirmed. |
+| Duplicate | Matches an existing member, or an earlier row, by first and last name plus date of birth or email address. Skipped; the existing record is never changed. |
+| Invalid | Missing or invalid required details, such as an absent date of birth or one that makes the member under 16. Skipped; correct the spreadsheet and import again. |
+
+Duplicates are checked again when the import is confirmed. Each imported record gets a `member_imported` audit event with the file name and spreadsheet row. Re-importing the same spreadsheet is safe: rows already imported appear as duplicates.
+
+Imported members remain `Pending`. Accept each one from their member record to allocate a Membership ID.
+
+Mapping from the form:
+
+- "Full name" is split at the last space: the final word becomes the last name. Check multi-word surnames after import and correct them if needed.
+- Medical, allergy, emergency-medication, mobility and other support answers are combined into the member's health information. "No", "None" and "N/A" style answers are ignored.
+- Photography/publicity consent is recorded only for "Yes"; "Please ask me first" is stored as no consent, and the original answer is kept in Notes.
+- Membership type, club news, WhatsApp group and volunteering answers are added to Notes because the member record has no fields for them yet.
+- The form has no relationship field for the second emergency contact, so it is left blank.
+- The privacy-notice version is recorded as `Member Responses Google Form`.
+
+### Member export
+
+Export CSV on the same page downloads every `Pending`, `Active` and `Lapsed` member in the same column layout as the Google Form, so the file can be worked on offline and read by the import. Rejected applications are excluded.
+
+- Health information is split back into the form's questions using the labels the import created. Health text from the website application form has no labels, so it is placed under the medical-condition question.
+- Membership type, club news, WhatsApp, volunteering and the original photo answer are read back from the import lines in Notes. They are blank for members who did not come from the Google Form.
+- The four confirmation columns and the trailing "Email Address" column are left blank because the website does not hold those answers separately.
+- Values that a spreadsheet would treat as a formula are prefixed with an apostrophe; the import removes it again.
+
+Importing an edited export only adds members who are not already in the register. It does not apply changes to existing members, so offline edits to existing records must still be made on each member record.
+
+Open the CSV in a spreadsheet as text, or check telephone numbers and dates before saving: Excel and Google Sheets can drop the leading zero from telephone numbers that have no spaces.
+
+The export contains health and emergency-contact details. Keep downloaded files on club devices only and delete them when finished.
+
+### Member import and export retest
+
+Run on staging (`HWFC_ENV=staging`, `HWFC_ADMIN_STAGING_MODE=1`) against a staging copy of the member database, never the production database.
+
+1. Confirm the admin header shows the deployed version and Admin Tools links to Member Import.
+2. Upload the member responses `.xlsx` and confirm the preview counts, that rows needing correction are marked Invalid with a reason, and that no health details appear.
+3. Cancel and confirm no member records were added.
+4. Upload again, confirm the import, and spot-check imported members: names, Pending status, health information, Notes and the `member_imported` History event.
+5. Upload the same file again and confirm every imported row is a Duplicate and the import button is not offered.
+6. Export CSV, open it in a spreadsheet, and confirm the columns match the Google Form and rejected applications are absent. Delete the downloaded file afterwards.
+7. Upload the exported CSV and confirm all rows are Duplicates.
+
+The preview omits health details. Uploaded files are not kept; the parsed preview is held in the administrator's server-side session until the import is confirmed or cancelled.
+
 ## GDPR / data-subject operations
 
 The initial GDPR operations are deliberately CLI-only until authenticated administration is implemented.

@@ -86,7 +86,7 @@ function adminMoney(int $pence): string
 <header class="adminHeader">
     <div class="adminShell adminHeaderInner">
         <p class="adminBrand"><strong>HWFC Administration</strong></p>
-        <p class="adminMode">Local Development · Version 0.6a3</p>
+        <p class="adminMode">Local Development · Version 0.6a5</p>
     </div>
 </header>
 <main class="adminMain">
@@ -150,6 +150,7 @@ function adminMoney(int $pence): string
             <div class="sectionHeading"><div><p class="eyebrow">Administration</p><h2 id="adminToolsHeading">Admin Tools</h2></div></div>
             <div class="adminPlaceholderGrid">
                 <article class="adminPlaceholder"><h3>Session Takings</h3><p>Import member attendance totals from organiseMyFooty and reconcile £2 session income.</p><p><a class="textLink" href="/admin/sessionTakings.php">Open Session Takings →</a></p></article>
+                <article class="adminPlaceholder"><h3>Member Import</h3><p>Preview and import existing members from the member responses Google Form spreadsheet as Pending records.</p><p><a class="textLink" href="/admin/memberImport.php">Open Member Import →</a></p></article>
                 <article class="adminPlaceholder"><h3>Member Payments</h3><p>Open an active member above to record £5 monthly or £60 annual membership payments and view their payment history.</p></article>
             </div>
         </section>
