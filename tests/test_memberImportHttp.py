@@ -65,12 +65,12 @@ def member(full_name, email, dob_serial, **overrides):
 
 
 ROWS = [
-    member('Alex Example', 'alex@example.test', 20000, **{
+    member('Alex Example', 'Alex@Example.TEST', 20000, **{
         HEADERS[14]: 'Yes', HEADERS[15]: 'Test condition <b>\nSecond line', HEADERS[18]: 'Yes', HEADERS[19]: 'Test inhaler\nIn kit bag',
         'Preferred method of contact': 'Text message',
         'Can we use photographs or videos featuring you on our social media or website?': 'Please ask me first',
     }),
-    member('Sam Van Tester', 'sam@example.test', 21000, **{'Second emergency contact name': 'Second Contact', 'Second emergency contact telephone number': '07000 000002'}),
+    member('Sam Van OHara', 'sam@example.test', 21000, **{'Second emergency contact name': 'Second Contact', 'Second emergency contact telephone number': '07000 000002'}),
     member('Alex Example', 'alex@example.test', 20000),
     member('Robin Missing', 'robin@ example.test', ''),
 ]
@@ -113,12 +113,12 @@ def build_xlsx(rows):
     return buffer.getvalue()
 
 
-def build_csv(rows):
+def build_csv(rows, start_dates=None):
     out = io.StringIO()
     writer = csv.writer(out)
-    writer.writerow(HEADERS)
-    for row in rows:
-        values = list(row)
+    writer.writerow(HEADERS + (['Membership start date'] if start_dates else []))
+    for index, row in enumerate(rows):
+        values = list(row) + ([start_dates[index]] if start_dates else [])
         values[0] = '27/10/2026 12:00:00'
         values[3] = '15/03/1955' if values[3] != '' else ''
         writer.writerow(values)
@@ -182,8 +182,8 @@ class MemberImportHttpTest(unittest.TestCase):
         with self.opener.open(request) as response:
             return html.unescape(response.read().decode())
 
-    def upload(self, content, file_name='Member Responses.xlsx'):
-        return self.post({'csrf': self.csrf(), 'action': 'preview'}, file_name, content)
+    def upload(self, content, file_name='Member Responses.xlsx', default_start=''):
+        return self.post({'csrf': self.csrf(), 'action': 'preview', 'defaultStartDate': default_start}, file_name, content)
 
     def commit(self):
         return self.post({'csrf': self.csrf(), 'action': 'commit'})
@@ -196,8 +196,10 @@ class MemberImportHttpTest(unittest.TestCase):
             return {r['email']: dict(r) for r in db.execute('SELECT * FROM membership_applications')}
 
     def test_xlsx_preview_commit_and_reimport_is_non_destructive(self):
-        page = self.upload(build_xlsx(ROWS))
+        page = self.upload(build_xlsx(ROWS), default_start='2026-11-01')
         self.assertIn('Import 3 New Members', page)
+        self.assertIn('alex@example.test', page)
+        self.assertNotIn('Alex@Example.TEST', page)
         self.assertIn('Repeats spreadsheet row 2.', page)
         self.assertIn('Date of birth is missing; 01/01/1970 will be used until it is amended.', page)
         self.assertNotIn('Test condition', page)
@@ -211,7 +213,8 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertIn('01/01/1970 is a placeholder', members['robin@example.test']['admin_notes'])
         alex, sam = members['alex@example.test'], members['sam@example.test']
         self.assertEqual((alex['first_name'], alex['last_name'], alex['status']), ('Alex', 'Example', 'Pending'))
-        self.assertEqual((sam['first_name'], sam['last_name']), ('Sam Van', 'Tester'))
+        self.assertEqual((sam['first_name'], sam['last_name']), ('Sam Van', "O'Hara"))
+        self.assertEqual((alex['membership_start_date'], alex['membership_expiry_date']), ('2026-11-01', '2027-10-31'))
         self.assertEqual(alex['date_of_birth'], '1954-10-03')
         self.assertEqual(alex['postcode'], 'BT00 1AA')
         self.assertEqual(alex['preferred_contact'], 'text')
@@ -235,10 +238,12 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual(self.members()['alex@example.test']['phone'], 'kept')
 
     def test_csv_download_is_accepted(self):
-        self.upload(build_csv(ROWS[:2]), 'Member Responses - Form Responses 1.csv')
+        self.upload(build_csv(ROWS[:2], ['01/12/2026', '']), 'Member Responses - Form Responses 1.csv', default_start='2026-11-01')
         self.commit()
         members = self.members()
         self.assertEqual(len(members), 2)
+        self.assertEqual(members['alex@example.test']['membership_start_date'], '2026-12-01')
+        self.assertEqual(members['sam@example.test']['membership_start_date'], '2026-11-01')
         self.assertEqual(members['sam@example.test']['date_of_birth'], '1955-03-15')
 
     def test_wrong_template_and_cancel_change_nothing(self):
@@ -259,7 +264,7 @@ class MemberImportHttpTest(unittest.TestCase):
             return response.read()
 
     def test_export_matches_form_layout_and_round_trips(self):
-        self.upload(build_xlsx(ROWS))
+        self.upload(build_xlsx(ROWS), default_start='2026-11-01')
         self.commit()
         with sqlite3.connect(self.db_path) as db:
             db.execute("UPDATE membership_applications SET address = '=HYPERLINK(\"x\")' WHERE email = 'sam@example.test'")
@@ -267,11 +272,13 @@ class MemberImportHttpTest(unittest.TestCase):
             db.execute("INSERT INTO membership_applications (application_uuid, first_name, last_name, date_of_birth, address, postcode, email, phone, preferred_contact, emergency_name, emergency_relationship, emergency_phone, privacy_version, submitted_at, updated_at, status) VALUES ('b'||hex(randomblob(15)), 'Rejected', 'Person', '1950-01-02', 'Addr', 'BT1', 'rejected@example.test', '1', 'email', 'C', 'R', '1', 'v', '2026-10-28T10:00:00+00:00', '2026-10-28T10:00:00+00:00', 'Rejected')")
         content = self.export()
         rows = list(csv.reader(io.StringIO(content.decode('utf-8-sig'))))
-        self.assertEqual(rows[0], HEADERS)
-        by_email = {row[7]: dict(zip(HEADERS, row)) for row in rows[1:]}
+        self.assertEqual(rows[0], HEADERS + ['Membership start date'])
+        by_email = {row[7]: dict(zip(rows[0], row)) for row in rows[1:]}
         self.assertEqual(set(by_email), {'alex@example.test', 'sam@example.test', 'robin@example.test', 'web@example.test'})
         alex = by_email['alex@example.test']
         self.assertEqual(alex['Full name'], 'Alex Example')
+        self.assertEqual(alex['Membership start date'], '01/11/2026')
+        self.assertEqual(by_email['web@example.test']['Membership start date'], '')
         self.assertEqual(alex['Date of birth'], '03/10/1954')
         self.assertEqual(alex['Preferred method of contact'], 'Text message')
         self.assertEqual((alex[HEADERS[14]], alex[HEADERS[15]]), ('Yes', 'Test condition <b>\nSecond line'))
@@ -296,7 +303,7 @@ class MemberImportHttpTest(unittest.TestCase):
         after = self.members()
         compared = ['first_name', 'last_name', 'preferred_name', 'date_of_birth', 'address', 'postcode', 'phone', 'preferred_contact',
                     'emergency_name', 'emergency_relationship', 'emergency_phone', 'second_emergency_name', 'second_emergency_phone',
-                    'health_relevant', 'health_details', 'photo_consent', 'submitted_at']
+                    'health_relevant', 'health_details', 'photo_consent', 'submitted_at', 'membership_start_date', 'membership_expiry_date']
         for email in ('alex@example.test', 'sam@example.test'):
             self.assertEqual({k: after[email][k] for k in compared}, {k: before[email][k] for k in compared}, email)
         self.assertEqual(after['web@example.test']['health_details'], 'Medical condition: Free text from the website form')

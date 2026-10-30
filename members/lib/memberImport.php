@@ -80,6 +80,12 @@ const HWFC_MEMBER_RESPONSES_HEADINGS = [
     'riskConfirmed' => 'I understand that walking football is a physical activity and that I should seek medical advice if I am unsure whether I can participate safely.',
     'privacyAcknowledged' => 'I acknowledge that I have been provided with the club privacy notice.',
     'formEmail' => 'Email Address',
+    'membershipStartDate' => 'Membership start date',
+];
+
+/** Columns the club may add to the form sheet; blank or absent values are allowed. */
+const HWFC_MEMBER_IMPORT_OPTIONAL_COLUMNS = [
+    'membershipStartDate' => 'Membership start date',
 ];
 
 function hwfcMemberImportReadFile(string $path): array
@@ -248,7 +254,7 @@ function hwfcZipRead(string $path, array $wanted): array
  * Maps spreadsheet rows to import candidates. Each candidate carries the database values,
  * a preview summary and its errors. Throws when the header row does not match the template.
  */
-function hwfcMemberImportCandidates(array $rows): array
+function hwfcMemberImportCandidates(array $rows, ?string $defaultStartDate = null): array
 {
     $headerRowNumber = array_key_first($rows);
     if ($headerRowNumber === null) {
@@ -273,6 +279,12 @@ function hwfcMemberImportCandidates(array $rows): array
             $missing[] = $heading;
         }
     }
+    foreach (HWFC_MEMBER_IMPORT_OPTIONAL_COLUMNS as $key => $heading) {
+        $normalised = hwfcMemberImportNormaliseHeading($heading);
+        if (isset($positions[$normalised])) {
+            $columns[$key] = $positions[$normalised];
+        }
+    }
     if ($missing) {
         throw new RuntimeException('The spreadsheet does not match the member responses template. Missing columns: ' . implode('; ', $missing));
     }
@@ -282,11 +294,11 @@ function hwfcMemberImportCandidates(array $rows): array
         if ($rowNumber === $headerRowNumber || implode('', $row) === '') {
             continue;
         }
-        $values = [];
+        $values = array_fill_keys(array_keys(HWFC_MEMBER_IMPORT_OPTIONAL_COLUMNS), '');
         foreach ($columns as $key => $index) {
             $values[$key] = trim((string) ($row[$index] ?? ''));
         }
-        $candidates[] = hwfcMemberImportCandidate((int) $rowNumber, $values);
+        $candidates[] = hwfcMemberImportCandidate((int) $rowNumber, $values, $defaultStartDate);
     }
 
     if (!$candidates) {
@@ -301,9 +313,18 @@ function hwfcMemberImportNormaliseHeading(string $heading): string
     return strtolower(preg_replace('/\s+/u', ' ', trim($heading)) ?? '');
 }
 
-function hwfcMemberImportCandidate(int $rowNumber, array $v): array
+/** Restores the apostrophe Google Form answers often drop from Irish surnames: OHara becomes O'Hara. */
+function hwfcMemberImportName(string $name): string
+{
+    return preg_replace("/(?<![\\p{L}'])O(?=\\p{Lu}\\p{Ll})/u", "O'", $name) ?? $name;
+}
+
+function hwfcMemberImportCandidate(int $rowNumber, array $v, ?string $defaultStartDate = null): array
 {
     $errors = [];
+    foreach (['fullName', 'preferredName', 'emergencyName', 'secondEmergencyName'] as $nameKey) {
+        $v[$nameKey] = hwfcMemberImportName($v[$nameKey]);
+    }
 
     $nameParts = preg_split('/\s+/u', $v['fullName'], -1, PREG_SPLIT_NO_EMPTY) ?: [];
     $lastName = count($nameParts) >= 2 ? (string) array_pop($nameParts) : '';
@@ -330,7 +351,21 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
     }
 
     // Email addresses cannot contain whitespace; form responses sometimes include a stray space.
-    $v['email'] = preg_replace('/\s+/u', '', $v['email']) ?? $v['email'];
+    $v['email'] = strtolower(preg_replace('/\s+/u', '', $v['email']) ?? $v['email']);
+
+    $startDate = null;
+    $expiryDate = null;
+    if ($v['membershipStartDate'] !== '') {
+        $startDate = hwfcMemberImportDate($v['membershipStartDate'], true);
+        if ($startDate === null) {
+            $errors[] = 'Membership start date is invalid.';
+        }
+    } elseif ($defaultStartDate !== null) {
+        $startDate = $defaultStartDate;
+    }
+    if ($startDate !== null) {
+        $expiryDate = (new DateTimeImmutable($startDate))->modify('+1 year -1 day')->format('Y-m-d');
+    }
 
     $required = [
         'address' => 'Home address',
@@ -393,6 +428,7 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
             'dateOfBirth' => $dateOfBirth ?? $v['dateOfBirth'],
             'membershipType' => $v['membershipType'],
             'healthInformation' => $healthLines !== [],
+            'membershipStartDate' => $startDate,
         ],
         'record' => [
             'first_name' => $firstName,
@@ -401,7 +437,7 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
             'date_of_birth' => $dateOfBirth,
             'address' => $v['address'],
             'postcode' => strtoupper($v['postcode']),
-            'email' => strtolower($v['email']),
+            'email' => $v['email'],
             'phone' => $v['phone'],
             'preferred_contact' => $preferredContact,
             'emergency_name' => $v['emergencyName'],
@@ -413,6 +449,8 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
             'health_details' => $healthLines ? implode("\n", $healthLines) : null,
             'photo_consent' => strtolower($v['photoConsent']) === 'yes' ? 1 : 0,
             'admin_notes' => implode("\n", $notes),
+            'membership_start_date' => $startDate,
+            'membership_expiry_date' => $expiryDate,
             'submitted_at' => $submittedAt,
         ],
         'privacyAcknowledged' => strtolower($v['privacyAcknowledged']) === 'i confirm',
@@ -437,7 +475,7 @@ function hwfcMemberImportHealthLine(string $label, string $answer, string $detai
 }
 
 /** Converts a spreadsheet date (Excel serial or d/m/Y text) to Y-m-d, rejecting future dates. */
-function hwfcMemberImportDate(string $value): ?string
+function hwfcMemberImportDate(string $value, bool $allowFuture = false): ?string
 {
     if ($value === '') {
         return null;
@@ -455,7 +493,7 @@ function hwfcMemberImportDate(string $value): ?string
             $date = false;
         }
     }
-    if ($date === false || $date > new DateTimeImmutable('today') || (int) $date->format('Y') < 1900) {
+    if ($date === false || (!$allowFuture && $date > new DateTimeImmutable('today')) || (int) $date->format('Y') < 1900) {
         return null;
     }
     return $date->format('Y-m-d');
@@ -542,14 +580,16 @@ INSERT INTO membership_applications (
     emergency_name, emergency_relationship, emergency_phone,
     second_emergency_name, second_emergency_phone,
     health_relevant, health_details, photo_consent,
-    privacy_version, admin_notes, submitted_at, updated_at, status
+    privacy_version, admin_notes, membership_start_date, membership_expiry_date,
+    submitted_at, updated_at, status
 ) VALUES (
     :uuid, :first_name, :last_name, :preferred_name, :date_of_birth,
     :address, :postcode, :email, :phone, :preferred_contact,
     :emergency_name, :emergency_relationship, :emergency_phone,
     :second_emergency_name, :second_emergency_phone,
     :health_relevant, :health_details, :photo_consent,
-    :privacy_version, :admin_notes, :submitted_at, :updated_at, 'Pending'
+    :privacy_version, :admin_notes, :membership_start_date, :membership_expiry_date,
+    :submitted_at, :updated_at, 'Pending'
 )
 SQL);
 
@@ -599,7 +639,7 @@ function hwfcMemberExportRows(PDO $db): array
 SELECT first_name, last_name, preferred_name, date_of_birth, address, postcode, email, phone,
        preferred_contact, emergency_name, emergency_relationship, emergency_phone,
        second_emergency_name, second_emergency_phone, health_relevant, health_details,
-       photo_consent, admin_notes, submitted_at
+       photo_consent, admin_notes, membership_start_date, submitted_at
 FROM membership_applications
 WHERE status <> 'Rejected'
 ORDER BY submitted_at, id
@@ -637,6 +677,8 @@ SQL)->fetchAll();
         $values['whatsApp'] = hwfcMemberExportNote($notes, 'Club WhatsApp group');
         $values['helping'] = hwfcMemberExportNote($notes, 'Helping with club activities');
         $photoAnswer = hwfcMemberExportNote($notes, 'Photographs or videos answer');
+        $start = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $member['membership_start_date']);
+        $values['membershipStartDate'] = $start === false ? '' : $start->format('d/m/Y');
         $values['photoConsent'] = (int) $member['photo_consent'] === 1 ? 'Yes' : ($photoAnswer !== '' && strtolower($photoAnswer) !== 'yes' ? $photoAnswer : 'No');
 
         $rows[] = array_map('hwfcMemberExportCell', array_values($values));

@@ -50,7 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('Upload the spreadsheet as an Excel (.xlsx) or CSV (.csv) file.');
             }
 
-            $candidates = hwfcMemberImportCandidates(hwfcMemberImportReadFile((string) $upload['tmp_name']));
+            $defaultStartDate = trim((string) ($_POST['defaultStartDate'] ?? ''));
+            if ($defaultStartDate !== '') {
+                $date = DateTimeImmutable::createFromFormat('!Y-m-d', $defaultStartDate);
+                if ($date === false || $date->format('Y-m-d') !== $defaultStartDate) {
+                    throw new RuntimeException('Enter a valid default membership start date.');
+                }
+            }
+
+            $candidates = hwfcMemberImportCandidates(hwfcMemberImportReadFile((string) $upload['tmp_name']), $defaultStartDate !== '' ? $defaultStartDate : null);
             $_SESSION['memberImport'] = [
                 'fileName' => $fileName,
                 'candidates' => hwfcMemberImportMarkDuplicates($db, $candidates),
@@ -130,6 +138,10 @@ $counts = array_merge(['New' => 0, 'Duplicate' => 0, 'Invalid' => 0], array_coun
             <label>Member Responses Spreadsheet
                 <input type="file" name="memberSpreadsheet" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" required>
             </label>
+            <label>Default Membership Start Date <span class="adminHelp">(optional)</span>
+                <input type="date" name="defaultStartDate">
+            </label>
+            <p class="adminHelp">Used for rows without a “Membership start date” column value. Expiry is set to one year less a day after the start date.</p>
             <p class="adminHelp">Use “Hillsborough Walking Football Club – Member Responses” downloaded from Google Sheets as Microsoft Excel (.xlsx) or as CSV for the Form Responses sheet. The column headings must match the form.</p>
             <button class="button buttonPrimary" type="submit">Preview Import</button>
         </form>
@@ -141,6 +153,8 @@ $counts = array_merge(['New' => 0, 'Duplicate' => 0, 'Invalid' => 0], array_coun
             <li>New members are added as <strong>Pending</strong>. Accept each one from their member record to allocate a Membership ID.</li>
             <li>Rows matching an existing member by name and date of birth or email address are skipped. Existing records are never changed.</li>
             <li>Rows with missing or invalid required details are skipped. Correct them in the spreadsheet and import again.</li>
+            <li>Add a “Membership start date” column to the sheet to give members individual start dates, or set a default above.</li>
+            <li>Names written like “OHara” are imported as “O'Hara”, and email addresses are saved in lowercase.</li>
             <li>A missing date of birth is imported as 01/01/1970 and noted on the member's record so it can be amended.</li>
             <li>Health, allergy, medication and support answers are combined into the member's health information.</li>
             <li>Membership type, club news, WhatsApp and volunteering answers are added to the member's Notes.</li>
@@ -176,13 +190,14 @@ $counts = array_merge(['New' => 0, 'Duplicate' => 0, 'Invalid' => 0], array_coun
 
     <section class="adminPanel">
         <div class="adminPanelHeader"><h2>Import Preview</h2><p>Health details are not shown here; they are visible on each member record after import.</p></div>
-        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Row</th><th>Name</th><th>Email</th><th>Date Of Birth</th><th>Membership Type</th><th>Health Info</th><th>Result</th></tr></thead><tbody>
+        <div class="adminTableWrap"><table class="adminTable"><thead><tr><th>Row</th><th>Name</th><th>Email</th><th>Date Of Birth</th><th>Start Date</th><th>Membership Type</th><th>Health Info</th><th>Result</th></tr></thead><tbody>
         <?php foreach ($candidates as $candidate): ?>
             <tr>
                 <td><?= (int) $candidate['rowNumber'] ?></td>
                 <td><?= importEsc($candidate['summary']['name']) ?></td>
                 <td><?= importEsc($candidate['summary']['email']) ?></td>
                 <td><?= importEsc(importDisplayDate((string) $candidate['summary']['dateOfBirth'])) ?></td>
+                <td><?= importEsc($candidate['summary']['membershipStartDate'] ? importDisplayDate((string) $candidate['summary']['membershipStartDate']) : '—') ?></td>
                 <td><?= importEsc($candidate['summary']['membershipType'] ?: '—') ?></td>
                 <td><?= $candidate['summary']['healthInformation'] ? 'Yes' : 'No' ?></td>
                 <td>
@@ -200,7 +215,7 @@ $counts = array_merge(['New' => 0, 'Duplicate' => 0, 'Invalid' => 0], array_coun
         <form method="post" action="/admin/memberImport.php" class="adminMembershipForm">
             <input type="hidden" name="csrf" value="<?= importEsc($_SESSION['admin_csrf']) ?>">
             <input type="hidden" name="action" value="export">
-            <p class="adminHelp">Downloads every Pending, Active and Lapsed member as a CSV file with the same columns as the member responses Google Form, so it can be worked on offline or imported again. Rejected applications are not included. The confirmation columns are left blank because the website does not record those answers separately.</p>
+            <p class="adminHelp">Downloads every Pending, Active and Lapsed member as a CSV file with the same columns as the member responses Google Form plus Membership start date, so it can be worked on offline or imported again. Rejected applications are not included. The confirmation columns are left blank because the website does not record those answers separately.</p>
             <p class="adminHelp">The file contains health and emergency-contact details. Keep it on a club device only and delete it when you have finished. Importing it again adds only members that are not already in the register; it does not update existing members.</p>
             <button class="button buttonSecondary" type="submit">Export CSV</button>
         </form>

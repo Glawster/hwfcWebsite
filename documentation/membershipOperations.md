@@ -134,6 +134,9 @@ Imported members remain `Pending`. Accept each one from their member record to a
 Mapping from the form:
 
 - "Full name" is split at the last space: the final word becomes the last name. Check multi-word surnames after import and correct them if needed.
+- Names written with a capital after a leading O, such as `OHara` or `ONeill`, are imported as `O'Hara` and `O'Neill`. This applies to member and emergency-contact names. Other spellings, such as `Ohara`, are left unchanged.
+- Email addresses are saved in lowercase with any spaces removed.
+- An optional "Membership start date" column (`dd/mm/yyyy`) sets each member's start date; the club adds it to the sheet. Rows without one use the optional default start date on the upload form. Membership expiry is set to one year less a day after the start date, matching Date Details. Accepting the member keeps these dates; payment plan and status are still set on the member record.
 - Medical, allergy, emergency-medication, mobility and other support answers are combined into the member's health information. "No", "None" and "N/A" style answers are ignored.
 - Photography/publicity consent is recorded only for "Yes"; "Please ask me first" is stored as no consent, and the original answer is kept in Notes.
 - Membership type, club news, WhatsApp group and volunteering answers are added to Notes because the member record has no fields for them yet.
@@ -142,7 +145,7 @@ Mapping from the form:
 
 ### Member export
 
-Export CSV on the same page downloads every `Pending`, `Active` and `Lapsed` member in the same column layout as the Google Form, so the file can be worked on offline and read by the import. Rejected applications are excluded.
+Export CSV on the same page downloads every `Pending`, `Active` and `Lapsed` member in the same column layout as the Google Form, plus a final "Membership start date" column, so the file can be worked on offline and read by the import. Rejected applications are excluded.
 
 - Health information is split back into the form's questions using the labels the import created. Health text from the website application form has no labels, so it is placed under the medical-condition question.
 - Membership type, club news, WhatsApp, volunteering and the original photo answer are read back from the import lines in Notes. They are blank for members who did not come from the Google Form.
