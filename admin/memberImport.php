@@ -141,6 +141,7 @@ $counts = array_merge(['New' => 0, 'Duplicate' => 0, 'Invalid' => 0], array_coun
             <li>New members are added as <strong>Pending</strong>. Accept each one from their member record to allocate a Membership ID.</li>
             <li>Rows matching an existing member by name and date of birth or email address are skipped. Existing records are never changed.</li>
             <li>Rows with missing or invalid required details are skipped. Correct them in the spreadsheet and import again.</li>
+            <li>A missing date of birth is imported as 01/01/1970 and noted on the member's record so it can be amended.</li>
             <li>Health, allergy, medication and support answers are combined into the member's health information.</li>
             <li>Membership type, club news, WhatsApp and volunteering answers are added to the member's Notes.</li>
             <li>Photo consent is recorded only for a plain “Yes”; “Please ask me first” is recorded as no consent.</li>

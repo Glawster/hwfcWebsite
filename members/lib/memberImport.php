@@ -13,6 +13,7 @@ require_once __DIR__ . '/memberDb.php';
 
 const HWFC_MEMBER_IMPORT_SOURCE = 'Member Responses Google Form';
 const HWFC_MEMBER_IMPORT_MAX_BYTES = 2 * 1024 * 1024;
+const HWFC_MEMBER_IMPORT_PLACEHOLDER_DOB = '1970-01-01';
 
 const HWFC_MEMBER_IMPORT_COLUMNS = [
     'timestamp' => 'Timestamp',
@@ -316,9 +317,14 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
         $errors[] = 'Timestamp is missing or invalid.';
     }
 
-    $dateOfBirth = hwfcMemberImportDate($v['dateOfBirth']);
-    if ($dateOfBirth === null) {
-        $errors[] = $v['dateOfBirth'] === '' ? 'Date of birth is missing.' : 'Date of birth is invalid.';
+    // A missing date of birth is imported as a placeholder for the club to amend on the member record.
+    $warnings = [];
+    $dateOfBirthMissing = $v['dateOfBirth'] === '';
+    $dateOfBirth = $dateOfBirthMissing ? HWFC_MEMBER_IMPORT_PLACEHOLDER_DOB : hwfcMemberImportDate($v['dateOfBirth']);
+    if ($dateOfBirthMissing) {
+        $warnings[] = 'Date of birth is missing; 01/01/1970 will be used until it is amended.';
+    } elseif ($dateOfBirth === null) {
+        $errors[] = 'Date of birth is invalid.';
     } elseif ($dateOfBirth > (new DateTimeImmutable('today'))->modify('-16 years')->format('Y-m-d')) {
         $errors[] = 'Date of birth looks wrong (the member would be under 16).';
     }
@@ -369,6 +375,7 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
 
     $notes = array_filter([
         'Imported from the ' . HWFC_MEMBER_IMPORT_SOURCE . ' (spreadsheet row ' . $rowNumber . ').',
+        $dateOfBirthMissing ? 'Date of birth was missing from the form; 01/01/1970 is a placeholder and must be amended.' : null,
         $v['membershipType'] !== '' ? 'Membership type: ' . $v['membershipType'] : null,
         $v['clubNews'] !== '' ? 'Club news and updates: ' . $v['clubNews'] : null,
         $v['whatsApp'] !== '' ? 'Club WhatsApp group: ' . $v['whatsApp'] : null,
@@ -379,7 +386,7 @@ function hwfcMemberImportCandidate(int $rowNumber, array $v): array
     return [
         'rowNumber' => $rowNumber,
         'result' => $errors ? 'Invalid' : 'New',
-        'messages' => $errors,
+        'messages' => $errors ?: $warnings,
         'summary' => [
             'name' => trim($firstName . ' ' . $lastName) ?: $v['fullName'],
             'email' => $v['email'],

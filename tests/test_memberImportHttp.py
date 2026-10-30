@@ -197,16 +197,18 @@ class MemberImportHttpTest(unittest.TestCase):
 
     def test_xlsx_preview_commit_and_reimport_is_non_destructive(self):
         page = self.upload(build_xlsx(ROWS))
-        self.assertIn('Import 2 New Members', page)
+        self.assertIn('Import 3 New Members', page)
         self.assertIn('Repeats spreadsheet row 2.', page)
-        self.assertIn('Date of birth is missing.', page)
+        self.assertIn('Date of birth is missing; 01/01/1970 will be used until it is amended.', page)
         self.assertNotIn('Test condition', page)
         self.assertEqual(self.members(), {})
 
         page = self.commit()
-        self.assertIn('2 member records imported as Pending. 2 duplicate or invalid rows were skipped.', page)
+        self.assertIn('3 member records imported as Pending. 1 duplicate or invalid row was skipped.', page)
         members = self.members()
-        self.assertEqual(set(members), {'alex@example.test', 'sam@example.test'})
+        self.assertEqual(set(members), {'alex@example.test', 'sam@example.test', 'robin@example.test'})
+        self.assertEqual(members['robin@example.test']['date_of_birth'], '1970-01-01')
+        self.assertIn('01/01/1970 is a placeholder', members['robin@example.test']['admin_notes'])
         alex, sam = members['alex@example.test'], members['sam@example.test']
         self.assertEqual((alex['first_name'], alex['last_name'], alex['status']), ('Alex', 'Example', 'Pending'))
         self.assertEqual((sam['first_name'], sam['last_name']), ('Sam Van', 'Tester'))
@@ -223,7 +225,7 @@ class MemberImportHttpTest(unittest.TestCase):
         self.assertEqual(sam['second_emergency_name'], 'Second Contact')
         self.assertIsNone(alex['membership_id'])
         with sqlite3.connect(self.db_path) as db:
-            self.assertEqual(db.execute("SELECT count(*) FROM membership_audit WHERE event_type = 'member_imported'").fetchone()[0], 2)
+            self.assertEqual(db.execute("SELECT count(*) FROM membership_audit WHERE event_type = 'member_imported'").fetchone()[0], 3)
 
         with sqlite3.connect(self.db_path) as db:
             db.execute("UPDATE membership_applications SET phone = 'kept' WHERE email = 'alex@example.test'")
@@ -267,7 +269,7 @@ class MemberImportHttpTest(unittest.TestCase):
         rows = list(csv.reader(io.StringIO(content.decode('utf-8-sig'))))
         self.assertEqual(rows[0], HEADERS)
         by_email = {row[7]: dict(zip(HEADERS, row)) for row in rows[1:]}
-        self.assertEqual(set(by_email), {'alex@example.test', 'sam@example.test', 'web@example.test'})
+        self.assertEqual(set(by_email), {'alex@example.test', 'sam@example.test', 'robin@example.test', 'web@example.test'})
         alex = by_email['alex@example.test']
         self.assertEqual(alex['Full name'], 'Alex Example')
         self.assertEqual(alex['Date of birth'], '03/10/1954')

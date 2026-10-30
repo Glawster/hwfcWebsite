@@ -123,9 +123,11 @@ Uploading shows a preview and saves nothing. Each row is marked:
 | --- | --- |
 | New | Saved as a `Pending` application when the import is confirmed. |
 | Duplicate | Matches an existing member, or an earlier row, by first and last name plus date of birth or email address. Skipped; the existing record is never changed. |
-| Invalid | Missing or invalid required details, such as an absent date of birth or one that makes the member under 16. Skipped; correct the spreadsheet and import again. |
+| Invalid | Missing or invalid required details, such as an invalid date of birth or one that makes the member under 16. Skipped; correct the spreadsheet and import again. |
 
 Duplicates are checked again when the import is confirmed. Each imported record gets a `member_imported` audit event with the file name and spreadsheet row. Re-importing the same spreadsheet is safe: rows already imported appear as duplicates.
+
+A missing date of birth does not block the import: the member is saved with `01/01/1970` as a placeholder, the preview shows a warning, and Notes records that the date must be amended. Correct it on the member record once known.
 
 Imported members remain `Pending`. Accept each one from their member record to allocate a Membership ID.
 
