@@ -16,3 +16,8 @@
 @media (max-width: 850px) {
     .siteFooter::after { text-align: left; }
 }
+
+/* Pitchside rules guide */
+.quickRules { padding-left: 1.6rem; }
+.quickRules li { padding: .7rem 0 .7rem .3rem; border-bottom: 1px solid #ddd; }
+.quickRules li::marker { font-weight: bold; }
