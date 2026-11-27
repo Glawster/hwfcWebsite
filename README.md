@@ -7,6 +7,7 @@ The site is intended to be the authoritative source of permanent club informatio
 ## Phase 1 Structure
 
 - `/` — Home
+- `/rules/` — Quick pitchside rules guide
 - `/play/` — Walking football information, sessions, costs and first-visit guidance
 - `/mens/` — Men's walking football
 - `/ladies/` — Ladies' walking football
